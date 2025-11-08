@@ -218,24 +218,35 @@ public function sendInvoice(string $packageId, string $invoiceNumber, string $in
 
 ---
 
-## Phase 7: Claims (Returns) Management
+## Phase 7: Claims Management ✅
 **Goal:** Handle product returns and refunds
 
-**Database Tables:**
-- [ ] `marketplace_claims` - Return/claim header
-- [ ] `marketplace_claim_items` - Returned items
+**Completed:** November 8, 2025
 
-**Tasks:**
-- [ ] Create `MarketplaceClaim` and `MarketplaceClaimItem` models
-- [ ] Implement claim fetch from marketplace
-- [ ] Add claim approval functionality
-- [ ] Add claim rejection with reasons
-- [ ] Create claim management endpoints
+**Database Tables:**
+- ✅ `marketplace_claims` - Return/claim header (39 columns)
+- ✅ `marketplace_claim_items` - Returned items (24 columns)
+
+**Models:**
+- ✅ `MarketplaceClaim` - with 4 relationships (user, marketplace, order, items)
+- ✅ `MarketplaceClaimItem` - with 4 relationships (claim, product, marketplaceProduct, orderItem)
+
+**API Endpoints:**
+```
+GET    /api/v1/marketplace-claims               # List claims with filters
+GET    /api/v1/marketplace-claims/{id}          # Get claim details
+POST   /api/v1/marketplace-claims/fetch         # Fetch from marketplace
+POST   /api/v1/marketplace-claims/{id}/approve  # Approve claim
+POST   /api/v1/marketplace-claims/{id}/reject   # Reject claim
+```
 
 **Deliverables:**
 - ✅ Claim fetch working
 - ✅ Approve/reject claims
 - ✅ Claim management API endpoints
+- ✅ Product-claim item auto-linking
+- ✅ Order-claim linking
+- ✅ 7 log points (Turkish)
 
 ---
 

@@ -338,24 +338,50 @@ POST   /api/v1/marketplace-orders/{id}/invoice  # Send invoice
 
 ---
 
-## Phase 7: Claims (Returns) Management
+## Phase 7: Claims (Returns) Management ✅
 **Goal:** Handle product returns and refunds
 
 **Database Tables:**
-- [ ] `marketplace_claims` - Return/claim header
-- [ ] `marketplace_claim_items` - Returned items
+- [x] `marketplace_claims` - Return/claim header
+- [x] `marketplace_claim_items` - Returned items
 
 **Tasks:**
-- [ ] Create `MarketplaceClaim` and `MarketplaceClaimItem` models
-- [ ] Implement claim fetch from marketplace
-- [ ] Add claim approval functionality
-- [ ] Add claim rejection with reasons
-- [ ] Create claim management endpoints
+- [x] Create `MarketplaceClaim` and `MarketplaceClaimItem` models
+- [x] Implement claim fetch from marketplace
+- [x] Add claim approval functionality
+- [x] Add claim rejection with reasons
+- [x] Create claim management endpoints
+
+**Service Methods:**
+```php
+public function getClaims(array $filters = []): array;
+public function getClaimItems(string $claimId): array;
+public function approveClaim(string $claimId): array;
+public function rejectClaim(string $claimId, string $reason): array;
+```
+
+**API Endpoints (5 total):**
+```
+GET    /api/v1/marketplace-claims               # List claims with filters
+GET    /api/v1/marketplace-claims/{id}          # Get claim details
+POST   /api/v1/marketplace-claims/fetch         # Fetch from marketplace
+POST   /api/v1/marketplace-claims/{id}/approve  # Approve claim
+POST   /api/v1/marketplace-claims/{id}/reject   # Reject claim
+```
 
 **Deliverables:**
-- ✅ Claim fetch working
-- ✅ Approve/reject claims
-- ✅ Claim management API endpoints
+- ✅ 2 database tables (marketplace_claims, marketplace_claim_items)
+- ✅ 2 models with relationships (MarketplaceClaim, MarketplaceClaimItem)
+- ✅ MarketplaceClaimController with 5 endpoints
+- ✅ Claim fetch from marketplace API
+- ✅ Claim approval functionality
+- ✅ Claim rejection with reasons
+- ✅ Product-claim item linking (auto-match by barcode)
+- ✅ Order-claim linking
+- ✅ Comprehensive logging (7 log points)
+- ✅ Translation support (TR/EN)
+
+**Phase 7 Completion Date:** November 8, 2025
 
 ---
 

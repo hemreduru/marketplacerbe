@@ -272,6 +272,14 @@ class TrendyolService extends BaseMarketplaceService
             'size' => $filters['size'] ?? 50,
         ];
 
+        if (isset($filters['startDate'])) {
+            $params['startDate'] = $filters['startDate'];
+        }
+
+        if (isset($filters['endDate'])) {
+            $params['endDate'] = $filters['endDate'];
+        }
+
         if (isset($filters['status'])) {
             $params['status'] = $filters['status'];
         }
@@ -412,5 +420,18 @@ class TrendyolService extends BaseMarketplaceService
         }
 
         return $formatted;
+    }
+
+    /**
+     * Get claim items for a specific claim.
+     *
+     * @param string $claimId
+     * @return array
+     */
+    public function getClaimItems(string $claimId): array
+    {
+        $supplierId = $this->credential->api_key;
+        $endpoint = $this->buildEndpoint('claims', ['supplierId' => $supplierId]) . "/{$claimId}/items";
+        return $this->makeRequest('GET', $endpoint);
     }
 }

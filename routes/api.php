@@ -90,4 +90,13 @@ Route::prefix('v1')->group(function () {
         Route::put('/{id}/tracking', [App\Http\Controllers\Api\V1\MarketplaceOrderController::class, 'updateTracking']);
         Route::post('/{id}/invoice', [App\Http\Controllers\Api\V1\MarketplaceOrderController::class, 'sendInvoice']);
     });
+
+    // Marketplace Claim (Returns) Management
+    Route::prefix('marketplace-claims')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\V1\MarketplaceClaimController::class, 'index']);
+        Route::get('/{id}', [App\Http\Controllers\Api\V1\MarketplaceClaimController::class, 'show']);
+        Route::post('/fetch', [App\Http\Controllers\Api\V1\MarketplaceClaimController::class, 'fetch']);
+        Route::post('/{id}/approve', [App\Http\Controllers\Api\V1\MarketplaceClaimController::class, 'approve']);
+        Route::post('/{id}/reject', [App\Http\Controllers\Api\V1\MarketplaceClaimController::class, 'reject']);
+    });
 });
