@@ -61,4 +61,12 @@ class Marketplace extends Model
     {
         return $this->hasMany(MarketplaceSyncLog::class);
     }
+
+    /**
+     * Get the orders for this marketplace.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(MarketplaceOrder::class);
+    }
 }

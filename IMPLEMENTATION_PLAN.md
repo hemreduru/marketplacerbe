@@ -289,20 +289,20 @@ php artisan queue:work --queue=sync,default --tries=3
 
 ---
 
-## Phase 6: Order Management System
+## Phase 6: Order Management System ✅
 **Goal:** Implement marketplace order tracking and management
 
 **Database Tables:**
-- [ ] `marketplace_orders` - Order header information
-- [ ] `marketplace_order_items` - Order line items
+- [x] `marketplace_orders` - Order header information
+- [x] `marketplace_order_items` - Order line items
 
 **Tasks:**
-- [ ] Create `MarketplaceOrder` and `MarketplaceOrderItem` models
-- [ ] Implement order fetch from marketplace
-- [ ] Create order status update functionality
-- [ ] Add tracking number update
-- [ ] Implement invoice link submission
-- [ ] Create order management endpoints
+- [x] Create `MarketplaceOrder` and `MarketplaceOrderItem` models
+- [x] Implement order fetch from marketplace
+- [x] Create order status update functionality
+- [x] Add tracking number update
+- [x] Implement invoice link submission
+- [x] Create order management endpoints
 
 **Service Methods:**
 ```php
@@ -312,11 +312,29 @@ public function updateTrackingNumber(string $packageId, string $trackingNumber):
 public function sendInvoice(string $packageId, string $invoiceNumber, string $invoiceLink): array;
 ```
 
+**API Endpoints (6 total):**
+```
+GET    /api/v1/marketplace-orders               # List orders with filters
+GET    /api/v1/marketplace-orders/{id}          # Get order details
+POST   /api/v1/marketplace-orders/fetch         # Fetch from marketplace
+PUT    /api/v1/marketplace-orders/{id}/status   # Update order status
+PUT    /api/v1/marketplace-orders/{id}/tracking # Update tracking number
+POST   /api/v1/marketplace-orders/{id}/invoice  # Send invoice
+```
+
 **Deliverables:**
-- ✅ Order fetch working
+- ✅ 2 database tables (marketplace_orders, marketplace_order_items)
+- ✅ 2 models with relationships (MarketplaceOrder, MarketplaceOrderItem)
+- ✅ MarketplaceOrderController with 6 endpoints
+- ✅ Order fetch from marketplace API
 - ✅ Order status updates
-- ✅ Order management API endpoints
-- ✅ Order-product relationship tracking
+- ✅ Tracking number updates
+- ✅ Invoice submission
+- ✅ Product-order item linking (auto-match by barcode)
+- ✅ Comprehensive logging (8 log points)
+- ✅ Translation support (TR/EN)
+
+**Phase 6 Completion Date:** November 8, 2025
 
 ---
 
@@ -388,39 +406,273 @@ php artisan marketplace:sync-brands {marketplace}
 
 ---
 
-## Phase 10: Queue & Scheduler
-**Goal:** Automate marketplace synchronization
+## Phase 10: Financial Reports & CHE (Cari Hesap Ekstresi) API
+**Goal:** Implement Trendyol CHE (Current Account Statement) API for financial tracking and profit calculation
 
-**Tasks:**
-- [ ] Create `FetchMarketplaceOrdersJob`
-- [ ] Create `FetchMarketplaceClaimsJob`
-- [ ] Create `FetchMarketplaceQuestionsJob`
-- [ ] Create `SyncMarketplaceStockJob`
-- [ ] Configure queue worker
-- [ ] Setup scheduler for automated syncs
-- [ ] Implement retry logic
-- [ ] Add failure notifications
+**Background:**
+Trendyol CHE (Cari Hesap Ekstresi) API provides detailed financial transaction data including sales, commissions, deductions, and revenue calculations. This is critical for accurate profit/loss tracking and financial reporting.
+
+**Database Tables:**
+- [ ] `marketplace_settlements` - Sales transactions (CHE settlements endpoint)
+- [ ] `marketplace_other_financials` - Deductions, invoices, penalties (CHE otherfinancials endpoint)
+- [ ] `marketplace_cargo_invoices` - Cargo invoice headers
+- [ ] `marketplace_cargo_invoice_items` - Cargo invoice line items per order
+
+**CHE API Endpoints (Trendyol):**
+```
+1. /integration/finance/che/sellers/{sellerId}/settlements
+   - Transaction types: Sale, Return, Discount, DiscountCancel, Coupon, CouponCancel,
+     ProvisionPositive, ProvisionNegative, ManualRefund, ManualRefundCancel,
+     TYDiscount, TYDiscountCancel, TYCoupon, TYCouponCancel,
+     SellerRevenuePositive, SellerRevenueNegative, CommissionPositive, CommissionNegative
+
+2. /integration/finance/che/sellers/{sellerId}/otherfinancials
+   - Transaction types: DeductionInvoices, FBA, WarehouseService, etc.
+   - Includes: Platform service fees, penalties, international operations
+
+3. /integration/finance/che/sellers/{sellerId}/cargo-invoice/{invoiceId}/items
+   - Detailed cargo costs per order
+```
+
+**Data Models:**
+
+### MarketplaceSettlement
+```php
+- id, user_id, marketplace_id, marketplace_order_id
+- transaction_type (Sale, Return, Discount, etc.)
+- transaction_date, payment_date
+- order_number, package_id, barcode
+- credit (alacak), debt (borç)
+- commission_amount, seller_revenue
+- store_id, payment_order_id
+- marketplace_data (full JSON)
+```
+
+### MarketplaceOtherFinancial
+```php
+- id, user_id, marketplace_id
+- transaction_type (DeductionInvoices, FBA, etc.)
+- transaction_date, receipt_date
+- order_number (nullable)
+- description (Platform Hizmet Bedeli, Ceza, etc.)
+- credit, debt
+- invoice_serial_number
+- marketplace_data
+```
+
+### MarketplaceCargoInvoice
+```php
+- id, user_id, marketplace_id
+- invoice_serial_number (unique)
+- invoice_date
+- total_amount
+- status
+- marketplace_data
+```
+
+### MarketplaceCargoInvoiceItem
+```php
+- id, cargo_invoice_id
+- order_number
+- amount
+- description
+- marketplace_data
+```
+
+**Service Layer Extensions:**
+
+### MarketplaceServiceInterface (add methods)
+```php
+// CHE Settlements
+public function getSettlements(array $filters = []): array;
+
+// CHE Other Financials
+public function getOtherFinancials(array $filters = []): array;
+
+// Cargo Invoice Items
+public function getCargoInvoiceItems(string $invoiceId): array;
+```
+
+### TrendyolService Implementation
+```php
+public function getSettlements(array $filters = []): array
+{
+    $endpoint = "integration/finance/che/sellers/{$sellerId}/settlements";
+    // Filters: startDate, endDate, transactionType, page, size
+    // Date format: Unix timestamp in milliseconds
+    // Max range: 15 days (requires chunking for larger ranges)
+}
+
+public function getOtherFinancials(array $filters = []): array
+{
+    $endpoint = "integration/finance/che/sellers/{$sellerId}/otherfinancials";
+    // Similar filtering as settlements
+}
+
+public function getCargoInvoiceItems(string $invoiceId): array
+{
+    $endpoint = "integration/finance/che/sellers/{$sellerId}/cargo-invoice/{$invoiceId}/items";
+    // Returns cargo cost breakdown per order
+}
+```
+
+**Controller Layer:**
+
+### MarketplaceFinancialController
+```php
+// Endpoints:
+GET    /api/v1/marketplace-financials/settlements              # List settlements
+POST   /api/v1/marketplace-financials/settlements/fetch       # Fetch from API
+GET    /api/v1/marketplace-financials/other-financials        # List deductions
+POST   /api/v1/marketplace-financials/other-financials/fetch  # Fetch from API
+GET    /api/v1/marketplace-financials/cargo-invoices          # List cargo invoices
+POST   /api/v1/marketplace-financials/cargo-invoices/fetch    # Fetch from API
+GET    /api/v1/marketplace-financials/summary                 # Financial summary
+```
+
+**Key Features:**
+
+1. **15-Day Chunking Logic**
+   - CHE API has 15-day max range limit
+   - Implement automatic chunking for date ranges > 15 days
+   - Combine results from multiple API calls
+
+2. **Transaction Classification**
+   ```php
+   // Classify deductions by description:
+   - Platform service fees (Platform Hizmet Bedeli, PHB, P.H.B)
+   - International operations (Yurtdışı Operasyon, YD Operasyon)
+   - International service (Uluslararası Hizmet)
+   - Penalties (Ceza)
+   - Other deductions
+   ```
+
+3. **Cargo Cost Mapping**
+   - Extract "Kargo Faturası" from otherfinancials
+   - Fetch detailed items via cargo-invoice endpoint
+   - Map cargo costs to orders (orderNumber => total shipping cost)
+
+4. **Financial Dashboard Data**
+   ```php
+   // Summary calculations:
+   - Gross sales (total credit from settlements)
+   - Total commission
+   - Platform service fees
+   - Cargo costs
+   - International operation fees
+   - Penalties & other deductions
+   - Net profit (gross - all deductions)
+   ```
+
+5. **Date Range Reports**
+   - Today / Yesterday / This Month / Last Month
+   - Custom date ranges (with 15-day chunking)
+   - Order-level profit breakdown
+
+**Helper Functions:**
+```php
+// Date conversion (PHP timestamp to Trendyol milliseconds)
+function dateToMs(string $date): int {
+    return strtotime($date) * 1000;
+}
+
+// Milliseconds to datetime
+function msToDatetime(int $ms): string {
+    return date('Y-m-d H:i:s', (int)($ms / 1000));
+}
+
+// Classify deduction by description
+function classifyDeduction(string $description): string {
+    // Return: 'platform', 'intl_ops', 'intl_service', 'penalty', 'other'
+}
+```
+
+**Queue Jobs:**
+```php
+// Auto-fetch settlements daily
+class FetchDailySettlementsJob implements ShouldQueue
+{
+    public function handle() {
+        // Fetch yesterday's settlements for all active credentials
+    }
+}
+
+// Auto-fetch other financials weekly
+class FetchWeeklyFinancialsJob implements ShouldQueue
+{
+    public function handle() {
+        // Fetch last 7 days deductions
+    }
+}
+```
 
 **Scheduler Config:**
 ```php
+// Fetch settlements daily at 6 AM
+$schedule->job(new FetchDailySettlementsJob)->dailyAt('06:00');
+
+// Fetch other financials every 6 hours
+$schedule->job(new FetchWeeklyFinancialsJob)->everySixHours();
+
+// Also keep existing jobs:
 // Orders every 5 minutes
 $schedule->job(new FetchMarketplaceOrdersJob)->everyFiveMinutes();
-
-// Claims every 30 minutes
-$schedule->job(new FetchMarketplaceClaimsJob)->everyThirtyMinutes();
-
-// Questions every hour
-$schedule->job(new FetchMarketplaceQuestionsJob)->hourly();
 
 // Stock sync every 6 hours
 $schedule->job(new SyncMarketplaceStockJob)->everySixHours();
 ```
 
+**Translation Keys (TR/EN):**
+```php
+'financial' => [
+    'settlements_list_success' => 'Cari hesap kayıtları getirildi',
+    'settlements_fetch_success' => 'Cari hesap kayıtları pazaryerinden çekildi',
+    'other_financials_list_success' => 'Kesinti kayıtları getirildi',
+    'cargo_invoice_list_success' => 'Kargo fatura kayıtları getirildi',
+    'summary_success' => 'Finansal özet başarıyla hazırlandı',
+    'date_range_too_long' => 'Tarih aralığı 15 günden uzun olamaz',
+    'chunking_in_progress' => 'Büyük tarih aralığı parçalara ayrılarak çekiliyor...',
+]
+```
+
+**Logging:**
+```php
+// 6 log points:
+Log::info("Kullanici ID:{$userId} - Pazaryeri ID:{$marketplaceId} - Settlements cekme basladi: {$startDate} - {$endDate}");
+Log::info("Kullanici ID:{$userId} - {$count} settlement kaydı cekildi");
+Log::info("Kullanici ID:{$userId} - Other financials cekme basladi");
+Log::info("Kullanici ID:{$userId} - {$count} kesinti kaydı cekildi");
+Log::info("Kullanici ID:{$userId} - Kargo faturası ID:{$invoiceId} kalemleri cekildi");
+Log::error("Kullanici ID:{$userId} - CHE API hatasi: {$error}");
+```
+
 **Deliverables:**
-- ✅ Queue jobs working
+- ✅ 4 database tables (settlements, other_financials, cargo_invoices, cargo_invoice_items)
+- ✅ 4 models with relationships
+- ✅ 3 service methods (getSettlements, getOtherFinancials, getCargoInvoiceItems)
+- ✅ MarketplaceFinancialController with 7 endpoints
+- ✅ 15-day chunking logic for large date ranges
+- ✅ Transaction classification system
+- ✅ Cargo cost mapping to orders
+- ✅ Financial dashboard summary
+- ✅ Queue jobs for auto-sync
 - ✅ Scheduler configured
-- ✅ Auto-sync running
-- ✅ Error handling and retries
+- ✅ Comprehensive logging (6 log points)
+- ✅ Translation support (TR/EN)
+
+**Testing Considerations:**
+- Test with valid Trendyol credentials (production/stage)
+- Verify 15-day chunking logic
+- Test cargo invoice integration
+- Validate classification logic
+- Test financial summary calculations
+
+**Notes:**
+- CHE API requires valid seller credentials
+- Date format: Unix timestamp in milliseconds
+- Max date range: 15 days per request
+- Cargo invoices are fetched separately by invoice ID
+- Transaction types vary by marketplace (Trendyol-specific)
 
 ---
 
@@ -493,7 +745,7 @@ margin_rate = (net_profit / purchase_cost) * 100
 | Phase 3 | Service Architecture | ✅ Completed | 2-3 days |
 | Phase 4 | API Controllers | ✅ Completed | 1-2 days |
 | Phase 5 | Product Sync + Logging | ✅ Completed | 2 days |
-| Phase 6 | Order Management | ⏳ Pending | 2 days |
+| Phase 6 | Order Management | ✅ Completed | 2 days |
 | Phase 7 | Claims Management | ⏳ Pending | 1 day |
 | Phase 8 | Q&A Management | ⏳ Pending | 1 day |
 | Phase 9 | Category/Brand Cache | ⏳ Pending | 1 day |

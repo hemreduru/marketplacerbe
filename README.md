@@ -188,20 +188,20 @@ SYNC: Check local vs marketplace → Sync differences → Log
 
 ---
 
-## Phase 6: Order Management System
+## Phase 6: Order Management System ✅
 **Goal:** Implement marketplace order tracking and management
 
 **Database Tables:**
-- [ ] `marketplace_orders` - Order header information
-- [ ] `marketplace_order_items` - Order line items
+- [x] `marketplace_orders` - Order header information
+- [x] `marketplace_order_items` - Order line items
 
 **Tasks:**
-- [ ] Create `MarketplaceOrder` and `MarketplaceOrderItem` models
-- [ ] Implement order fetch from marketplace
-- [ ] Create order status update functionality
-- [ ] Add tracking number update
-- [ ] Implement invoice link submission
-- [ ] Create order management endpoints
+- [x] Create `MarketplaceOrder` and `MarketplaceOrderItem` models
+- [x] Implement order fetch from marketplace
+- [x] Create order status update functionality
+- [x] Add tracking number update
+- [x] Implement invoice link submission
+- [x] Create order management endpoints
 
 **Service Methods:**
 ```php
@@ -212,10 +212,9 @@ public function sendInvoice(string $packageId, string $invoiceNumber, string $in
 ```
 
 **Deliverables:**
-- ✅ Order fetch working
-- ✅ Order status updates
-- ✅ Order management API endpoints
-- ✅ Order-product relationship tracking
+- ✅ 2 tables, 2 models, 6 endpoints
+- ✅ Order fetch, status update, tracking, invoice
+- ✅ Product-order item auto-linking
 
 ---
 
@@ -287,39 +286,68 @@ php artisan marketplace:sync-brands {marketplace}
 
 ---
 
-## Phase 10: Queue & Scheduler
-**Goal:** Automate marketplace synchronization
+## Phase 10: Financial Reports & CHE API Integration
+**Goal:** Integrate Trendyol CHE (Cari Hesap Ekstresi) Finance API for detailed financial tracking and profit analysis
+
+**Database Tables:**
+- [ ] `marketplace_settlements` - Sales transactions (22+ transaction types)
+- [ ] `marketplace_other_financials` - Deductions, invoices, penalties
+- [ ] `marketplace_cargo_invoices` - Cargo invoice headers
+- [ ] `marketplace_cargo_invoice_items` - Detailed cargo costs per order
 
 **Tasks:**
-- [ ] Create `FetchMarketplaceOrdersJob`
-- [ ] Create `FetchMarketplaceClaimsJob`
-- [ ] Create `FetchMarketplaceQuestionsJob`
-- [ ] Create `SyncMarketplaceStockJob`
-- [ ] Configure queue worker
-- [ ] Setup scheduler for automated syncs
-- [ ] Implement retry logic
-- [ ] Add failure notifications
+- [ ] Create financial models with proper relationships
+- [ ] Extend TrendyolService with CHE API methods
+- [ ] Implement 15-day chunking logic for date ranges
+- [ ] Create MarketplaceFinancialController with 7 endpoints
+- [ ] Add transaction classification system (sale, return, discount, penalty, etc.)
+- [ ] Implement cargo cost mapping to orders
+- [ ] Create financial dashboard calculations
+- [ ] Setup queue jobs for automated sync
+- [ ] Configure scheduler for daily/weekly updates
+
+**CHE API Endpoints:**
+```php
+GET /integration/finance/che/sellers/{sellerId}/settlements
+GET /integration/finance/che/sellers/{sellerId}/otherfinancials
+GET /integration/finance/che/sellers/{sellerId}/cargo-invoice/{invoiceId}/items
+```
+
+**API Endpoints:**
+```php
+GET    /api/v1/marketplace-financials              // List all financial data
+GET    /api/v1/marketplace-financials/settlements  // Get settlements only
+GET    /api/v1/marketplace-financials/other        // Get other financials
+GET    /api/v1/marketplace-financials/cargo        // Get cargo invoices
+POST   /api/v1/marketplace-financials/sync         // Manual sync
+GET    /api/v1/marketplace-financials/dashboard    // Financial dashboard
+GET    /api/v1/marketplace-financials/profit/{orderId} // Order profit breakdown
+```
 
 **Scheduler Config:**
 ```php
-// Orders every 5 minutes
-$schedule->job(new FetchMarketplaceOrdersJob)->everyFiveMinutes();
+// Daily settlements sync (yesterday's data)
+$schedule->job(new FetchDailySettlementsJob)->dailyAt('01:00');
 
-// Claims every 30 minutes
-$schedule->job(new FetchMarketplaceClaimsJob)->everyThirtyMinutes();
-
-// Questions every hour
-$schedule->job(new FetchMarketplaceQuestionsJob)->hourly();
-
-// Stock sync every 6 hours
-$schedule->job(new SyncMarketplaceStockJob)->everySixHours();
+// Weekly comprehensive financial sync
+$schedule->job(new FetchWeeklyFinancialsJob)->weekly()->sundays()->at('02:00');
 ```
 
+**Key Features:**
+- ✅ 15-day chunking for large date ranges
+- ✅ Transaction classification (22+ types)
+- ✅ Cargo cost mapping to orders
+- ✅ Platform fee categorization
+- ✅ Net profit calculation per order
+- ✅ Financial dashboard summaries
+
 **Deliverables:**
-- ✅ Queue jobs working
-- ✅ Scheduler configured
-- ✅ Auto-sync running
-- ✅ Error handling and retries
+- ✅ CHE API integration working
+- ✅ 4 financial tables created
+- ✅ 7 API endpoints functional
+- ✅ Automated daily/weekly sync
+- ✅ Financial dashboard with summaries
+- ✅ Order-level profit breakdown
 
 ---
 
@@ -392,7 +420,7 @@ margin_rate = (net_profit / purchase_cost) * 100
 | Phase 3 | Service Architecture | ✅ Completed | 2-3 days |
 | Phase 4 | API Controllers | ⏳ In Progress | 1-2 days |
 | Phase 5 | Product Sync | ⏳ Pending | 2 days |
-| Phase 6 | Order Management | ⏳ Pending | 2 days |
+| Phase 6 | Order Management | ✅ Completed | 2 days |
 | Phase 7 | Claims Management | ⏳ Pending | 1 day |
 | Phase 8 | Q&A Management | ⏳ Pending | 1 day |
 | Phase 9 | Category/Brand Cache | ⏳ Pending | 1 day |

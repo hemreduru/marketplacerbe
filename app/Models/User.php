@@ -79,4 +79,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(MarketplaceSyncLog::class);
     }
+
+    /**
+     * Get the marketplace orders for this user.
+     */
+    public function marketplaceOrders(): HasMany
+    {
+        return $this->hasMany(MarketplaceOrder::class);
+    }
 }

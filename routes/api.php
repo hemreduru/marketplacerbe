@@ -80,4 +80,14 @@ Route::prefix('v1')->group(function () {
         Route::post('/bulk-sync', [App\Http\Controllers\Api\V1\MarketplaceProductController::class, 'bulkSync']);
         Route::post('/{id}/sync', [App\Http\Controllers\Api\V1\MarketplaceProductController::class, 'sync']);
     });
+
+    // Marketplace Order Management
+    Route::prefix('marketplace-orders')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\V1\MarketplaceOrderController::class, 'index']);
+        Route::get('/{id}', [App\Http\Controllers\Api\V1\MarketplaceOrderController::class, 'show']);
+        Route::post('/fetch', [App\Http\Controllers\Api\V1\MarketplaceOrderController::class, 'fetch']);
+        Route::put('/{id}/status', [App\Http\Controllers\Api\V1\MarketplaceOrderController::class, 'updateStatus']);
+        Route::put('/{id}/tracking', [App\Http\Controllers\Api\V1\MarketplaceOrderController::class, 'updateTracking']);
+        Route::post('/{id}/invoice', [App\Http\Controllers\Api\V1\MarketplaceOrderController::class, 'sendInvoice']);
+    });
 });
