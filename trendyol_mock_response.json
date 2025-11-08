@@ -1,0 +1,53 @@
+{
+    "totalElements": 30,
+    "totalPages": 2,
+    "page": 0,
+    "size": 10,
+    "content": [
+        {
+            "id": "000741dbafd0790b3d41cd5cbf575eb5",
+            "approved": true,
+            "productCode": 13622639,
+            "batchRequestId": "a8529b65-27c1-494a-a01c-a791d6a9b135-1529674360",
+            "supplierId": 1234567,
+            "createDateTime": 1525583690416,
+            "lastUpdateDate": 1529587960412,
+            "gender": "M",
+            "brand": "EVEREST",
+            "barcode": "999999999",
+            "title": "Everest Pseb240 240-200 Motorlu Projeksiyon Perdes",
+            "categoryName": "Görüntü Sistemleri Aksesuarları",
+            "productMainId": "PRO M.PRD 240-200 E",
+            "description": "Everest PSEB240 240-200 Motorlu Projeksiyon Perdes",
+            "stockUnitType": "Adet",
+            "quantity": 6,
+            "listPrice": 1335.65,
+            "salePrice": 1293.21,
+            "vatRate": 18,
+            "dimensionalWeight": 0,
+            "stockCode": "0099000",
+            "locationBasedDelivery": "ENABLED",
+            "lotNumber": "LOT-2024-001",
+            "deliveryOption": {
+                "deliveryDuration": 1,
+                "fastDeliveryType": "SAME_DAY_SHIPPING"
+            },
+            "images": [
+                {
+                    "url": "https://img-trendyol.mncdn.com/mnresize/1200/1800//Assets/ProductImages/oa/54/1078914/3/8808993855858_1_org_zoom.jpg"
+                }
+            ],
+            "attributes": [],
+            "variantAttributes": [
+                {
+                    "attributeName": "Renk",
+                    "attributeValue": "Karışık, Çok Renkli"
+                }
+            ],
+            "platformListingId": "9876563563cc11231241",
+            "stockId": "523e210e0e3072e307a287c429881f5c",
+            "color": "Karışık, Çok Renkli",
+            "productUrl": "https://www.trendyol.com/everest/pseb240-240-200-motorlu-projeksiyon-perdes-p-13622639"
+        }
+    ]
+}
