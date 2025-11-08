@@ -23,7 +23,7 @@ return new class extends Migration
             $table->json('response_data')->nullable(); // Response from marketplace
             $table->text('error_message')->nullable();
             $table->integer('duration_ms')->nullable(); // Request duration in milliseconds
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps(); // created_at and updated_at
 
             $table->index(['user_id', 'marketplace_id', 'created_at']);
             $table->index(['entity_type', 'entity_id']);
