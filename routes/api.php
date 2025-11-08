@@ -99,4 +99,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/{id}/approve', [App\Http\Controllers\Api\V1\MarketplaceClaimController::class, 'approve']);
         Route::post('/{id}/reject', [App\Http\Controllers\Api\V1\MarketplaceClaimController::class, 'reject']);
     });
+
+    // Marketplace Q&A Management
+    Route::prefix('marketplace-questions')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\V1\MarketplaceQuestionController::class, 'index']);
+        Route::get('/{id}', [App\Http\Controllers\Api\V1\MarketplaceQuestionController::class, 'show']);
+        Route::post('/fetch', [App\Http\Controllers\Api\V1\MarketplaceQuestionController::class, 'fetch']);
+        Route::post('/{id}/answer', [App\Http\Controllers\Api\V1\MarketplaceQuestionController::class, 'answer']);
+    });
 });

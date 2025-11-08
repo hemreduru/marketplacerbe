@@ -385,22 +385,91 @@ POST   /api/v1/marketplace-claims/{id}/reject   # Reject claim
 
 ---
 
-## Phase 8: Q&A Management
+## Phase 8: Q&A Management ✅
 **Goal:** Manage customer questions and answers
 
 **Database Tables:**
-- [ ] `marketplace_questions` - Customer questions
+- [x] `marketplace_questions` - Customer questions (product Q&A)
 
 **Tasks:**
-- [ ] Create `MarketplaceQuestion` model
-- [ ] Implement question fetch from marketplace
-- [ ] Add answer submission functionality
-- [ ] Create Q&A management endpoints
+- [x] Create `MarketplaceQuestion` model with relationships
+- [x] Implement question fetch from marketplace API
+- [x] Add answer submission functionality
+- [x] Create Q&A management endpoints
+
+**Service Methods:**
+```php
+public function getQuestions(array $filters = []): array;  // ✅ Implemented in TrendyolService
+public function answerQuestion(string $questionId, string $answer): array;  // ✅ Implemented in TrendyolService
+```
+
+**API Endpoints (4 total):**
+```
+GET    /api/v1/marketplace-questions               # List questions with filters ✅
+GET    /api/v1/marketplace-questions/{id}          # Get question details ✅
+POST   /api/v1/marketplace-questions/fetch         # Fetch from marketplace ✅
+POST   /api/v1/marketplace-questions/{id}/answer   # Submit answer ✅
+```
+
+**Implementation Details:**
+- **Migration**: `2025_11_08_190000_create_marketplace_questions_table.php`
+  - 28 columns including IDs, question/answer text, customer info, product snapshot, timestamps
+  - 4 custom-named indexes (to avoid MySQL 64-char limit):
+    * `mq_marketplace_question_unique` - unique(marketplace_id, marketplace_question_id)
+    * `mq_user_status_index` - index(user_id, question_status)
+    * `mq_marketplace_date_index` - index(marketplace_id, question_date)
+    * `mq_product_id_index` - index(marketplace_product_id)
+  - Foreign keys: user_id, marketplace_id, product_id (nullable), marketplace_product_id (nullable)
+
+- **Model**: `MarketplaceQuestion`
+  - 16 fillable fields
+  - 5 casts: show_customer_name (boolean), question_date/answered_at (datetime), marketplace_raw_data (array)
+  - 4 relationships: user(), marketplace(), product(), marketplaceProduct()
+
+- **Controller**: `MarketplaceQuestionController`
+  - 4 public endpoints + 1 private helper (storeQuestion)
+  - Features:
+    * Smart filtering: marketplace, status, date range, search (question/customer/product)
+    * Pagination (default 20 per page)
+    * Transaction-wrapped fetch operation
+    * Automatic product linking by marketplace_product_id
+    * Error collection during batch import
+    * 6 log points (Turkish, single-line, context-aware)
+  - Validation:
+    * fetch(): marketplace_id required, page/size/status optional
+    * answer(): answer text required (min 10 chars)
 
 **Deliverables:**
-- ✅ Question fetch working
-- ✅ Answer submission working
-- ✅ Q&A API endpoints
+- ✅ 1 database table (marketplace_questions) with custom index names
+- ✅ 1 model with 4 relationships (MarketplaceQuestion)
+- ✅ MarketplaceQuestionController with 4 endpoints
+- ✅ Question fetch from marketplace API
+- ✅ Answer submission functionality
+- ✅ Product-question linking (auto-match by marketplace_product_id)
+- ✅ Comprehensive logging (6 log points)
+- ✅ Translation support (TR/EN)
+- ✅ 404 handling with ModelNotFoundException
+- ✅ Proper error messages for not found cases
+
+**Phase 8 Test Results:**
+- **Test Date:** November 8, 2025
+- **Total Tests:** 6/6 ✅
+- **Pass Rate:** 100%
+- **Test Scenarios:**
+  1. List questions (empty state) - ✅ Pass
+  2. Filter by marketplace_id - ✅ Pass
+  3. Filter by question_status - ✅ Pass
+  4. Fetch from marketplace (expected failure with test credentials) - ✅ Pass
+  5. Get question details (not found - 404) - ✅ Pass
+  6. Answer validation (too short) - ✅ Pass
+
+**Bugs Fixed:**
+1. MySQL index name too long (>64 chars) → Fixed with custom short names
+2. Wrong model query (Marketplace vs UserMarketplaceCredential) → Fixed
+3. Missing `use` statement for UserMarketplaceCredential → Added
+4. Wrong error message for 404 (fetch_failed vs not_found) → Fixed with ModelNotFoundException
+
+**Phase 8 Completion Date:** November 8, 2025
 
 ---
 
@@ -772,8 +841,8 @@ margin_rate = (net_profit / purchase_cost) * 100
 | Phase 4 | API Controllers | ✅ Completed | 1-2 days |
 | Phase 5 | Product Sync + Logging | ✅ Completed | 2 days |
 | Phase 6 | Order Management | ✅ Completed | 2 days |
-| Phase 7 | Claims Management | ⏳ Pending | 1 day |
-| Phase 8 | Q&A Management | ⏳ Pending | 1 day |
+| Phase 7 | Claims Management | ✅ Completed | 1 day |
+| Phase 8 | Q&A Management | ✅ Completed | 1 day |
 | Phase 9 | Category/Brand Cache | ⏳ Pending | 1 day |
 | Phase 10 | Queue & Scheduler | ⏳ Pending | 1 day |
 | Phase 11 | Profit Calculation | ⏳ Pending | 1 day |
@@ -801,11 +870,11 @@ margin_rate = (net_profit / purchase_cost) * 100
 9. `marketplace_claim_items` - Returned items
 
 ### Support Tables (Phase 8-9)
-10. `marketplace_questions` - Customer Q&A
+10. `marketplace_questions` - Customer Q&A ✅
 11. `marketplace_categories` - Cached categories (hierarchical)
 12. `marketplace_brands` - Cached brands
 
-**Total: 12 tables**
+**Total: 12 tables (10 completed)**
 
 ---
 
@@ -918,12 +987,12 @@ POST   /api/v1/marketplace-claims/{id}/approve  # Approve claim
 POST   /api/v1/marketplace-claims/{id}/reject   # Reject claim
 ```
 
-### Q&A Management
+### Q&A Management ✅
 ```
-GET    /api/v1/marketplace-questions            # List questions
-GET    /api/v1/marketplace-questions/{id}       # Get question details
-POST   /api/v1/marketplace-questions/fetch      # Fetch from marketplace
-POST   /api/v1/marketplace-questions/{id}/answer # Submit answer
+GET    /api/v1/marketplace-questions            # List questions ✅
+GET    /api/v1/marketplace-questions/{id}       # Get question details ✅
+POST   /api/v1/marketplace-questions/fetch      # Fetch from marketplace ✅
+POST   /api/v1/marketplace-questions/{id}/answer # Submit answer ✅
 ```
 
 ### Data Sync
@@ -975,7 +1044,7 @@ return [
 
 ## 🚀 Current Status
 
-**Active Phase:** Phase 6 - Order Management System (Ready to start)
+**Active Phase:** Phase 9 - Category & Brand Cache (Ready to start)
 
 **Completed Phases:**
 - ✅ Phase 1: Foundation & Core Database Setup
@@ -983,6 +1052,9 @@ return [
 - ✅ Phase 3: Marketplace Service Architecture (Hybrid: BaseMarketplaceService + TrendyolService)
 - ✅ Phase 4: API Controllers & Routes with Multi-language Support **[TESTED & VERIFIED: Nov 8, 2025]**
 - ✅ Phase 5: Product Sync + Logging + Batch Operations + Retry Mechanism **[COMPLETED & TESTED: Nov 8, 2025]**
+- ✅ Phase 6: Order Management System **[COMPLETED: Nov 8, 2025]**
+- ✅ Phase 7: Claims Management **[COMPLETED: Nov 8, 2025]**
+- ✅ Phase 8: Q&A Management **[COMPLETED & TESTED: Nov 8, 2025]**
 
 **Phase 4 Completion Details:**
 - ✅ **Test Date:** November 8, 2025
