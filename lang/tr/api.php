@@ -26,6 +26,21 @@ return [
         'not_implemented' => 'Pazaryeri servisi henüz hazır değil',
     ],
 
+    // Kullanıcı Ayarları
+    'settings' => [
+        'show_success' => 'Ayarlar başarıyla getirildi',
+        'update_success' => 'Ayarlar başarıyla güncellendi',
+        'theme_updated' => 'Tema başarıyla değiştirildi',
+        'language_updated' => 'Dil başarıyla değiştirildi',
+    ],
+
+    // Diller
+    'language' => [
+        'list_success' => 'Diller başarıyla getirildi',
+        'show_success' => 'Dil başarıyla getirildi',
+        'not_found' => 'Dil bulunamadı',
+    ],
+
     // API Bilgileri
     'credential' => [
         'list_success' => 'API bilgileri başarıyla getirildi',

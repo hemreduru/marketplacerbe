@@ -26,6 +26,21 @@ return [
         'not_implemented' => 'Marketplace service not implemented yet',
     ],
 
+    // User Settings
+    'settings' => [
+        'show_success' => 'Settings retrieved successfully',
+        'update_success' => 'Settings updated successfully',
+        'theme_updated' => 'Theme updated successfully',
+        'language_updated' => 'Language updated successfully',
+    ],
+
+    // Languages
+    'language' => [
+        'list_success' => 'Languages retrieved successfully',
+        'show_success' => 'Language retrieved successfully',
+        'not_found' => 'Language not found',
+    ],
+
     // Credentials
     'credential' => [
         'list_success' => 'Credentials retrieved successfully',

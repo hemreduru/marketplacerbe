@@ -57,6 +57,20 @@ Route::prefix('v1')->group(function () {
     // Protected routes (require authentication)
     Route::middleware('auth:sanctum')->group(function () {
 
+    // User Settings
+    Route::prefix('settings')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\V1\UserSettingController::class, 'show']);
+        Route::put('/', [App\Http\Controllers\Api\V1\UserSettingController::class, 'update']);
+        Route::put('/theme', [App\Http\Controllers\Api\V1\UserSettingController::class, 'updateTheme']);
+        Route::put('/language', [App\Http\Controllers\Api\V1\UserSettingController::class, 'updateLanguage']);
+    });
+
+    // Languages (public but inside auth group for consistency)
+    Route::prefix('languages')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\V1\LanguageController::class, 'index']);
+        Route::get('/{id}', [App\Http\Controllers\Api\V1\LanguageController::class, 'show']);
+    });
+
     // Marketplace Management
     Route::prefix('marketplaces')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\V1\MarketplaceController::class, 'index']);

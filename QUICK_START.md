@@ -180,8 +180,8 @@ const categoryTree = await fetch('/api/v1/marketplace-categories/tree?marketplac
 ### Adım 3: Ürünü Pazaryerine Ekle
 
 ```javascript
-// POST /api/v1/marketplace-products
-await fetch('/api/v1/marketplace-products', {
+// POST /api/v1/marketplace-products/push
+await fetch('/api/v1/marketplace-products/push', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${token}`,
@@ -189,13 +189,7 @@ await fetch('/api/v1/marketplace-products', {
   },
   body: JSON.stringify({
     product_id: 1,
-    marketplace_id: 1,
-    credential_id: 1,
-    marketplace_category_id: 'ELKT-123',
-    sale_price: 42000.00,
-    list_price: 45000.00,
-    stock_quantity: 5,
-    cargo_company: 'Aras Kargo'
+    marketplace_id: 1
   })
 });
 ```
@@ -204,11 +198,11 @@ await fetch('/api/v1/marketplace-products', {
 
 ## 5️⃣ Sipariş Yönetimi
 
-### Siparişleri Senkronize Et
+### Siparişleri Pazaryerinden Çek
 
 ```javascript
-// POST /api/v1/marketplace-orders/sync
-await fetch('/api/v1/marketplace-orders/sync', {
+// POST /api/v1/marketplace-orders/fetch
+await fetch('/api/v1/marketplace-orders/fetch', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${token}`,
@@ -216,7 +210,6 @@ await fetch('/api/v1/marketplace-orders/sync', {
   },
   body: JSON.stringify({
     marketplace_id: 1,
-    credential_id: 1,
     start_date: '2025-11-01',
     end_date: '2025-11-08'
   })
@@ -232,20 +225,43 @@ const pendingOrders = await fetch('/api/v1/marketplace-orders?status=awaiting_sh
 }).then(r => r.json());
 ```
 
-### Sipariş Gönder
+### Sipariş Durumu Güncelle ve Kargo Bilgisi Ekle
 
 ```javascript
-// POST /api/v1/marketplace-orders/{id}/ship
-await fetch('/api/v1/marketplace-orders/1/ship', {
+// 1. Durumu güncelle: PUT /api/v1/marketplace-orders/{id}/status
+await fetch('/api/v1/marketplace-orders/1/status', {
+  method: 'PUT',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    status: 'shipped'
+  })
+});
+
+// 2. Kargo takip numarası ekle: PUT /api/v1/marketplace-orders/{id}/tracking
+await fetch('/api/v1/marketplace-orders/1/tracking', {
+  method: 'PUT',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    tracking_number: 'ARAS1234567890'
+  })
+});
+
+// 3. Fatura gönder: POST /api/v1/marketplace-orders/{id}/invoice
+await fetch('/api/v1/marketplace-orders/1/invoice', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
-    tracking_number: 'ARAS1234567890',
-    cargo_company: 'Aras Kargo',
-    invoice_number: 'INV-2025-001'
+    invoice_number: 'INV-2025-001',
+    invoice_link: 'https://example.com/invoices/INV-2025-001.pdf'
   })
 });
 ```
@@ -416,7 +432,64 @@ settlements.data.forEach(settlement => {
 
 ---
 
-## 9️⃣ Kullanıcı Bilgileri ve İstatistikler
+## 9️⃣ Kullanıcı Ayarları (Tema ve Dil)
+
+### Kullanıcı Ayarlarını Getir
+
+```javascript
+// GET /api/v1/settings
+const settings = await fetch('/api/v1/settings', {
+  headers: { 'Authorization': `Bearer ${token}` }
+}).then(r => r.json());
+
+console.log(`Tema: ${settings.data.theme}`); // light, dark, system
+console.log(`Dil: ${settings.data.preferred_language.native_name}`);
+```
+
+### Temayı Değiştir
+
+```javascript
+// PUT /api/v1/settings/theme
+await fetch('/api/v1/settings/theme', {
+  method: 'PUT',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    theme: 'dark' // light, dark, system
+  })
+});
+```
+
+### Dili Değiştir
+
+```javascript
+// 1. Önce dilleri listele
+// GET /api/v1/languages
+const languages = await fetch('/api/v1/languages', {
+  headers: { 'Authorization': `Bearer ${token}` }
+}).then(r => r.json());
+
+console.log(languages.data); // [{ id: 1, code: 'tr', name: 'Turkish' }, ...]
+
+// 2. Dil seç ve güncelle
+// PUT /api/v1/settings/language
+await fetch('/api/v1/settings/language', {
+  method: 'PUT',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    language_id: 2 // English
+  })
+});
+```
+
+---
+
+## 🔟 Kullanıcı Bilgileri ve İstatistikler
 
 ### Profil Bilgisi ve Özet İstatistikler
 
@@ -434,7 +507,7 @@ console.log(`Bağlı Pazaryeri: ${userInfo.data.stats.marketplace_credentials}`)
 
 ---
 
-## 🔟 Hata Yönetimi
+## 1️⃣1️⃣ Hata Yönetimi
 
 ### Standart Hata Yanıtı
 

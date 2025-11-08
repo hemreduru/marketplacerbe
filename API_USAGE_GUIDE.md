@@ -30,6 +30,26 @@ Accept: application/json
 
 ---
 
+## ⚙️ User Settings (Kullanıcı Ayarları)
+
+| Method | Endpoint | Auth | Açıklama | Parametreler |
+|--------|----------|------|----------|--------------|
+| GET | `/settings` | ✅ | Kullanıcı ayarlarını getir | - |
+| PUT | `/settings` | ✅ | Ayarları güncelle | `preferred_language_id`, `theme`, `dark_mode`, `additional_settings` (hepsi opsiyonel) |
+| PUT | `/settings/theme` | ✅ | Sadece temayı değiştir | `theme` (light, dark, system) |
+| PUT | `/settings/language` | ✅ | Sadece dili değiştir | `language_id` (integer) |
+
+---
+
+## 🌍 Languages (Diller)
+
+| Method | Endpoint | Auth | Açıklama | Parametreler |
+|--------|----------|------|----------|--------------|
+| GET | `/languages` | ✅ | Aktif dilleri listele | - |
+| GET | `/languages/{id}` | ✅ | Dil detayı | `id` (integer) |
+
+---
+
 ## 🏪 Marketplace Management
 
 | Method | Endpoint | Auth | Açıklama | Parametreler |
@@ -207,6 +227,6 @@ Tüm endpoint'ler aynı formatta JSON döner:
 
 ---
 
-**Son Güncelleme:** 8 Kasım 2025  
-**Toplam Endpoint:** 65  
+**Son Güncelleme:** 9 Kasım 2025  
+**Toplam Endpoint:** 71 (6 yeni: settings + languages)  
 **API Versiyonu:** v1
