@@ -64,6 +64,10 @@ return [
         'sync_failed' => 'Ürün senkronize edilemedi',
         'not_found' => 'Pazaryeri ürünü bulunamadı',
         'already_synced' => 'Ürün bu pazaryeri ile zaten senkronize',
+        'bulk_push_success' => 'Toplu gönderme işlemi tamamlandı',
+        'bulk_push_failed' => 'Toplu gönderme işlemi başarısız',
+        'bulk_sync_success' => 'Toplu senkronizasyon tamamlandı',
+        'bulk_sync_failed' => 'Toplu senkronizasyon başarısız',
     ],
 
     // Siparişler
@@ -112,6 +116,26 @@ return [
         'brands_success' => 'Markalar başarıyla senkronize edildi',
         'brands_failed' => 'Markalar senkronize edilemedi',
         'log_list_success' => 'Senkronizasyon logları başarıyla getirildi',
+    ],
+
+    // Doğrulama
+    'validation' => [
+        'credential_id_required' => 'Pazaryeri API bilgisi ID gerekli',
+        'credential_not_found' => 'Pazaryeri API bilgisi bulunamadı',
+        'product_ids_required' => 'Ürün ID\'leri gerekli',
+        'product_ids_array' => 'Ürün ID\'leri dizi olmalı',
+        'product_ids_min' => 'En az bir ürün ID gerekli',
+        'product_id_required' => 'Ürün ID gerekli',
+        'product_id_integer' => 'Ürün ID sayı olmalı',
+        'product_not_found' => 'Ürün bulunamadı',
+        'marketplace_product_ids_required' => 'Pazaryeri ürün ID\'leri gerekli',
+        'marketplace_product_ids_array' => 'Pazaryeri ürün ID\'leri dizi olmalı',
+        'marketplace_product_ids_min' => 'En az bir pazaryeri ürün ID gerekli',
+        'marketplace_product_id_required' => 'Pazaryeri ürün ID gerekli',
+        'marketplace_product_id_integer' => 'Pazaryeri ürün ID sayı olmalı',
+        'marketplace_product_not_found' => 'Pazaryeri ürünü bulunamadı',
+        'sync_type_required' => 'Senkronizasyon tipi gerekli',
+        'sync_type_invalid' => 'Senkronizasyon tipi stock, price veya both olmalı',
     ],
 
 ];

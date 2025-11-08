@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCredentialRequest;
 use App\Http\Requests\UpdateCredentialRequest;
@@ -72,6 +73,7 @@ class MarketplaceCredentialController extends Controller
                 ->exists();
 
             if ($exists) {
+                Log::warning("Kullanici ID:{$userId} - Pazaryeri ID:{$request->marketplace_id} icin credential zaten mevcut");
                 return $this->errorResponse(
                     __('api.credential.already_exists'),
                     409
@@ -88,6 +90,8 @@ class MarketplaceCredentialController extends Controller
             ]);
 
             $credential->load('marketplace');
+
+            Log::info("Kullanici ID:{$userId} - Credential ID:{$credential->id} - {$credential->marketplace->name} olusturuldu");
 
             return $this->createdResponse(
                 $credential,
@@ -164,6 +168,8 @@ class MarketplaceCredentialController extends Controller
 
             $credential->load('marketplace');
 
+            Log::info("Kullanici ID:{$userId} - Credential ID:{$credential->id} - {$credential->marketplace->name} guncellendi");
+
             return $this->successResponse(
                 $credential,
                 __('api.credential.update_success')
@@ -196,7 +202,11 @@ class MarketplaceCredentialController extends Controller
                 );
             }
 
+            $marketplaceName = $credential->marketplace->name;
+            $credentialId = $credential->id;
             $credential->delete();
+
+            Log::info("Kullanici ID:{$userId} - Credential ID:{$credentialId} - {$marketplaceName} silindi");
 
             return $this->successResponse(
                 null,
@@ -245,6 +255,8 @@ class MarketplaceCredentialController extends Controller
             // Test with getting brands (lightweight call)
             $result = $service->getBrands();
 
+            Log::info("Kullanici ID:{$userId} - Credential ID:{$credential->id} - {$credential->marketplace->name} test basarili");
+
             return $this->successResponse(
                 [
                     'marketplace' => $credential->marketplace->name,
@@ -254,6 +266,8 @@ class MarketplaceCredentialController extends Controller
                 __('api.credential.test_success')
             );
         } catch (\Exception $e) {
+            $userId = Auth::id() ?? 3;
+            Log::error("Kullanici ID:{$userId} - Credential ID:{$id} test basarisiz - " . $e->getMessage());
             return $this->errorResponse(
                 __('api.credential.test_failed') . ': ' . $e->getMessage(),
                 400

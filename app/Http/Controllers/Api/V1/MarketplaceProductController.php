@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BulkPushProductRequest;
+use App\Http\Requests\BulkSyncRequest;
 use App\Http\Requests\PullProductRequest;
 use App\Http\Requests\PushProductRequest;
 use App\Http\Traits\ApiResponseTrait;
@@ -14,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MarketplaceProductController extends Controller
 {
@@ -147,6 +150,7 @@ class MarketplaceProductController extends Controller
                 ->exists();
 
             if ($exists && !$request->force) {
+                Log::warning("Kullanici ID:{$userId} - Urun ID:{$product->id} - SKU:{$product->sku} - Pazaryeri ID:{$request->marketplace_id} zaten senkronize");
                 return $this->errorResponse(
                     __('api.marketplace_product.already_synced'),
                     409
@@ -177,11 +181,15 @@ class MarketplaceProductController extends Controller
                 ]
             );
 
+            Log::info("Kullanici ID:{$userId} - Urun ID:{$product->id} - SKU:{$product->sku} - {$credential->marketplace->name} pazaryerine gonderildi");
+
             return $this->successResponse(
                 $marketplaceProduct->load(['product', 'marketplace']),
                 __('api.marketplace_product.push_success')
             );
         } catch (\Exception $e) {
+            $userId = Auth::id() ?? 3;
+            Log::error("Kullanici ID:{$userId} - Urun pazaryerine gonderilemedi - " . $e->getMessage());
             return $this->errorResponse(
                 __('api.marketplace_product.push_failed') . ': ' . $e->getMessage(),
                 400
@@ -295,6 +303,8 @@ class MarketplaceProductController extends Controller
 
             DB::commit();
 
+            Log::info("Kullanici ID:{$userId} - {$credential->marketplace->name} pazaryerinden urun cekildi - Yeni: {$imported} - Guncellenen: {$updated}");
+
             return $this->successResponse(
                 [
                     'imported' => $imported,
@@ -312,6 +322,8 @@ class MarketplaceProductController extends Controller
             );
         } catch (\Exception $e) {
             DB::rollBack();
+            $userId = Auth::id() ?? 3;
+            Log::error("Kullanici ID:{$userId} - Pazaryerinden urun cekilemedi - " . $e->getMessage());
             return $this->errorResponse(
                 __('api.marketplace_product.pull_failed') . ': ' . $e->getMessage(),
                 400
@@ -369,8 +381,10 @@ class MarketplaceProductController extends Controller
                         $marketplaceProduct->product->stock_quantity
                     );
                     $syncResults['stock'] = 'success';
+                    Log::info("Kullanici ID:{$userId} - Pazaryeri Urun ID:{$marketplaceProduct->id} - {$marketplaceProduct->marketplace->name} stok senkronize edildi - Miktar: {$marketplaceProduct->product->stock_quantity}");
                 } catch (\Exception $e) {
                     $syncResults['stock'] = 'failed: ' . $e->getMessage();
+                    Log::error("Kullanici ID:{$userId} - Pazaryeri Urun ID:{$marketplaceProduct->id} - {$marketplaceProduct->marketplace->name} stok senkronize edilemedi - " . $e->getMessage());
                 }
             }
 
@@ -382,8 +396,10 @@ class MarketplaceProductController extends Controller
                         $marketplaceProduct->product->sale_price
                     );
                     $syncResults['price'] = 'success';
+                    Log::info("Kullanici ID:{$userId} - Pazaryeri Urun ID:{$marketplaceProduct->id} - {$marketplaceProduct->marketplace->name} fiyat senkronize edildi - Fiyat: {$marketplaceProduct->product->sale_price}");
                 } catch (\Exception $e) {
                     $syncResults['price'] = 'failed: ' . $e->getMessage();
+                    Log::error("Kullanici ID:{$userId} - Pazaryeri Urun ID:{$marketplaceProduct->id} - {$marketplaceProduct->marketplace->name} fiyat senkronize edilemedi - " . $e->getMessage());
                 }
             }
 
@@ -400,8 +416,254 @@ class MarketplaceProductController extends Controller
                 __('api.marketplace_product.sync_success')
             );
         } catch (\Exception $e) {
+            $userId = Auth::id() ?? 3;
+            Log::error("Kullanici ID:{$userId} - Senkronizasyon basarisiz - " . $e->getMessage());
             return $this->errorResponse(
                 __('api.marketplace_product.sync_failed') . ': ' . $e->getMessage(),
+                400
+            );
+        }
+    }
+
+    /**
+     * Bulk push multiple products to marketplace.
+     *
+     * @param BulkPushProductRequest $request
+     * @return JsonResponse
+     */
+    public function bulkPush(BulkPushProductRequest $request): JsonResponse
+    {
+        try {
+            $userId = Auth::id() ?? 3;
+
+            // Get credential
+            $credential = UserMarketplaceCredential::with('marketplace')
+                ->where('user_id', $userId)
+                ->find($request->marketplace_credential_id);
+
+            if (!$credential) {
+                return $this->notFoundResponse(__('api.credential.not_found'));
+            }
+
+            // Get products
+            $products = Product::where('user_id', $userId)
+                ->whereIn('id', $request->product_ids)
+                ->get();
+
+            if ($products->isEmpty()) {
+                return $this->notFoundResponse(__('api.product.not_found'));
+            }
+
+            // Initialize service
+            $service = MarketplaceServiceFactory::make($credential);
+
+            $results = [
+                'successful' => [],
+                'failed' => [],
+                'skipped' => [],
+            ];
+
+            DB::beginTransaction();
+
+            foreach ($products as $product) {
+                try {
+                    // Check if already synced
+                    $existingSync = MarketplaceProduct::where('product_id', $product->id)
+                        ->where('marketplace_id', $credential->marketplace_id)
+                        ->where('user_id', $userId)
+                        ->first();
+
+                    if ($existingSync) {
+                        Log::warning("Kullanici ID:{$userId} - Urun ID:{$product->id} - SKU:{$product->sku} - Pazaryeri ID:{$credential->marketplace_id} zaten senkronize");
+                        $results['skipped'][] = [
+                            'product_id' => $product->id,
+                            'sku' => $product->sku,
+                            'reason' => __('api.marketplace_product.already_synced'),
+                        ];
+                        continue;
+                    }
+
+                    // Push to marketplace
+                    $response = $service->createProduct($product);
+
+                    // Store marketplace product relationship
+                    $marketplaceProduct = MarketplaceProduct::create([
+                        'user_id' => $userId,
+                        'product_id' => $product->id,
+                        'marketplace_id' => $credential->marketplace_id,
+                        'marketplace_product_id' => $response['id'] ?? null,
+                        'marketplace_sku' => $response['sku'] ?? $product->sku,
+                        'marketplace_barcode' => $response['barcode'] ?? $product->barcode,
+                        'marketplace_status' => $response['status'] ?? 'pending',
+                        'approved' => $response['approved'] ?? false,
+                        'last_sync_at' => now(),
+                        'metadata' => $response,
+                    ]);
+
+                    Log::info("Kullanici ID:{$userId} - Urun ID:{$product->id} - SKU:{$product->sku} - {$credential->marketplace->name} pazaryerine gonderildi");
+
+                    $results['successful'][] = [
+                        'product_id' => $product->id,
+                        'sku' => $product->sku,
+                        'marketplace_product_id' => $marketplaceProduct->id,
+                    ];
+                } catch (\Exception $e) {
+                    Log::error("Kullanici ID:{$userId} - Urun ID:{$product->id} - SKU:{$product->sku} pazaryerine gonderilemedi - " . $e->getMessage());
+                    $results['failed'][] = [
+                        'product_id' => $product->id,
+                        'sku' => $product->sku,
+                        'error' => $e->getMessage(),
+                    ];
+                }
+            }
+
+            DB::commit();
+
+            Log::info("Kullanici ID:{$userId} - Toplu push - Basarili: " . count($results['successful']) . " - Basarisiz: " . count($results['failed']) . " - Atlandi: " . count($results['skipped']));
+
+            return $this->successResponse(
+                $results,
+                __('api.marketplace_product.bulk_push_success')
+            );
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $userId = Auth::id() ?? 3;
+            Log::error("Kullanici ID:{$userId} - Toplu push basarisiz - " . $e->getMessage());
+            return $this->errorResponse(
+                __('api.marketplace_product.bulk_push_failed') . ': ' . $e->getMessage(),
+                400
+            );
+        }
+    }
+
+    /**
+     * Bulk sync stock and/or price for multiple marketplace products.
+     *
+     * @param BulkSyncRequest $request
+     * @return JsonResponse
+     */
+    public function bulkSync(BulkSyncRequest $request): JsonResponse
+    {
+        try {
+            $userId = Auth::id() ?? 3;
+
+            // Get marketplace products
+            $marketplaceProducts = MarketplaceProduct::with(['product', 'marketplace', 'credential'])
+                ->where('user_id', $userId)
+                ->whereIn('id', $request->marketplace_product_ids)
+                ->get();
+
+            if ($marketplaceProducts->isEmpty()) {
+                return $this->notFoundResponse(__('api.marketplace_product.not_found'));
+            }
+
+            $results = [
+                'successful' => [],
+                'failed' => [],
+            ];
+
+            $syncType = $request->sync_type;
+
+            foreach ($marketplaceProducts as $marketplaceProduct) {
+                try {
+                    // Get credential for this marketplace product
+                    $credential = UserMarketplaceCredential::where('user_id', $userId)
+                        ->where('marketplace_id', $marketplaceProduct->marketplace_id)
+                        ->first();
+
+                    if (!$credential) {
+                        throw new \Exception("Credential not found for marketplace");
+                    }
+
+                    // Initialize service
+                    $service = MarketplaceServiceFactory::make($credential);
+
+                    $syncResults = [];
+
+                    // Sync stock
+                    if (in_array($syncType, ['stock', 'both'])) {
+                        try {
+                            $barcode = $marketplaceProduct->marketplace_barcode ?? $marketplaceProduct->product->barcode;
+                            if (!$barcode) {
+                                throw new \Exception("Barcode not found for product");
+                            }
+
+                            $stockResponse = $service->updateStock(
+                                $barcode,
+                                $marketplaceProduct->product->stock_quantity
+                            );
+
+                            $syncResults['stock'] = 'success';
+                            Log::info("Kullanici ID:{$userId} - Pazaryeri Urun ID:{$marketplaceProduct->id} - {$marketplaceProduct->marketplace->name} stok senkronize edildi - Miktar: {$marketplaceProduct->product->stock_quantity}");
+                        } catch (\Exception $e) {
+                            $syncResults['stock'] = 'failed';
+                            $syncResults['stock_error'] = $e->getMessage();
+                            Log::error("Kullanici ID:{$userId} - Pazaryeri Urun ID:{$marketplaceProduct->id} - {$marketplaceProduct->marketplace->name} stok senkronize edilemedi - " . $e->getMessage());
+                        }
+                    }
+
+                    // Sync price
+                    if (in_array($syncType, ['price', 'both'])) {
+                        try {
+                            $barcode = $marketplaceProduct->marketplace_barcode ?? $marketplaceProduct->product->barcode;
+                            if (!$barcode) {
+                                throw new \Exception("Barcode not found for product");
+                            }
+
+                            $priceResponse = $service->updatePrice(
+                                $barcode,
+                                $marketplaceProduct->product->sale_price
+                            );
+
+                            $syncResults['price'] = 'success';
+                            Log::info("Kullanici ID:{$userId} - Pazaryeri Urun ID:{$marketplaceProduct->id} - {$marketplaceProduct->marketplace->name} fiyat senkronize edildi - Fiyat: {$marketplaceProduct->product->sale_price}");
+                        } catch (\Exception $e) {
+                            $syncResults['price'] = 'failed';
+                            $syncResults['price_error'] = $e->getMessage();
+                            Log::error("Kullanici ID:{$userId} - Pazaryeri Urun ID:{$marketplaceProduct->id} - {$marketplaceProduct->marketplace->name} fiyat senkronize edilemedi - " . $e->getMessage());
+                        }
+                    }
+
+                    // Update last sync time
+                    $marketplaceProduct->update([
+                        'last_sync_at' => now(),
+                    ]);
+
+                    if (isset($syncResults['stock']) && $syncResults['stock'] === 'success' ||
+                        isset($syncResults['price']) && $syncResults['price'] === 'success') {
+                        $results['successful'][] = [
+                            'marketplace_product_id' => $marketplaceProduct->id,
+                            'product_sku' => $marketplaceProduct->product->sku,
+                            'sync_results' => $syncResults,
+                        ];
+                    } else {
+                        $results['failed'][] = [
+                            'marketplace_product_id' => $marketplaceProduct->id,
+                            'product_sku' => $marketplaceProduct->product->sku,
+                            'sync_results' => $syncResults,
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Kullanici ID:{$userId} - Pazaryeri Urun ID:{$marketplaceProduct->id} senkronize edilemedi - " . $e->getMessage());
+                    $results['failed'][] = [
+                        'marketplace_product_id' => $marketplaceProduct->id,
+                        'product_sku' => $marketplaceProduct->product->sku,
+                        'error' => $e->getMessage(),
+                    ];
+                }
+            }
+
+            Log::info("Kullanici ID:{$userId} - Toplu sync - Basarili: " . count($results['successful']) . " - Basarisiz: " . count($results['failed']));
+
+            return $this->successResponse(
+                $results,
+                __('api.marketplace_product.bulk_sync_success')
+            );
+        } catch (\Exception $e) {
+            $userId = Auth::id() ?? 3;
+            Log::error("Kullanici ID:{$userId} - Toplu sync basarisiz - " . $e->getMessage());
+            return $this->errorResponse(
+                __('api.marketplace_product.bulk_sync_failed') . ': ' . $e->getMessage(),
                 400
             );
         }

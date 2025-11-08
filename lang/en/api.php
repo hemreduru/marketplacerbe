@@ -64,6 +64,10 @@ return [
         'sync_failed' => 'Failed to synchronize product',
         'not_found' => 'Marketplace product not found',
         'already_synced' => 'Product already synced with this marketplace',
+        'bulk_push_success' => 'Bulk push operation completed',
+        'bulk_push_failed' => 'Bulk push operation failed',
+        'bulk_sync_success' => 'Bulk sync operation completed',
+        'bulk_sync_failed' => 'Bulk sync operation failed',
     ],
 
     // Orders
@@ -112,6 +116,26 @@ return [
         'brands_success' => 'Brands synchronized successfully',
         'brands_failed' => 'Failed to synchronize brands',
         'log_list_success' => 'Sync logs retrieved successfully',
+    ],
+
+    // Validation
+    'validation' => [
+        'credential_id_required' => 'Marketplace credential ID is required',
+        'credential_not_found' => 'Marketplace credential not found',
+        'product_ids_required' => 'Product IDs are required',
+        'product_ids_array' => 'Product IDs must be an array',
+        'product_ids_min' => 'At least one product ID is required',
+        'product_id_required' => 'Product ID is required',
+        'product_id_integer' => 'Product ID must be an integer',
+        'product_not_found' => 'Product not found',
+        'marketplace_product_ids_required' => 'Marketplace product IDs are required',
+        'marketplace_product_ids_array' => 'Marketplace product IDs must be an array',
+        'marketplace_product_ids_min' => 'At least one marketplace product ID is required',
+        'marketplace_product_id_required' => 'Marketplace product ID is required',
+        'marketplace_product_id_integer' => 'Marketplace product ID must be an integer',
+        'marketplace_product_not_found' => 'Marketplace product not found',
+        'sync_type_required' => 'Sync type is required',
+        'sync_type_invalid' => 'Sync type must be: stock, price, or both',
     ],
 
 ];

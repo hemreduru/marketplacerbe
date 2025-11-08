@@ -90,4 +90,15 @@ class MarketplaceProduct extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the marketplace credential used for this product.
+     * Note: This assumes the user has only one credential per marketplace.
+     * For multiple credentials per marketplace, you'd need to add a credential_id column.
+     */
+    public function credential(): BelongsTo
+    {
+        return $this->belongsTo(UserMarketplaceCredential::class, 'marketplace_id', 'marketplace_id')
+            ->where('user_id', $this->user_id);
+    }
 }

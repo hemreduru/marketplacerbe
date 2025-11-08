@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -87,8 +88,9 @@ class ProductController extends Controller
                 ->exists();
 
             if ($exists) {
+                Log::warning("Kullanici ID:{$userId} - SKU:{$request->sku} zaten mevcut");
                 return $this->errorResponse(
-                    __('api.product.already_exists'),
+                    __('api.product.sku_exists'),
                     409
                 );
             }
@@ -111,6 +113,8 @@ class ProductController extends Controller
                 'attributes' => $request->attributes ?? [],
                 'is_active' => $request->is_active ?? true,
             ]);
+
+            Log::info("Kullanici ID:{$userId} - Urun ID:{$product->id} - SKU:{$product->sku} olusturuldu");
 
             return $this->createdResponse(
                 $product,
@@ -186,6 +190,7 @@ class ProductController extends Controller
                     ->exists();
 
                 if ($exists) {
+                    Log::warning("Kullanici ID:{$userId} - Urun guncelleme - SKU:{$request->sku} zaten mevcut");
                     return $this->errorResponse(
                         __('api.product.already_exists'),
                         409
@@ -210,6 +215,8 @@ class ProductController extends Controller
                 'attributes',
                 'is_active',
             ]));
+
+            Log::info("Kullanici ID:{$userId} - Urun ID:{$product->id} - SKU:{$product->sku} guncellendi");
 
             return $this->successResponse(
                 $product,
@@ -243,7 +250,11 @@ class ProductController extends Controller
                 );
             }
 
+            $sku = $product->sku;
+            $productId = $product->id;
             $product->delete();
+
+            Log::info("Kullanici ID:{$userId} - Urun ID:{$productId} - SKU:{$sku} soft delete yapildi");
 
             return $this->successResponse(
                 null,
@@ -279,6 +290,8 @@ class ProductController extends Controller
             }
 
             $product->restore();
+
+            Log::info("Kullanici ID:{$userId} - Urun ID:{$product->id} - SKU:{$product->sku} restore edildi");
 
             return $this->successResponse(
                 $product,
@@ -322,6 +335,7 @@ class ProductController extends Controller
                         ->exists();
 
                     if ($exists) {
+                        Log::warning("Kullanici ID:{$userId} - Toplu urun ekleme - SKU:{$productData['sku']} zaten mevcut");
                         $errors[] = [
                             'index' => $index,
                             'sku' => $productData['sku'],
@@ -360,6 +374,8 @@ class ProductController extends Controller
             }
 
             DB::commit();
+
+            Log::info("Kullanici ID:{$userId} - Toplu urun ekleme - Basarili: " . count($products) . " - Basarisiz: " . count($errors));
 
             return $this->successResponse(
                 [

@@ -76,6 +76,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', [App\Http\Controllers\Api\V1\MarketplaceProductController::class, 'show']);
         Route::post('/push', [App\Http\Controllers\Api\V1\MarketplaceProductController::class, 'push']);
         Route::post('/pull', [App\Http\Controllers\Api\V1\MarketplaceProductController::class, 'pull']);
+        Route::post('/bulk-push', [App\Http\Controllers\Api\V1\MarketplaceProductController::class, 'bulkPush']);
+        Route::post('/bulk-sync', [App\Http\Controllers\Api\V1\MarketplaceProductController::class, 'bulkSync']);
         Route::post('/{id}/sync', [App\Http\Controllers\Api\V1\MarketplaceProductController::class, 'sync']);
     });
 });
