@@ -19,7 +19,7 @@ class MarketplaceServiceFactory
         $credential->load('marketplace');
         $marketplace = $credential->marketplace;
 
-        return match ($marketplace->code) {
+        return match (strtoupper($marketplace->code)) {
             'TRENDYOL' => new TrendyolService($credential),
             // 'HEPSIBURADA' => new HepsiburadaService($credential),
             // 'N11' => new N11Service($credential),

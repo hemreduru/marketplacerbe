@@ -107,4 +107,16 @@ Route::prefix('v1')->group(function () {
         Route::post('/fetch', [App\Http\Controllers\Api\V1\MarketplaceQuestionController::class, 'fetch']);
         Route::post('/{id}/answer', [App\Http\Controllers\Api\V1\MarketplaceQuestionController::class, 'answer']);
     });
+
+    // Marketplace Categories & Brands Cache
+    Route::prefix('marketplace-categories')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\V1\MarketplaceDataController::class, 'listCategories']);
+        Route::get('/tree', [App\Http\Controllers\Api\V1\MarketplaceDataController::class, 'getCategoryTree']);
+        Route::get('/{id}', [App\Http\Controllers\Api\V1\MarketplaceDataController::class, 'getCategory']);
+    });
+
+    Route::prefix('marketplace-brands')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\V1\MarketplaceDataController::class, 'listBrands']);
+        Route::get('/{id}', [App\Http\Controllers\Api\V1\MarketplaceDataController::class, 'getBrand']);
+    });
 });
