@@ -147,4 +147,28 @@ interface MarketplaceServiceInterface
      * @return array
      */
     public function getCategoryAttributes(int $categoryId): array;
+
+    /**
+     * Get CHE settlements (financial transactions) from marketplace.
+     *
+     * @param array $filters - startDate, endDate, transactionType, page, size
+     * @return array
+     */
+    public function getSettlements(array $filters = []): array;
+
+    /**
+     * Get CHE other financials (deductions, fees) from marketplace.
+     *
+     * @param array $filters - startDate, endDate, transactionType, page, size
+     * @return array
+     */
+    public function getOtherFinancials(array $filters = []): array;
+
+    /**
+     * Get cargo invoice items for a specific invoice.
+     *
+     * @param string $invoiceId
+     * @return array
+     */
+    public function getCargoInvoiceItems(string $invoiceId): array;
 }

@@ -434,4 +434,93 @@ class TrendyolService extends BaseMarketplaceService
         $endpoint = $this->buildEndpoint('claims', ['supplierId' => $supplierId]) . "/{$claimId}/items";
         return $this->makeRequest('GET', $endpoint);
     }
+
+    /**
+     * Get CHE settlements (financial transactions).
+     *
+     * @param array $filters - startDate, endDate, transactionType, page, size
+     * @return array
+     */
+    public function getSettlements(array $filters = []): array
+    {
+        $sellerId = $this->credential->api_key;
+        $endpoint = "integration/finance/che/sellers/{$sellerId}/settlements";
+
+        $params = [];
+
+        // Date filters (Unix timestamp in milliseconds)
+        if (isset($filters['startDate'])) {
+            $params['startDate'] = is_numeric($filters['startDate'])
+                ? $filters['startDate']
+                : strtotime($filters['startDate']) * 1000;
+        }
+
+        if (isset($filters['endDate'])) {
+            $params['endDate'] = is_numeric($filters['endDate'])
+                ? $filters['endDate']
+                : strtotime($filters['endDate']) * 1000;
+        }
+
+        // Transaction type filter
+        if (isset($filters['transactionType'])) {
+            $params['transactionType'] = $filters['transactionType'];
+        }
+
+        // Pagination
+        $params['page'] = $filters['page'] ?? 0;
+        $params['size'] = $filters['size'] ?? 200;
+
+        return $this->makeRequest('GET', $endpoint, $params);
+    }
+
+    /**
+     * Get CHE other financials (deductions, fees, penalties).
+     *
+     * @param array $filters - startDate, endDate, transactionType, page, size
+     * @return array
+     */
+    public function getOtherFinancials(array $filters = []): array
+    {
+        $sellerId = $this->credential->api_key;
+        $endpoint = "integration/finance/che/sellers/{$sellerId}/otherfinancials";
+
+        $params = [];
+
+        // Date filters (Unix timestamp in milliseconds)
+        if (isset($filters['startDate'])) {
+            $params['startDate'] = is_numeric($filters['startDate'])
+                ? $filters['startDate']
+                : strtotime($filters['startDate']) * 1000;
+        }
+
+        if (isset($filters['endDate'])) {
+            $params['endDate'] = is_numeric($filters['endDate'])
+                ? $filters['endDate']
+                : strtotime($filters['endDate']) * 1000;
+        }
+
+        // Transaction type filter
+        if (isset($filters['transactionType'])) {
+            $params['transactionType'] = $filters['transactionType'];
+        }
+
+        // Pagination
+        $params['page'] = $filters['page'] ?? 0;
+        $params['size'] = $filters['size'] ?? 200;
+
+        return $this->makeRequest('GET', $endpoint, $params);
+    }
+
+    /**
+     * Get cargo invoice items for a specific invoice.
+     *
+     * @param string $invoiceId
+     * @return array
+     */
+    public function getCargoInvoiceItems(string $invoiceId): array
+    {
+        $sellerId = $this->credential->api_key;
+        $endpoint = "integration/finance/che/sellers/{$sellerId}/cargo-invoice/{$invoiceId}/items";
+        return $this->makeRequest('GET', $endpoint);
+    }
 }

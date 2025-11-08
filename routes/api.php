@@ -119,4 +119,36 @@ Route::prefix('v1')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\V1\MarketplaceDataController::class, 'listBrands']);
         Route::get('/{id}', [App\Http\Controllers\Api\V1\MarketplaceDataController::class, 'getBrand']);
     });
+
+    // Marketplace Financial Data (CHE API)
+    Route::prefix('marketplace-financials')->group(function () {
+        // Settlements (Sales transactions)
+        Route::get('/settlements', [App\Http\Controllers\Api\V1\MarketplaceFinancialController::class, 'listSettlements']);
+        Route::post('/settlements/fetch', [App\Http\Controllers\Api\V1\MarketplaceFinancialController::class, 'fetchSettlements']);
+
+        // Other Financials (Deductions, fees, penalties)
+        Route::get('/other-financials', [App\Http\Controllers\Api\V1\MarketplaceFinancialController::class, 'listOtherFinancials']);
+        Route::post('/other-financials/fetch', [App\Http\Controllers\Api\V1\MarketplaceFinancialController::class, 'fetchOtherFinancials']);
+
+        // Cargo Invoices
+        Route::get('/cargo-invoices', [App\Http\Controllers\Api\V1\MarketplaceFinancialController::class, 'listCargoInvoices']);
+        Route::post('/cargo-invoices/fetch', [App\Http\Controllers\Api\V1\MarketplaceFinancialController::class, 'fetchCargoInvoice']);
+
+        // Financial Summary & Dashboard
+        Route::get('/summary', [App\Http\Controllers\Api\V1\MarketplaceFinancialController::class, 'getSummary']);
+    });
+
+    // Profit Calculation & Additional Expenses
+    Route::prefix('profit')->group(function () {
+        // Profit calculation
+        Route::post('/calculate', [App\Http\Controllers\Api\V1\ProfitController::class, 'calculate']);
+        Route::post('/bulk-calculate', [App\Http\Controllers\Api\V1\ProfitController::class, 'bulkCalculate']);
+        Route::get('/summary', [App\Http\Controllers\Api\V1\ProfitController::class, 'summary']);
+
+        // Additional expenses management
+        Route::get('/expenses', [App\Http\Controllers\Api\V1\ProfitController::class, 'listExpenses']);
+        Route::post('/expenses', [App\Http\Controllers\Api\V1\ProfitController::class, 'addExpense']);
+        Route::put('/expenses/{id}', [App\Http\Controllers\Api\V1\ProfitController::class, 'updateExpense']);
+        Route::delete('/expenses/{id}', [App\Http\Controllers\Api\V1\ProfitController::class, 'deleteExpense']);
+    });
 });
