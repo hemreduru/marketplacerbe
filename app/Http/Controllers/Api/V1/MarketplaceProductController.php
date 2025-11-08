@@ -31,7 +31,7 @@ class MarketplaceProductController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $query = MarketplaceProduct::with(['product', 'marketplace'])
                 ->where('user_id', $userId);
@@ -86,7 +86,7 @@ class MarketplaceProductController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $marketplaceProduct = MarketplaceProduct::with(['product', 'marketplace'])
                 ->where('user_id', $userId)
@@ -119,7 +119,7 @@ class MarketplaceProductController extends Controller
     public function push(PushProductRequest $request): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             // Get product
             $product = Product::where('user_id', $userId)
@@ -188,7 +188,7 @@ class MarketplaceProductController extends Controller
                 __('api.marketplace_product.push_success')
             );
         } catch (\Exception $e) {
-            $userId = Auth::id() ?? 3;
+            $userId = Auth::id();
             Log::error("Kullanici ID:{$userId} - Urun pazaryerine gonderilemedi - " . $e->getMessage());
             return $this->errorResponse(
                 __('api.marketplace_product.push_failed') . ': ' . $e->getMessage(),
@@ -206,7 +206,7 @@ class MarketplaceProductController extends Controller
     public function pull(PullProductRequest $request): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             // Get credential
             $credential = UserMarketplaceCredential::where('user_id', $userId)
@@ -322,7 +322,7 @@ class MarketplaceProductController extends Controller
             );
         } catch (\Exception $e) {
             DB::rollBack();
-            $userId = Auth::id() ?? 3;
+            $userId = Auth::id();
             Log::error("Kullanici ID:{$userId} - Pazaryerinden urun cekilemedi - " . $e->getMessage());
             return $this->errorResponse(
                 __('api.marketplace_product.pull_failed') . ': ' . $e->getMessage(),
@@ -346,7 +346,7 @@ class MarketplaceProductController extends Controller
         ]);
 
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $marketplaceProduct = MarketplaceProduct::with(['product', 'marketplace'])
                 ->where('user_id', $userId)
@@ -416,7 +416,7 @@ class MarketplaceProductController extends Controller
                 __('api.marketplace_product.sync_success')
             );
         } catch (\Exception $e) {
-            $userId = Auth::id() ?? 3;
+            $userId = Auth::id();
             Log::error("Kullanici ID:{$userId} - Senkronizasyon basarisiz - " . $e->getMessage());
             return $this->errorResponse(
                 __('api.marketplace_product.sync_failed') . ': ' . $e->getMessage(),
@@ -434,7 +434,7 @@ class MarketplaceProductController extends Controller
     public function bulkPush(BulkPushProductRequest $request): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3;
+            $userId = Auth::id();
 
             // Get credential
             $credential = UserMarketplaceCredential::with('marketplace')
@@ -527,7 +527,7 @@ class MarketplaceProductController extends Controller
             );
         } catch (\Exception $e) {
             DB::rollBack();
-            $userId = Auth::id() ?? 3;
+            $userId = Auth::id();
             Log::error("Kullanici ID:{$userId} - Toplu push basarisiz - " . $e->getMessage());
             return $this->errorResponse(
                 __('api.marketplace_product.bulk_push_failed') . ': ' . $e->getMessage(),
@@ -545,7 +545,7 @@ class MarketplaceProductController extends Controller
     public function bulkSync(BulkSyncRequest $request): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3;
+            $userId = Auth::id();
 
             // Get marketplace products
             $marketplaceProducts = MarketplaceProduct::with(['product', 'marketplace', 'credential'])
@@ -660,7 +660,7 @@ class MarketplaceProductController extends Controller
                 __('api.marketplace_product.bulk_sync_success')
             );
         } catch (\Exception $e) {
-            $userId = Auth::id() ?? 3;
+            $userId = Auth::id();
             Log::error("Kullanici ID:{$userId} - Toplu sync basarisiz - " . $e->getMessage());
             return $this->errorResponse(
                 __('api.marketplace_product.bulk_sync_failed') . ': ' . $e->getMessage(),

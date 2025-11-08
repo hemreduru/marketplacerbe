@@ -29,7 +29,7 @@ class MarketplaceOrderController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $query = MarketplaceOrder::with(['marketplace', 'items'])
                 ->where('user_id', $userId);
@@ -90,7 +90,7 @@ class MarketplaceOrderController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $order = MarketplaceOrder::with(['marketplace', 'items.product', 'items.marketplaceProduct'])
                 ->where('user_id', $userId)
@@ -134,7 +134,7 @@ class MarketplaceOrderController extends Controller
         ]);
 
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             // Get credential
             $credential = UserMarketplaceCredential::where('user_id', $userId)
@@ -238,7 +238,7 @@ class MarketplaceOrderController extends Controller
         ]);
 
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $order = MarketplaceOrder::where('user_id', $userId)->find($id);
 
@@ -307,7 +307,7 @@ class MarketplaceOrderController extends Controller
         ]);
 
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $order = MarketplaceOrder::where('user_id', $userId)->find($id);
 
@@ -379,7 +379,7 @@ class MarketplaceOrderController extends Controller
         ]);
 
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $order = MarketplaceOrder::where('user_id', $userId)->find($id);
 

@@ -26,7 +26,7 @@ class ProductController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $query = Product::where('user_id', $userId);
 
@@ -80,7 +80,7 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             // Check if SKU already exists
             $exists = Product::where('user_id', $userId)
@@ -137,7 +137,7 @@ class ProductController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $product = Product::with('marketplaceProducts.marketplace')
                 ->where('user_id', $userId)
@@ -171,7 +171,7 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, int $id): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $product = Product::where('user_id', $userId)
                 ->find($id);
@@ -239,7 +239,7 @@ class ProductController extends Controller
     public function destroy(int $id): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $product = Product::where('user_id', $userId)
                 ->find($id);
@@ -277,7 +277,7 @@ class ProductController extends Controller
     public function restore(int $id): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $product = Product::onlyTrashed()
                 ->where('user_id', $userId)
@@ -321,7 +321,7 @@ class ProductController extends Controller
         ]);
 
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
             $products = [];
             $errors = [];
 

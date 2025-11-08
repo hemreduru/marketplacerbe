@@ -104,7 +104,7 @@ class MarketplaceController extends Controller
                 );
             }
 
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $stats = [
                 'marketplace' => $marketplace->only(['id', 'name', 'code', 'is_active']),

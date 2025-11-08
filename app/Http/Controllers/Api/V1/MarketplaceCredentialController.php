@@ -27,7 +27,7 @@ class MarketplaceCredentialController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $query = UserMarketplaceCredential::with('marketplace')
                 ->where('user_id', $userId);
@@ -65,7 +65,7 @@ class MarketplaceCredentialController extends Controller
     public function store(StoreCredentialRequest $request): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             // Check if credential already exists
             $exists = UserMarketplaceCredential::where('user_id', $userId)
@@ -114,7 +114,7 @@ class MarketplaceCredentialController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $credential = UserMarketplaceCredential::with('marketplace')
                 ->where('user_id', $userId)
@@ -148,7 +148,7 @@ class MarketplaceCredentialController extends Controller
     public function update(UpdateCredentialRequest $request, int $id): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $credential = UserMarketplaceCredential::where('user_id', $userId)
                 ->find($id);
@@ -191,7 +191,7 @@ class MarketplaceCredentialController extends Controller
     public function destroy(int $id): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $credential = UserMarketplaceCredential::where('user_id', $userId)
                 ->find($id);
@@ -229,7 +229,7 @@ class MarketplaceCredentialController extends Controller
     public function test(int $id): JsonResponse
     {
         try {
-            $userId = Auth::id() ?? 3; // Fallback to test user for now
+            $userId = Auth::id();
 
             $credential = UserMarketplaceCredential::with('marketplace')
                 ->where('user_id', $userId)
@@ -266,7 +266,7 @@ class MarketplaceCredentialController extends Controller
                 __('api.credential.test_success')
             );
         } catch (\Exception $e) {
-            $userId = Auth::id() ?? 3;
+            $userId = Auth::id();
             Log::error("Kullanici ID:{$userId} - Credential ID:{$id} test basarisiz - " . $e->getMessage());
             return $this->errorResponse(
                 __('api.credential.test_failed') . ': ' . $e->getMessage(),

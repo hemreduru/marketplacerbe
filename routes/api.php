@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')->group(function () {
-    // Health check
+    // Health check (public)
     Route::get('/ping', function () {
         return response()->json([
             'success' => true,
@@ -25,7 +25,21 @@ Route::prefix('v1')->group(function () {
         ]);
     });
 
-    // Test language endpoint (for development)
+    // Authentication routes (public)
+    Route::prefix('auth')->group(function () {
+        Route::post('/register', [App\Http\Controllers\Api\V1\AuthController::class, 'register']);
+        Route::post('/login', [App\Http\Controllers\Api\V1\AuthController::class, 'login']);
+
+        // Protected auth routes
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::post('/logout', [App\Http\Controllers\Api\V1\AuthController::class, 'logout']);
+            Route::get('/me', [App\Http\Controllers\Api\V1\AuthController::class, 'me']);
+            Route::post('/refresh', [App\Http\Controllers\Api\V1\AuthController::class, 'refresh']);
+            Route::post('/revoke-all', [App\Http\Controllers\Api\V1\AuthController::class, 'revokeAll']);
+        });
+    });
+
+    // Test language endpoint (for development - public)
     Route::get('/test-lang', function () {
         return response()->json([
             'success' => true,
@@ -40,7 +54,8 @@ Route::prefix('v1')->group(function () {
         ]);
     });
 
-    // Public routes (no auth required for now - will be protected in Phase 12)
+    // Protected routes (require authentication)
+    Route::middleware('auth:sanctum')->group(function () {
 
     // Marketplace Management
     Route::prefix('marketplaces')->group(function () {
@@ -151,4 +166,6 @@ Route::prefix('v1')->group(function () {
         Route::put('/expenses/{id}', [App\Http\Controllers\Api\V1\ProfitController::class, 'updateExpense']);
         Route::delete('/expenses/{id}', [App\Http\Controllers\Api\V1\ProfitController::class, 'deleteExpense']);
     });
+
+    }); // End of auth:sanctum middleware group
 });
