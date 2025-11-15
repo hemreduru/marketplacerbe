@@ -1,0 +1,61 @@
+<?php
+
+return [
+    // General
+    'welcome' => 'Welcome',
+    'dashboard' => 'Dashboard',
+    'home' => 'Home',
+    'logout' => 'Logout',
+    'login' => 'Login',
+    'register' => 'Register',
+    'sign_in' => 'Sign In',
+    'sign_up' => 'Sign Up',
+    'sign_out' => 'Sign Out',
+    'profile' => 'Profile',
+    'my_profile' => 'My Profile',
+    'settings' => 'Settings',
+    'create' => 'Create',
+    'save' => 'Save',
+    'cancel' => 'Cancel',
+    'delete' => 'Delete',
+    'edit' => 'Edit',
+    'view_all' => 'View All',
+    'search' => 'Search',
+    'filter' => 'Filter',
+    'export' => 'Export',
+    'import' => 'Import',
+    'actions' => 'Actions',
+    'status' => 'Status',
+    'date' => 'Date',
+    'amount' => 'Amount',
+    'total' => 'Total',
+    'active' => 'Active',
+    'inactive' => 'Inactive',
+    'pending' => 'Pending',
+    'completed' => 'Completed',
+    'cancelled' => 'Cancelled',
+    'loading' => 'Loading',
+    'please_wait' => 'Please wait...',
+    'no_data' => 'No data found',
+    'error' => 'Error',
+    'success' => 'Success',
+    'warning' => 'Warning',
+    'info' => 'Info',
+
+    // Confirmation & Dialog
+    'are_you_sure' => 'Are you sure?',
+    'yes' => 'Yes',
+    'no' => 'No',
+    'confirm' => 'Confirm',
+
+    // Error Messages
+    'forbidden' => 'You do not have permission to perform this action.',
+    'not_found' => 'The requested resource was not found.',
+    'server_error' => 'A server error occurred. Please try again later.',
+    'network_error' => 'Network connection error. Please check your internet connection.',
+    'unexpected_error' => 'An unexpected error occurred. Please try again.',
+
+    // Language
+        'language_updated' => 'Language updated successfully.',
+    'theme_updated' => 'Theme updated successfully.',
+];

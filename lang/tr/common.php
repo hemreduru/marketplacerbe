@@ -1,0 +1,61 @@
+<?php
+
+return [
+    // General
+    'welcome' => 'Hoş Geldiniz',
+    'dashboard' => 'Dashboard',
+    'home' => 'Ana Sayfa',
+    'logout' => 'Çıkış Yap',
+    'login' => 'Giriş Yap',
+    'register' => 'Kayıt Ol',
+    'sign_in' => 'Giriş Yap',
+    'sign_up' => 'Kayıt Ol',
+    'sign_out' => 'Çıkış Yap',
+    'profile' => 'Profil',
+    'my_profile' => 'Profilim',
+    'settings' => 'Ayarlar',
+    'create' => 'Oluştur',
+    'save' => 'Kaydet',
+    'cancel' => 'İptal',
+    'delete' => 'Sil',
+    'edit' => 'Düzenle',
+    'view_all' => 'Tümünü Gör',
+    'search' => 'Ara',
+    'filter' => 'Filtrele',
+    'export' => 'Dışa Aktar',
+    'import' => 'İçe Aktar',
+    'actions' => 'İşlemler',
+    'status' => 'Durum',
+    'date' => 'Tarih',
+    'amount' => 'Tutar',
+    'total' => 'Toplam',
+    'active' => 'Aktif',
+    'inactive' => 'Pasif',
+    'pending' => 'Bekliyor',
+    'completed' => 'Tamamlandı',
+    'cancelled' => 'İptal Edildi',
+    'loading' => 'Yükleniyor',
+    'please_wait' => 'Lütfen bekleyin...',
+    'no_data' => 'Veri bulunamadı',
+    'error' => 'Hata',
+    'success' => 'Başarılı',
+    'warning' => 'Uyarı',
+    'info' => 'Bilgi',
+
+    // Confirmation & Dialog
+    'are_you_sure' => 'Emin misiniz?',
+    'yes' => 'Evet',
+    'no' => 'Hayır',
+    'confirm' => 'Onayla',
+
+    // Error Messages
+    'forbidden' => 'Bu işlem için yetkiniz yok.',
+    'not_found' => 'Aradığınız kayıt bulunamadı.',
+    'server_error' => 'Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.',
+    'network_error' => 'Ağ bağlantısı hatası. İnternet bağlantınızı kontrol edin.',
+    'unexpected_error' => 'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.',
+
+    // Language
+        'language_updated' => 'Dil başarıyla değiştirildi.',
+    'theme_updated' => 'Tema başarıyla değiştirildi.',
+];

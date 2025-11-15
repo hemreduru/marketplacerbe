@@ -17,6 +17,22 @@ return [
     'validation_error' => 'Doğrulama hatası',
     'server_error' => 'Sunucu hatası',
 
+    // Kimlik Doğrulama
+    'auth' => [
+        'register_success' => 'Kayıt başarıyla tamamlandı',
+        'register_failed' => 'Kayıt başarısız oldu',
+        'login_success' => 'Giriş başarılı',
+        'invalid_credentials' => 'Geçersiz e-posta veya şifre',
+        'logout_success' => 'Çıkış başarılı',
+        'logout_failed' => 'Çıkış yapılamadı',
+        'user_info_success' => 'Kullanıcı bilgileri başarıyla getirildi',
+        'user_info_failed' => 'Kullanıcı bilgileri getirilemedi',
+        'token_refreshed' => 'Token başarıyla yenilendi',
+        'refresh_failed' => 'Token yenilenemedi',
+        'tokens_revoked' => 'Tüm tokenlar iptal edildi',
+        'revoke_failed' => 'Tokenlar iptal edilemedi',
+    ],
+
     // Pazaryerleri
     'marketplace' => [
         'list_success' => 'Pazaryerleri başarıyla getirildi',
@@ -24,6 +40,18 @@ return [
         'not_found' => 'Pazaryeri bulunamadı',
         'not_active' => 'Pazaryeri aktif değil',
         'not_implemented' => 'Pazaryeri servisi henüz hazır değil',
+    ],
+
+    // Profil
+    'profile' => [
+        'show_success' => 'Profil bilgileri başarıyla getirildi',
+        'show_failed' => 'Profil bilgileri getirilemedi',
+        'update_success' => 'Profil başarıyla güncellendi',
+        'update_failed' => 'Profil güncellenemedi',
+        'validation_failed' => 'Doğrulama hatası',
+        'current_password_incorrect' => 'Mevcut şifre yanlış',
+        'password_update_success' => 'Şifre başarıyla değiştirildi',
+        'password_update_failed' => 'Şifre değiştirilemedi',
     ],
 
     // Kullanıcı Ayarları

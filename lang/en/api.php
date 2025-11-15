@@ -17,6 +17,22 @@ return [
     'validation_error' => 'Validation error',
     'server_error' => 'Server error',
 
+    // Authentication
+    'auth' => [
+        'register_success' => 'Registration completed successfully',
+        'register_failed' => 'Registration failed',
+        'login_success' => 'Login successful',
+        'invalid_credentials' => 'Invalid email or password',
+        'logout_success' => 'Logout successful',
+        'logout_failed' => 'Logout failed',
+        'user_info_success' => 'User information retrieved successfully',
+        'user_info_failed' => 'Failed to retrieve user information',
+        'token_refreshed' => 'Token refreshed successfully',
+        'refresh_failed' => 'Token refresh failed',
+        'tokens_revoked' => 'All tokens revoked',
+        'revoke_failed' => 'Failed to revoke tokens',
+    ],
+
     // Marketplaces
     'marketplace' => [
         'list_success' => 'Marketplaces retrieved successfully',
@@ -24,6 +40,18 @@ return [
         'not_found' => 'Marketplace not found',
         'not_active' => 'Marketplace is not active',
         'not_implemented' => 'Marketplace service not implemented yet',
+    ],
+
+    // Profile
+    'profile' => [
+        'show_success' => 'Profile information retrieved successfully',
+        'show_failed' => 'Failed to retrieve profile information',
+        'update_success' => 'Profile updated successfully',
+        'update_failed' => 'Failed to update profile',
+        'validation_failed' => 'Validation failed',
+        'current_password_incorrect' => 'Current password is incorrect',
+        'password_update_success' => 'Password updated successfully',
+        'password_update_failed' => 'Failed to update password',
     ],
 
     // User Settings

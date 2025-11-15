@@ -14,7 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Add localization middleware to API routes
         $middleware->api(append: [
-            \App\Http\Middleware\LocalizationMiddleware::class,
+            \App\Http\Middleware\SetLocale::class,
+        ]);
+        
+        // Add localization middleware to web routes
+        $middleware->web(append: [
+            \App\Http\Middleware\SetLocaleFromSession::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
