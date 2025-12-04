@@ -155,8 +155,12 @@ class TrendyolFinanceService
     /**
      * Sync financial data for a date range to database.
      */
-    public function syncFinancialData(int $credentialId, string $startDateYmd, string $endDateYmd): void
+    /**
+     * Sync financial data for a date range to database.
+     */
+    public function syncFinancialData(int $credentialId, string $startDateYmd, string $endDateYmd): array
     {
+        $stats = ['created' => 0, 'updated' => 0, 'failed' => 0];
         $startMs = strtotime($startDateYmd . ' 00:00:00') * 1000;
         $endMs = strtotime($endDateYmd . ' 23:59:59') * 1000;
 
@@ -184,7 +188,7 @@ class TrendyolFinanceService
             $gross = (float)($s['credit'] ?? 0);
             $commission = (float)($s['commissionAmount'] ?? 0);
 
-            \App\Models\FinancialTransaction::updateOrCreate(
+            $tx = \App\Models\FinancialTransaction::updateOrCreate(
                 [
                     'user_marketplace_credential_id' => $credentialId,
                     'transaction_type' => 'Sale',
@@ -198,6 +202,9 @@ class TrendyolFinanceService
                     'metadata' => $s
                 ]
             );
+
+            if ($tx->wasRecentlyCreated) $stats['created']++;
+            else $stats['updated']++;
 
             if (!isset($dailyStats[$day])) {
                 $dailyStats[$day] = [
@@ -221,7 +228,7 @@ class TrendyolFinanceService
             $amt = (float)($d['debt'] ?? 0) - (float)($d['credit'] ?? 0);
             $val = max(0, $amt);
 
-            \App\Models\FinancialTransaction::updateOrCreate(
+            $tx = \App\Models\FinancialTransaction::updateOrCreate(
                 [
                     'user_marketplace_credential_id' => $credentialId,
                     'transaction_type' => 'Deduction',
@@ -233,6 +240,9 @@ class TrendyolFinanceService
                     'metadata' => $d
                 ]
             );
+
+            if ($tx->wasRecentlyCreated) $stats['created']++;
+            else $stats['updated']++;
 
             if (!isset($dailyStats[$day])) {
                 $dailyStats[$day] = [
@@ -267,21 +277,23 @@ class TrendyolFinanceService
             }
         }
 
-        foreach ($dailyStats as $day => $stats) {
-            $stats['net_profit'] = $stats['gross_sales']
-                - $stats['commission']
-                - $stats['shipping_cost']
-                - $stats['platform_expense']
-                - $stats['other_expense'];
+        foreach ($dailyStats as $day => $s) {
+            $s['net_profit'] = $s['gross_sales']
+                - $s['commission']
+                - $s['shipping_cost']
+                - $s['platform_expense']
+                - $s['other_expense'];
 
             \App\Models\FinancialDailySummary::updateOrCreate(
                 [
                     'user_marketplace_credential_id' => $credentialId,
                     'date' => $day
                 ],
-                $stats
+                $s
             );
         }
+
+        return $stats;
     }
 
     /**
@@ -293,7 +305,14 @@ class TrendyolFinanceService
      * @param int $credentialId
      * @param callable|null $onProgress function($current, $total)
      */
-    public function syncSmart(int $credentialId, ?callable $onProgress = null): void
+    /**
+     * Smart sync: fetches only missing/recent data (last 7 days if exists, else 5 years).
+     *
+     * @param int $credentialId
+     * @param int|null $startYear
+     * @param callable|null $onProgress function($current, $total, $msg, $stats)
+     */
+    public function syncSmart(int $credentialId, ?int $startYear = null, ?callable $onProgress = null): void
     {
         $latestTx = \App\Models\FinancialTransaction::where('user_marketplace_credential_id', $credentialId)
             ->orderBy('transaction_date', 'desc')
@@ -301,11 +320,14 @@ class TrendyolFinanceService
 
         $endDate = \Carbon\Carbon::now();
 
-        if ($latestTx) {
-            // Data exists: Sync from 7 days before latest transaction to cover updates/returns
+        if ($startYear) {
+            // Explicit start year
+            $startDate = \Carbon\Carbon::createFromDate($startYear, 1, 1)->startOfDay();
+        } elseif ($latestTx) {
+            // Data exists: Sync from 7 days before latest transaction
             $startDate = \Carbon\Carbon::parse($latestTx->transaction_date)->subDays(7);
         } else {
-            // No data: Sync last 5 years
+            // No data or full sync: Sync last 5 years
             $startDate = \Carbon\Carbon::now()->subYears(5);
         }
 
@@ -319,19 +341,26 @@ class TrendyolFinanceService
         while ($currentDate->lessThanOrEqualTo($endDate)) {
             $chunkEnd = $currentDate->copy()->addDays($chunkSize)->min($endDate);
 
+            $chunkStats = ['created' => 0, 'updated' => 0, 'failed' => 0];
             try {
-                $this->syncFinancialData(
+                $chunkStats = $this->syncFinancialData(
                     $credentialId,
                     $currentDate->format('Y-m-d'),
                     $chunkEnd->format('Y-m-d')
                 );
             } catch (\Exception $e) {
                 Log::error("Chunk sync failed ({$credentialId}): {$currentDate->format('Y-m-d')} - {$e->getMessage()}");
+                $chunkStats['failed']++;
             }
 
             $currentChunkIndex++;
             if ($onProgress) {
-                $onProgress($currentChunkIndex, $totalChunks);
+                $onProgress(
+                    $currentChunkIndex,
+                    $totalChunks,
+                    "Syncing period: " . $currentDate->format('Y-m-d') . " to " . $chunkEnd->format('Y-m-d'),
+                    $chunkStats
+                );
             }
 
             $currentDate->addDays($chunkSize + 1);

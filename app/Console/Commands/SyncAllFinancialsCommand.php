@@ -77,7 +77,7 @@ class SyncAllFinancialsCommand extends Command
                     false
                 );
 
-                $service->syncSmart($credential->id, function($current, $total) use ($bar) {
+                $service->syncSmart($credential->id, null, function($current, $total, $msg = null, $stats = []) use ($bar) {
                     if ($bar->getMaxSteps() != $total) {
                         $bar->setMaxSteps($total);
                         $bar->start();

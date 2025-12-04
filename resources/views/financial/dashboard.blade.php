@@ -3,6 +3,30 @@
 @section('title', 'Financial Dashboard')
 
 @section('content')
+    {{-- User Guidance Section --}}
+    <div class="alert alert-dismissible bg-light-primary d-flex flex-column flex-sm-row p-5 mb-5">
+        <i class="ki-duotone ki-information-5 fs-2hx text-primary me-4 mb-5 mb-sm-0">
+            <span class="path1"></span>
+            <span class="path2"></span>
+            <span class="path3"></span>
+        </i>
+        <div class="d-flex flex-column pe-0 pe-sm-10">
+            <h4 class="mb-2 text-dark">{{ __('common.financial_management_guide') }}</h4>
+            <ul class="mb-0">
+                <li><i class="ki-duotone ki-calendar fs-6 text-success me-1"><span class="path1"></span><span
+                            class="path2"></span></i> <strong>{{ __('common.date_range') }}:</strong>
+                    {{ __('common.financial_filter_description') }}</li>
+                <li><i class="ki-duotone ki-arrows-circle fs-6 text-info me-1"><span class="path1"></span><span
+                            class="path2"></span></i> <strong>{{ __('common.sync_data') }}:</strong>
+                    {{ __('common.financial_sync_description') }}</li>
+            </ul>
+        </div>
+        <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto"
+            data-bs-dismiss="alert">
+            <i class="ki-duotone ki-cross fs-1 text-primary"><span class="path1"></span><span class="path2"></span></i>
+        </button>
+    </div>
+
     <!--begin::Toolbar-->
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
         <div id="kt_app_toolbar_container" class="d-flex flex-stack w-100">
@@ -141,6 +165,25 @@
         $("#kt_daterangepicker_1").daterangepicker({
             startDate: moment("{{ $startDate }}"),
             endDate: moment("{{ $endDate }}"),
+            locale: {
+                applyLabel: '{{ __('common.apply') }}',
+                cancelLabel: '{{ __('common.cancel') }}',
+                fromLabel: '{{ __('common.from') }}',
+                toLabel: '{{ __('common.to') }}',
+                customRangeLabel: '{{ __('common.custom') }}',
+                daysOfWeek: ['{{ __('common.sun') }}', '{{ __('common.mon') }}', '{{ __('common.tue') }}',
+                    '{{ __('common.wed') }}', '{{ __('common.thu') }}', '{{ __('common.fri') }}',
+                    '{{ __('common.sat') }}'
+                ],
+                monthNames: ['{{ __('common.january') }}', '{{ __('common.february') }}',
+                    '{{ __('common.march') }}', '{{ __('common.april') }}', '{{ __('common.may') }}',
+                    '{{ __('common.june') }}', '{{ __('common.july') }}', '{{ __('common.august') }}',
+                    '{{ __('common.september') }}', '{{ __('common.october') }}',
+                    '{{ __('common.november') }}', '{{ __('common.december') }}'
+                ],
+                firstDay: 1,
+                format: 'DD.MM.YYYY'
+            },
             ranges: {
                 '{{ __('common.today') }}': [moment(), moment()],
                 '{{ __('common.yesterday') }}': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -155,6 +198,7 @@
         }, function(start, end, label) {
             $('#start_date').val(start.format('YYYY-MM-DD'));
             $('#end_date').val(end.format('YYYY-MM-DD'));
+            $('#kt_daterangepicker_1').val(start.format('DD.MM.YYYY') + ' - ' + end.format('DD.MM.YYYY'));
             $('#kt_daterangepicker_1').closest('form').submit();
         });
 

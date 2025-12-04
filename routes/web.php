@@ -8,6 +8,8 @@ use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\ProfileController;
 use App\Http\Controllers\Web\MarketplaceSettingsController;
 use App\Http\Controllers\Web\FinancialController;
+use App\Http\Controllers\Web\QuestionController;
+use App\Http\Controllers\Web\OrderController;
 
 // Redirect root to dashboard or login
 Route::get('/', function () {
@@ -41,6 +43,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/data', [ProductController::class, 'getData'])->name('products.data');
     Route::post('/products/sync', [ProductController::class, 'sync'])->name('products.sync');
+
+    // Questions
+    Route::get('/questions', [QuestionController::class, 'index'])->name('questions.index');
+    Route::post('/questions/answer', [QuestionController::class, 'answer'])->name('questions.answer');
+
+    // Orders
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/data', [OrderController::class, 'getData'])->name('orders.data');
+    Route::post('/orders/sync', [OrderController::class, 'sync'])->name('orders.sync');
+    Route::post('/orders/status', [OrderController::class, 'updateStatus'])->name('orders.status');
+    Route::post('/orders/label', [OrderController::class, 'getLabel'])->name('orders.label');
 
     // Marketplace Settings
     Route::get('/marketplace-settings', [MarketplaceSettingsController::class, 'index'])->name('marketplace.settings');

@@ -115,6 +115,7 @@ class TrendyolProductService
         $page = 0;
         $size = 50;
         $totalProcessed = 0;
+        $stats = ['created' => 0, 'updated' => 0, 'failed' => 0];
 
         do {
             $response = $this->getProducts(['page' => $page, 'size' => $size]);
@@ -131,34 +132,42 @@ class TrendyolProductService
             }
 
             foreach ($content as $item) {
-                \App\Models\Product::updateOrCreate(
-                    [
-                        'user_marketplace_credential_id' => $credentialId,
-                        'remote_id' => $item['productMainId'] ?? $item['id'] ?? null,
-                    ],
-                    [
-                        'barcode' => $item['barcode'] ?? null,
-                        'sku' => $item['stockCode'] ?? null,
-                        'title' => $item['title'] ?? 'Unknown Product',
-                        'brand' => $item['brand']['name'] ?? null,
-                        'category_name' => $item['categoryName'] ?? null,
-                        'category_id' => $item['pimCategoryId'] ?? null,
-                        'price' => $item['salePrice'] ?? 0,
-                        'list_price' => $item['listPrice'] ?? 0,
-                        'stock' => $item['quantity'] ?? $item['stockUnitQuantity'] ?? 0,
-                        'currency' => $item['currencyType'] ?? 'TRY',
-                        'status' => ($item['approved'] ?? false) ? 'active' : 'inactive',
-                        'images' => $item['images'] ?? [],
-                        'attributes' => $item['attributes'] ?? [],
-                        'description' => $item['description'] ?? null,
-                        'product_url' => $item['productUrl'] ?? null,
-                    ]
-                );
+                try {
+                    $product = \App\Models\Product::updateOrCreate(
+                        [
+                            'user_marketplace_credential_id' => $credentialId,
+                            'remote_id' => $item['productMainId'] ?? $item['id'] ?? null,
+                        ],
+                        [
+                            'barcode' => $item['barcode'] ?? null,
+                            'sku' => $item['stockCode'] ?? null,
+                            'title' => $item['title'] ?? 'Unknown Product',
+                            'brand' => $item['brand']['name'] ?? null,
+                            'category_name' => $item['categoryName'] ?? null,
+                            'category_id' => $item['pimCategoryId'] ?? null,
+                            'price' => $item['salePrice'] ?? 0,
+                            'list_price' => $item['listPrice'] ?? 0,
+                            'stock' => $item['quantity'] ?? $item['stockUnitQuantity'] ?? 0,
+                            'currency' => $item['currencyType'] ?? 'TRY',
+                            'status' => ($item['approved'] ?? false) ? 'active' : 'inactive',
+                            'images' => $item['images'] ?? [],
+                            'attributes' => $item['attributes'] ?? [],
+                            'description' => $item['description'] ?? null,
+                            'product_url' => $item['productUrl'] ?? null,
+                        ]
+                    );
+
+                    if ($product->wasRecentlyCreated) $stats['created']++;
+                    else $stats['updated']++;
+
+                } catch (\Exception $e) {
+                    $stats['failed']++;
+                }
                 $totalProcessed++;
             }
 
             if ($onProgress) {
-                $onProgress($totalProcessed, $totalElements);
+                $onProgress($totalProcessed, $totalElements, "Fetched: {$totalProcessed} / {$totalElements}", $stats);
             }
 
             $page++;
