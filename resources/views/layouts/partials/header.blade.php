@@ -1,10 +1,13 @@
 <!--begin::Header-->
-<div id="kt_app_header" class="app-header app-header-dark" data-kt-sticky="true" data-kt-sticky-activate="{default: true, lg: true}" data-kt-sticky-name="app-header-minimize" data-kt-sticky-offset="{default: '200px', lg: '0'}" data-kt-sticky-animation="false">
+<div id="kt_app_header" class="app-header app-header-dark" data-kt-sticky="true"
+    data-kt-sticky-activate="{default: true, lg: true}" data-kt-sticky-name="app-header-minimize"
+    data-kt-sticky-offset="{default: '200px', lg: '0'}" data-kt-sticky-animation="false">
     <!--begin::Header container-->
-    <div class="app-container container-fluid d-flex align-items-stretch justify-content-between" id="kt_app_header_container">
+    <div class="app-container container-fluid d-flex align-items-stretch justify-content-between"
+        id="kt_app_header_container">
         <!--begin::Sidebar mobile toggle-->
         <div class="d-flex align-items-center d-lg-none ms-n3 me-1 me-md-2" title="Show sidebar menu">
-            <div class="btn btn-icon btn-active-color-primary w-35px h-35px" id="kt_app_sidebar_mobile_toggle">
+            <div class="btn btn-sm btn-icon btn-active-color-primary w-35px h-35px" id="kt_app_sidebar_mobile_toggle">
                 <i class="ki-duotone ki-abstract-14 fs-2 fs-md-1">
                     <span class="path1"></span>
                     <span class="path2"></span>
@@ -21,13 +24,25 @@
         </div>
         <!--end::Mobile logo-->
 
+        <!--begin::Page title-->
+        <div class="d-flex align-items-center flex-wrap me-3 ms-lg-5">
+            <!--begin::Title-->
+            <h1 class="d-flex flex-column text-gray-900 fw-bold fs-3 mb-0">
+                @yield('title')
+            </h1>
+            <!--end::Title-->
+        </div>
+        <!--end::Page title-->
+
         <!--begin::Header wrapper-->
         <div class="d-flex align-items-stretch justify-content-end flex-lg-grow-1" id="kt_app_header_wrapper">
             <!--begin::Navbar-->
             <div class="app-navbar flex-shrink-0">
                 <!--begin::Language-->
                 <div class="app-navbar-item ms-1 ms-md-4">
-                    <a href="#" class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px" id="kt_language_toggle">
+                    <a href="#"
+                        class="btn btn-sm btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px"
+                        id="kt_language_toggle">
                         <span class="fs-5 fw-bold" id="current-language-code">TR</span>
                     </a>
                 </div>
@@ -35,7 +50,9 @@
 
                 <!--begin::Theme mode-->
                 <div class="app-navbar-item ms-1 ms-md-4">
-                    <a href="#" class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px" id="kt_theme_mode_toggle">
+                    <a href="#"
+                        class="btn btn-sm btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px"
+                        id="kt_theme_mode_toggle">
                         <i class="ki-duotone ki-night-day theme-light-show fs-1">
                             <span class="path1"></span>
                             <span class="path2"></span>
@@ -59,12 +76,15 @@
                 <!--begin::User menu-->
                 <div class="app-navbar-item ms-1 ms-md-4" id="kt_header_user_menu_toggle">
                     <!--begin::Menu wrapper-->
-                    <div class="cursor-pointer symbol symbol-35px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+                    <div class="cursor-pointer symbol symbol-35px"
+                        data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent"
+                        data-kt-menu-placement="bottom-end">
                         <img src="{{ asset('assets/media/avatars/blank.png') }}" class="rounded-3" alt="user" />
                     </div>
 
                     <!--begin::User account menu-->
-                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px" data-kt-menu="true">
+                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px"
+                        data-kt-menu="true">
                         <!--begin::Menu item-->
                         <div class="menu-item px-3">
                             <div class="menu-content d-flex align-items-center px-3">

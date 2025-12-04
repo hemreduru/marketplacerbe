@@ -2,11 +2,8 @@
 <!--begin::Global Javascript Bundle(mandatory for all pages)-->
 <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
 <script src="{{ asset('assets/js/scripts.bundle.js') }}"></script>
+<script src="{{ asset('assets/plugins/nprogress/nprogress.js') }}"></script>
 <!--end::Global Javascript Bundle-->
-
-<!--begin::Toastr JS (from Metronic)-->
-<script src="{{ asset('metronic_html_v8.2.0_demo1/demo1/src/plugins/toastr/build/toastr.min.js') }}"></script>
-<!--end::Toastr JS-->
 
 <!--begin::Global Configuration-->
 @include('layouts.partials.scripts.config')

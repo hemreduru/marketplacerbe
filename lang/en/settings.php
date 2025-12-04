@@ -27,8 +27,16 @@ return [
     // Validation & Messages
     'password_min_length' => 'Password must be at least 8 characters',
     'passwords_not_match' => 'Passwords do not match',
+    'current_password_incorrect' => 'Your current password is incorrect',
     'profile_updated' => 'Profile updated successfully',
     'password_updated' => 'Password updated successfully',
     'preferences_updated' => 'Preferences updated successfully',
+    'updated_successfully' => 'Settings updated successfully',
+    'data_loaded' => 'Settings loaded',
+    'language_updated' => 'Language preference updated',
+    'theme_updated' => 'Theme preference updated',
     'reload_page_for_changes' => 'The page will be reloaded for changes to take effect. Do you confirm?',
+    'select_theme' => 'Select Theme',
+    'marketplace_settings' => 'Marketplace Settings',
+    'credentials_updated' => 'Credentials updated successfully.',
 ];

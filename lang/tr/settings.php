@@ -27,8 +27,16 @@ return [
     // Validation & Messages
     'password_min_length' => 'Şifre en az 8 karakter olmalıdır',
     'passwords_not_match' => 'Şifreler eşleşmiyor',
+    'current_password_incorrect' => 'Mevcut şifreniz yanlış',
     'profile_updated' => 'Profil başarıyla güncellendi',
     'password_updated' => 'Şifre başarıyla değiştirildi',
     'preferences_updated' => 'Tercihler başarıyla güncellendi',
+    'updated_successfully' => 'Ayarlar başarıyla güncellendi',
+    'data_loaded' => 'Ayarlar yüklendi',
+    'language_updated' => 'Dil tercihi güncellendi',
+    'theme_updated' => 'Tema tercihi güncellendi',
     'reload_page_for_changes' => 'Değişikliklerin etkili olması için sayfa yenilenecek. Onaylıyor musunuz?',
+    'select_theme' => 'Tema Seçin',
+    'marketplace_settings' => 'Pazaryeri Ayarları',
+    'credentials_updated' => 'Kimlik bilgileri başarıyla güncellendi.',
 ];

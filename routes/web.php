@@ -5,6 +5,8 @@ use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\ProfileController;
+use App\Http\Controllers\Web\MarketplaceSettingsController;
+use App\Http\Controllers\Web\FinancialController;
 
 // Redirect root to dashboard or login
 Route::get('/', function () {
@@ -25,17 +27,20 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // Profile
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
-    
+
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
-    
-    // AJAX preferences endpoints
-    Route::post('/settings/language', [SettingsController::class, 'updateLanguage'])->name('settings.language');
+    Route::put('/settings/password', [ProfileController::class, 'updatePassword'])->name('settings.password');
+    Route::put('/settings/profile', [ProfileController::class, 'update'])->name('settings.profile');
     Route::post('/settings/theme', [SettingsController::class, 'updateTheme'])->name('settings.theme');
+    Route::post('/settings/language', [SettingsController::class, 'updateLanguage'])->name('settings.language');
+
+    // Marketplace Settings
+    Route::get('/marketplace-settings', [MarketplaceSettingsController::class, 'index'])->name('marketplace.settings');
+    Route::put('/marketplace-settings', [MarketplaceSettingsController::class, 'update'])->name('marketplace.settings.update');
+
+    // Financial
+    Route::get('/financial', [FinancialController::class, 'index'])->name('financial.index');
+    Route::post('/financial/sync', [FinancialController::class, 'sync'])->name('financial.sync');
 });

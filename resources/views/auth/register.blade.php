@@ -119,7 +119,7 @@
 
                             <!--begin::Submit button-->
                             <div class="d-grid mb-10">
-                                <button type="submit" id="kt_sign_up_submit" class="btn btn-primary">
+                                <button type="submit" id="kt_sign_up_submit" class="btn btn-sm btn-primary">
                                     <span class="indicator-label">{{ __('auth.sign_up') }}</span>
                                     <span class="indicator-progress">{{ __('common.please_wait') }}
                                     <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>

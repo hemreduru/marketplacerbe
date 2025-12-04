@@ -7,7 +7,7 @@
      */
 
     // Set axios defaults
-    axios.defaults.baseURL = '{{ url("/") }}';
+    axios.defaults.baseURL = '{{ url('/') }}';
     axios.defaults.headers.common['Accept'] = 'application/json';
     axios.defaults.headers.common['Content-Type'] = 'application/json';
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -18,12 +18,31 @@
         axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken.getAttribute('content');
     }
 
+    // Configure NProgress
+    NProgress.configure({
+        showSpinner: false
+    });
+
+    // Add request interceptor
+    axios.interceptors.request.use(
+        (config) => {
+            NProgress.start();
+            return config;
+        },
+        (error) => {
+            NProgress.done();
+            return Promise.reject(error);
+        }
+    );
+
     // Add response interceptor for global error handling
     axios.interceptors.response.use(
         (response) => {
+            NProgress.done();
             return response;
         },
         (error) => {
+            NProgress.done();
             if (error.response) {
                 // Handle 401 Unauthorized - redirect to login
                 if (error.response.status === 401) {

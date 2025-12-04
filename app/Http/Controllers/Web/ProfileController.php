@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -15,11 +17,7 @@ class ProfileController extends Controller
      */
     public function show()
     {
-        $user = Auth::user();
-        
-        return view('profile.show', [
-            'user' => $user
-        ]);
+        return redirect()->route('settings');
     }
 
     /**
@@ -28,24 +26,55 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
-        
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
         ]);
 
         if ($validator->fails()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first(),
+                    'errors' => $validator->errors()
+                ], 422);
+            }
             return back()->withErrors($validator)->withInput();
         }
 
-        $user->update([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-        ]);
+        DB::beginTransaction();
 
-        return back()->with('success', __('common.profile_updated'));
+        try {
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+            ]);
+
+            DB::commit();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => __('settings.profile_updated'),
+                    'data' => $user
+                ]);
+            }
+
+            return back()->with('success', __('settings.profile_updated'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to update profile: ' . $e->getMessage());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('common.error_occurred')
+                ], 500);
+            }
+
+            return back()->with('error', __('common.error_occurred'));
+        }
     }
 
     /**
@@ -54,27 +83,66 @@ class ProfileController extends Controller
     public function updatePassword(Request $request)
     {
         $user = Auth::user();
-        
+
         $validator = Validator::make($request->all(), [
             'current_password' => 'required|string',
-            'password' => 'required|string|min:6|confirmed',
+            'new_password' => 'required|string|min:8',
+            'new_password_confirmation' => 'required|string|same:new_password',
         ]);
 
         if ($validator->fails()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first(),
+                    'errors' => $validator->errors()
+                ], 422);
+            }
             return back()->withErrors($validator)->withInput();
         }
 
         // Check if current password is correct
         if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors([
-                'current_password' => __('auth.current_password_incorrect')
-            ]);
+            $errorMessage = __('settings.current_password_incorrect');
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage,
+                    'errors' => ['current_password' => [$errorMessage]]
+                ], 422);
+            }
+            return back()->withErrors(['current_password' => $errorMessage]);
         }
 
-        $user->update([
-            'password' => Hash::make($request->password),
-        ]);
+        DB::beginTransaction();
 
-        return back()->with('success', __('common.password_updated'));
+        try {
+            $user->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+
+            DB::commit();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => __('settings.password_updated')
+                ]);
+            }
+
+            return back()->with('success', __('settings.password_updated'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to update password: ' . $e->getMessage());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('common.error_occurred')
+                ], 500);
+            }
+
+            return back()->with('error', __('common.error_occurred'));
+        }
     }
 }

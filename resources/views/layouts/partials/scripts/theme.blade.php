@@ -34,12 +34,11 @@
             language_id: newLangId
         }).then(response => {
             if (response.data.success) {
-                showSuccess(response.data.message || '{{ __("common.language_updated") }}');
                 // Reload to apply new translations
-                setTimeout(() => window.location.reload(), 500);
+                window.location.reload();
             }
         }).catch(error => {
-            showError(error.response?.data?.message || '{{ __("common.language_update_failed") }}');
+            showError(error.response?.data?.message || '{{ __('common.language_update_failed') }}');
         });
     }
 </script>
