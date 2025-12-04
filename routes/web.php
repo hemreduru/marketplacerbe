@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\SettingsController;
+use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\ProfileController;
 use App\Http\Controllers\Web\MarketplaceSettingsController;
 use App\Http\Controllers\Web\FinancialController;
@@ -35,6 +36,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/settings/profile', [ProfileController::class, 'update'])->name('settings.profile');
     Route::post('/settings/theme', [SettingsController::class, 'updateTheme'])->name('settings.theme');
     Route::post('/settings/language', [SettingsController::class, 'updateLanguage'])->name('settings.language');
+
+    // Products
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/data', [ProductController::class, 'getData'])->name('products.data');
+    Route::post('/products/sync', [ProductController::class, 'sync'])->name('products.sync');
 
     // Marketplace Settings
     Route::get('/marketplace-settings', [MarketplaceSettingsController::class, 'index'])->name('marketplace.settings');

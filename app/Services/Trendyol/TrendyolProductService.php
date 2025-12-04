@@ -103,4 +103,68 @@ class TrendyolProductService
 
         return $response->json();
     }
+    /**
+     * Sync products from Trendyol to Database.
+     *
+     * @param int $credentialId
+     * @param callable|null $onProgress function($current, $total)
+     * @return void
+     */
+    public function syncProducts(int $credentialId, ?callable $onProgress = null): void
+    {
+        $page = 0;
+        $size = 50;
+        $totalProcessed = 0;
+
+        do {
+            $response = $this->getProducts(['page' => $page, 'size' => $size]);
+
+            if (isset($response['error'])) {
+                throw new \Exception($response['message']);
+            }
+
+            $content = $response['content'] ?? [];
+            $totalElements = $response['totalElements'] ?? 0;
+
+            if (empty($content)) {
+                break;
+            }
+
+            foreach ($content as $item) {
+                \App\Models\Product::updateOrCreate(
+                    [
+                        'user_marketplace_credential_id' => $credentialId,
+                        'remote_id' => $item['productMainId'] ?? $item['id'] ?? null,
+                    ],
+                    [
+                        'barcode' => $item['barcode'] ?? null,
+                        'sku' => $item['stockCode'] ?? null,
+                        'title' => $item['title'] ?? 'Unknown Product',
+                        'brand' => $item['brand']['name'] ?? null,
+                        'category_name' => $item['categoryName'] ?? null,
+                        'category_id' => $item['pimCategoryId'] ?? null,
+                        'price' => $item['salePrice'] ?? 0,
+                        'list_price' => $item['listPrice'] ?? 0,
+                        'stock' => $item['quantity'] ?? $item['stockUnitQuantity'] ?? 0,
+                        'currency' => $item['currencyType'] ?? 'TRY',
+                        'status' => ($item['approved'] ?? false) ? 'active' : 'inactive',
+                        'images' => $item['images'] ?? [],
+                        'attributes' => $item['attributes'] ?? [],
+                        'description' => $item['description'] ?? null,
+                        'product_url' => $item['productUrl'] ?? null,
+                    ]
+                );
+                $totalProcessed++;
+            }
+
+            if ($onProgress) {
+                $onProgress($totalProcessed, $totalElements);
+            }
+
+            $page++;
+            // Safety break to prevent infinite loops if API reports wrong total
+            if ($page * $size > $totalElements + $size) break;
+
+        } while (!empty($content));
+    }
 }

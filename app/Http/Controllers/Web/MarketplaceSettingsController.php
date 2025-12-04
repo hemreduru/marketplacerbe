@@ -59,6 +59,7 @@ class MarketplaceSettingsController extends Controller
             $marketplace = \App\Models\Marketplace::find($validated['marketplace_id']);
             if ($marketplace && $marketplace->slug === 'trendyol') {
                 \App\Jobs\SyncTrendyolFinancialsJob::dispatch($credential->id);
+                \App\Jobs\SyncTrendyolProductsJob::dispatch($credential->id);
             }
 
             return response()->json([
