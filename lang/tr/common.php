@@ -111,4 +111,5 @@ return [
     'stock_less_than_tooltip' => 'Stokta olmayan ürünleri dahil etmez',
     'sku' => 'SKU',
     'has_stock' => 'Stok Var',
+    'financial' => 'Finansal',
 ];

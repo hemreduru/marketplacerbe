@@ -112,4 +112,5 @@ return [
     'stock_less_than_tooltip' => 'Excludes out of stock items',
     'sku' => 'SKU',
     'has_stock' => 'In Stock',
+    'financial' => 'Financial',
 ];

@@ -57,24 +57,6 @@
 
                 <!--begin:Menu item-->
                 <div class="menu-item">
-                    <a class="menu-link {{ request()->routeIs('marketplace.settings') ? 'active' : '' }}"
-                        href="{{ route('marketplace.settings') }}">
-                        <span class="menu-icon">
-                            <i class="ki-duotone ki-shop fs-2">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                                <span class="path3"></span>
-                                <span class="path4"></span>
-                                <span class="path5"></span>
-                            </i>
-                        </span>
-                        <span class="menu-title">{{ __('settings.marketplace_settings') }}</span>
-                    </a>
-                </div>
-                <!--end:Menu item-->
-
-                <!--begin:Menu item-->
-                <div class="menu-item">
                     <a class="menu-link {{ request()->routeIs('financial.index') ? 'active' : '' }}"
                         href="{{ route('financial.index') }}">
                         <span class="menu-icon">
@@ -84,7 +66,7 @@
                                 <span class="path3"></span>
                             </i>
                         </span>
-                        <span class="menu-title">Financial</span>
+                        <span class="menu-title">{{ __('common.financial') }}</span>
                     </a>
                 </div>
                 <!--end:Menu item-->
@@ -102,6 +84,24 @@
                             </i>
                         </span>
                         <span class="menu-title">{{ __('common.products') }}</span>
+                    </a>
+                </div>
+                <!--end:Menu item-->
+
+                <!--begin:Menu item-->
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('marketplace.settings') ? 'active' : '' }}"
+                        href="{{ route('marketplace.settings') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-shop fs-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                                <span class="path4"></span>
+                                <span class="path5"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">{{ __('settings.marketplace_settings') }}</span>
                     </a>
                 </div>
                 <!--end:Menu item-->
