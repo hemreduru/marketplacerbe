@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Language;
+use App\Models\UserSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\UserSetting;
-use App\Models\Language;
+use Illuminate\Support\Facades\Validator;
 
 class SettingsController extends Controller
 {
@@ -25,7 +25,7 @@ class SettingsController extends Controller
         return view('profile.settings', [
             'user' => $user,
             'settings' => $settings,
-            'languages' => $languages
+            'languages' => $languages,
         ]);
     }
 
@@ -46,7 +46,7 @@ class SettingsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => __('validation.failed'),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -78,21 +78,22 @@ class SettingsController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('settings.updated_successfully'),
-                'data' => $settings
+                'data' => $settings,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update settings: ' . $e->getMessage());
+            Log::error('Failed to update settings: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => __('common.error_occurred')
+                'message' => __('common.error_occurred'),
             ], 500);
         }
     }
 
     /**
      * Update language preference (AJAX)
+     *
      * @deprecated Use update() method instead
      */
     public function updateLanguage(Request $request)
@@ -107,7 +108,7 @@ class SettingsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $validator->errors()->first(),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -130,21 +131,22 @@ class SettingsController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('settings.language_updated'),
-                'data' => ['language' => $language->code]
+                'data' => ['language' => $language->code],
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update language: ' . $e->getMessage());
+            Log::error('Failed to update language: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => __('common.error_occurred')
+                'message' => __('common.error_occurred'),
             ], 500);
         }
     }
 
     /**
      * Update theme preference (AJAX)
+     *
      * @deprecated Use update() method instead
      */
     public function updateTheme(Request $request)
@@ -159,20 +161,22 @@ class SettingsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $validator->errors()->first(),
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         DB::beginTransaction();
 
         try {
+            $settings = UserSetting::where('user_id', $user->id)->first();
+            $languageId = $settings ? $settings->preferred_language_id : (Language::where('code', 'tr')->first()->id ?? 1);
+
             $settings = UserSetting::updateOrCreate(
                 ['user_id' => $user->id],
                 [
                     'dark_mode' => $request->dark_mode,
                     'theme' => $request->dark_mode ? 'dark' : 'light',
-                    // Ensure preferred_language_id is set if creating new
-                    'preferred_language_id' => DB::raw('COALESCE(preferred_language_id, (SELECT id FROM languages WHERE code = "tr" LIMIT 1))')
+                    'preferred_language_id' => $languageId,
                 ]
             );
 
@@ -183,15 +187,15 @@ class SettingsController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('settings.theme_updated'),
-                'data' => ['dark_mode' => $request->dark_mode]
+                'data' => ['dark_mode' => $request->dark_mode],
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update theme: ' . $e->getMessage());
+            Log::error('Failed to update theme: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => __('common.error_occurred')
+                'message' => __('common.error_occurred'),
             ], 500);
         }
     }

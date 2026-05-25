@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,11 +16,6 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'username',
@@ -29,45 +23,28 @@ class User extends Authenticatable
         'avatar',
         'password',
         'settings_id',
+        'is_admin',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 
-    /**
-     * Get the marketplace credentials for this user.
-     */
     public function marketplaceCredentials(): HasMany
     {
         return $this->hasMany(UserMarketplaceCredential::class);
     }
 
-    /**
-     * Get the products this user has across all of their marketplace credentials.
-     *
-     * Products belong to a credential rather than directly to a user, so this
-     * resolves them through the user_marketplace_credentials table.
-     */
     public function products(): HasManyThrough
     {
         return $this->hasManyThrough(
@@ -78,17 +55,11 @@ class User extends Authenticatable
         );
     }
 
-    /**
-     * Get the orders placed against this user's marketplaces.
-     */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
-    /**
-     * Get the marketplace sync logs across this user's credentials.
-     */
     public function syncLogs(): HasManyThrough
     {
         return $this->hasManyThrough(
@@ -99,11 +70,62 @@ class User extends Authenticatable
         );
     }
 
-    /**
-     * Get the user settings.
-     */
     public function settings(): HasOne
     {
         return $this->hasOne(UserSetting::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class)->latest();
+    }
+
+    /**
+     * Returns the most recent subscription that is currently valid (trial, active, or grace period).
+     * The related plan is eager-loaded to avoid N+1 queries.
+     */
+    public function activeSubscription(): ?Subscription
+    {
+        return $this->subscriptions()
+            ->with('plan')
+            ->get()
+            ->first(fn (Subscription $s) => $s->valid());
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return $this->activeSubscription() !== null;
+    }
+
+    public function canUseFeature(string $feature): bool
+    {
+        $subscription = $this->activeSubscription();
+
+        if (! $subscription) {
+            return false;
+        }
+
+        return $subscription->plan->hasFeature($feature);
+    }
+
+    /**
+     * Returns the resource limit from the active plan. -1 means unlimited.
+     *
+     * @param  string  $resource  marketplaces|orders|products
+     */
+    public function getSubscriptionLimit(string $resource): int
+    {
+        $subscription = $this->activeSubscription();
+
+        if (! $subscription) {
+            return 0;
+        }
+
+        return $subscription->plan->getLimit($resource);
+    }
+
+    public function isAdmin(): bool
+    {
+        return (bool) $this->is_admin;
     }
 }

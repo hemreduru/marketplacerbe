@@ -44,6 +44,25 @@ class MarketplaceSettingsController extends Controller
             $user = Auth::user();
             $validated = $request->validated();
 
+            // Guard: Marketplace Limit Enforcement
+            $exists = UserMarketplaceCredential::where('user_id', $user->id)
+                ->where('marketplace_id', $validated['marketplace_id'])
+                ->exists();
+
+            if (! $exists) {
+                $currentCount = UserMarketplaceCredential::where('user_id', $user->id)->count();
+                $limit = $user->getSubscriptionLimit('marketplaces');
+
+                if ($limit !== -1 && $currentCount >= $limit) {
+                    DB::rollBack();
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => __('subscription.marketplace_limit_reached', ['limit' => $limit]),
+                    ], 422);
+                }
+            }
+
             $credential = UserMarketplaceCredential::updateOrCreate(
                 [
                     'user_id' => $user->id,

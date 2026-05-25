@@ -3,6 +3,34 @@
 @section('title', __('settings.marketplace_settings'))
 
 @section('content')
+    <!--begin::Session Alerts-->
+    @if(session('success'))
+        <div class="alert alert-dismissible bg-light-success border border-success d-flex align-items-center p-5 mb-8" style="border-radius: 1rem;">
+            <i class="ki-duotone ki-shield-tick fs-2hx text-success me-4"><span class="path1"></span><span class="path2"></span></i>
+            <div class="d-flex flex-column">
+                <h4 class="mb-1 text-success fw-bold">{{ __('common.success') }}</h4>
+                <span class="fw-semibold">{{ session('success') }}</span>
+            </div>
+            <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto" data-bs-dismiss="alert">
+                <i class="ki-duotone ki-cross fs-1 text-success"><span class="path1"></span><span class="path2"></span></i>
+            </button>
+        </div>
+    @endif
+
+    @if(session('info'))
+        <div class="alert alert-dismissible bg-light-info border border-info d-flex align-items-center p-5 mb-8" style="border-radius: 1rem;">
+            <i class="ki-duotone ki-information-5 fs-2hx text-info me-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+            <div class="d-flex flex-column">
+                <h4 class="mb-1 text-info fw-bold">{{ __('common.info') }}</h4>
+                <span class="fw-semibold">{{ session('info') }}</span>
+            </div>
+            <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto" data-bs-dismiss="alert">
+                <i class="ki-duotone ki-cross fs-1 text-info"><span class="path1"></span><span class="path2"></span></i>
+            </button>
+        </div>
+    @endif
+    <!--end::Session Alerts-->
+
     <!--begin::Content-->
     <div class="card">
         <div class="card-header card-header-stretch overflow-auto">

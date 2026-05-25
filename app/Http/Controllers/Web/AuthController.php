@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Plan;
+use App\Models\User;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -17,6 +20,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
+
         return view('auth.login');
     }
 
@@ -28,6 +32,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
+
         return view('auth.register');
     }
 
@@ -49,6 +54,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
             return redirect()->intended('dashboard');
         }
 
@@ -73,12 +79,17 @@ class AuthController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        $user = \App\Models\User::create([
+        $user = User::create([
             'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
+
+        $trialPlan = Plan::where('name', 'growth')->first();
+        if ($trialPlan) {
+            app(SubscriptionService::class)->startTrial($user, $trialPlan);
+        }
 
         Auth::login($user);
         $request->session()->regenerate();

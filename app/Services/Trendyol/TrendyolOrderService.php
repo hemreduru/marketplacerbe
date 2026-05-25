@@ -2,7 +2,9 @@
 
 namespace App\Services\Trendyol;
 
+use App\Exceptions\SubscriptionLimitException;
 use App\Models\Order;
+use App\Models\User;
 use App\Services\Contracts\OrderServiceContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -88,6 +90,16 @@ class TrendyolOrderService implements OrderServiceContract
     {
         $totalStats = ['created' => 0, 'updated' => 0, 'failed' => 0];
 
+        $user = User::find($userId);
+        $limit = $user?->getSubscriptionLimit('orders') ?? 100;
+        $currentMonthOrdersCount = Order::where('user_id', $userId)
+            ->where('order_date', '>=', now()->startOfMonth())
+            ->count();
+
+        if ($limit !== -1 && $currentMonthOrdersCount >= $limit) {
+            throw new SubscriptionLimitException(__('subscription.order_limit_reached', ['limit' => $limit]));
+        }
+
         // Smart Sync Logic
         $lastOrder = Order::where('marketplace_id', $marketplaceId)
             ->where('user_id', $userId)
@@ -148,7 +160,22 @@ class TrendyolOrderService implements OrderServiceContract
 
                 foreach ($orders as $orderData) {
                     try {
-                        DB::transaction(function () use ($orderData, $marketplaceId, $userId, &$chunkStats, &$totalStats) {
+                        DB::transaction(function () use ($orderData, $marketplaceId, $userId, $limit, &$chunkStats, &$totalStats) {
+                            $exists = Order::where('marketplace_id', $marketplaceId)
+                                ->where('user_id', $userId)
+                                ->where('order_number', $orderData['orderNumber'])
+                                ->exists();
+
+                            if (! $exists) {
+                                $currentMonthOrdersCount = Order::where('user_id', $userId)
+                                    ->where('order_date', '>=', now()->startOfMonth())
+                                    ->count();
+
+                                if ($currentMonthOrdersCount >= $limit) {
+                                    throw new SubscriptionLimitException(__('subscription.order_limit_reached', ['limit' => $limit]));
+                                }
+                            }
+
                             $orderDate = isset($orderData['orderDate']) ? Carbon::createFromTimestampMs($orderData['orderDate']) : null;
 
                             $order = Order::updateOrCreate(
@@ -197,6 +224,9 @@ class TrendyolOrderService implements OrderServiceContract
                             }
                         });
                     } catch (\Exception $e) {
+                        if ($e instanceof SubscriptionLimitException) {
+                            throw $e;
+                        }
                         Log::error('Failed to sync order '.($orderData['orderNumber'] ?? '?').': '.$e->getMessage());
                         $chunkStats['failed']++;
                         $totalStats['failed']++;

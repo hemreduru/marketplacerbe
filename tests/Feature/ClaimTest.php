@@ -4,7 +4,7 @@ use App\Models\Claim;
 use Illuminate\Support\Facades\Http;
 
 test('claim sync stores claims pulled from the marketplace', function () {
-    [$user, $credential] = userWithTrendyol();
+    [$user, $credential] = userWithTrendyol('pro');
 
     Http::fake([
         '*/integration/order/sellers/*/claims*' => Http::sequence()
@@ -37,7 +37,7 @@ test('claim sync stores claims pulled from the marketplace', function () {
 });
 
 test('claims data endpoint returns claims for the datatable', function () {
-    [$user, $credential] = userWithTrendyol();
+    [$user, $credential] = userWithTrendyol('pro');
     Claim::factory()->count(3)->create(['user_marketplace_credential_id' => $credential->id]);
 
     $this->actingAs($user)
@@ -50,7 +50,7 @@ test('approving a claim is simulated when writes are disabled', function () {
     config(['marketplace.write_enabled' => false]);
     Http::preventStrayRequests();
 
-    [$user, $credential] = userWithTrendyol();
+    [$user, $credential] = userWithTrendyol('pro');
     $claim = Claim::factory()->create(['user_marketplace_credential_id' => $credential->id]);
 
     $this->actingAs($user)

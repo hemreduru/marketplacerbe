@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Web\AdminPlanController;
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\ClaimController;
 use App\Http\Controllers\Web\DashboardController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\ProfileController;
 use App\Http\Controllers\Web\QuestionController;
 use App\Http\Controllers\Web\SettingsController;
+use App\Http\Controllers\Web\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to dashboard or login
@@ -29,6 +31,18 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 // Protected routes (require authentication)
 Route::middleware('auth')->group(function () {
+    // Subscription
+    Route::get('/subscription/select', [SubscriptionController::class, 'select'])->name('subscription.select');
+    Route::post('/subscription/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
+    Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+
+    // Admin
+    Route::prefix('admin')->middleware('admin')->group(function () {
+        Route::get('/plans', [AdminPlanController::class, 'index'])->name('admin.plans.index');
+        Route::get('/plans/{plan}/edit', [AdminPlanController::class, 'edit'])->name('admin.plans.edit');
+        Route::put('/plans/{plan}', [AdminPlanController::class, 'update'])->name('admin.plans.update');
+    });
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -47,10 +61,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/update-price-stock', [ProductController::class, 'updatePriceStock'])->name('products.update-price-stock');
 
     // Claims (returns)
-    Route::get('/claims', [ClaimController::class, 'index'])->name('claims.index');
-    Route::get('/claims/data', [ClaimController::class, 'getData'])->name('claims.data');
-    Route::post('/claims/sync', [ClaimController::class, 'sync'])->name('claims.sync');
-    Route::post('/claims/approve', [ClaimController::class, 'approve'])->name('claims.approve');
+    Route::middleware('feature:claims')->group(function () {
+        Route::get('/claims', [ClaimController::class, 'index'])->name('claims.index');
+        Route::get('/claims/data', [ClaimController::class, 'getData'])->name('claims.data');
+        Route::post('/claims/sync', [ClaimController::class, 'sync'])->name('claims.sync');
+        Route::post('/claims/approve', [ClaimController::class, 'approve'])->name('claims.approve');
+    });
 
     // Questions
     Route::get('/questions', [QuestionController::class, 'index'])->name('questions.index');
@@ -69,6 +85,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/marketplace-settings', [MarketplaceSettingsController::class, 'update'])->name('marketplace.settings.update');
 
     // Financial
-    Route::get('/financial', [FinancialController::class, 'index'])->name('financial.index');
-    Route::post('/financial/sync', [FinancialController::class, 'sync'])->name('financial.sync');
+    Route::middleware('feature:analytics')->group(function () {
+        Route::get('/financial', [FinancialController::class, 'index'])->name('financial.index');
+        Route::post('/financial/sync', [FinancialController::class, 'sync'])->name('financial.sync');
+    });
 });

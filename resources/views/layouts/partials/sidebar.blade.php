@@ -6,10 +6,10 @@
     <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
         <!--begin::Logo image-->
         <a href="{{ route('dashboard') }}">
-            <img alt="Logo" src="{{ asset('assets/media/logos/default-dark.svg') }}"
-                class="h-25px app-sidebar-logo-default" />
-            <img alt="Logo" src="{{ asset('assets/media/logos/default-small.svg') }}"
-                class="h-20px app-sidebar-logo-minimize" />
+            <img alt="Logo" src="{{ asset('assets/media/logos/cirotik-logo.png') }}"
+                class="h-35px app-sidebar-logo-default" />
+            <img alt="Logo" src="{{ asset('assets/media/logos/cirotik-logo-mini.png') }}"
+                class="h-25px app-sidebar-logo-minimize" />
         </a>
         <!--end::Logo image-->
 
@@ -34,6 +34,7 @@
             data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto"
             data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
             data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
+
             <!--begin::Menu-->
             <div class="menu menu-column menu-rounded menu-sub-indention px-3" id="#kt_app_sidebar_menu"
                 data-kt-menu="true" data-kt-menu-expand="false">
@@ -55,19 +56,35 @@
                 </div>
                 <!--end:Menu item-->
 
-                <!--begin:Menu item-->
+                <!--begin:Menu item - Analytics (feature gated)-->
                 <div class="menu-item">
-                    <a class="menu-link {{ request()->routeIs('financial.index') ? 'active' : '' }}"
-                        href="{{ route('financial.index') }}">
-                        <span class="menu-icon">
-                            <i class="ki-duotone ki-chart-line-star fs-2">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                                <span class="path3"></span>
-                            </i>
-                        </span>
-                        <span class="menu-title">{{ __('common.financial') }}</span>
-                    </a>
+                    @feature('analytics')
+                        <a class="menu-link {{ request()->routeIs('financial.index') ? 'active' : '' }}"
+                            href="{{ route('financial.index') }}">
+                            <span class="menu-icon">
+                                <i class="ki-duotone ki-chart-line-star fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                            </span>
+                            <span class="menu-title">{{ __('common.financial') }}</span>
+                        </a>
+                    @else
+                        <a class="menu-link opacity-50"
+                            href="{{ route('subscription.select') }}"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
+                            title="{{ __('subscription.analytics_restricted') }}">
+                            <span class="menu-icon">
+                                <i class="ki-duotone ki-lock-2 fs-2 text-warning">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </span>
+                            <span class="menu-title text-gray-500">{{ __('common.financial') }}</span>
+                        </a>
+                    @endfeature
                 </div>
                 <!--end:Menu item-->
 
@@ -105,18 +122,34 @@
                 </div>
                 <!--end:Menu item-->
 
-                <!--begin:Menu item-->
+                <!--begin:Menu item - Claims (feature gated)-->
                 <div class="menu-item">
-                    <a class="menu-link {{ request()->routeIs('claims.index') ? 'active' : '' }}"
-                        href="{{ route('claims.index') }}">
-                        <span class="menu-icon">
-                            <i class="ki-duotone ki-arrow-circle-left fs-2">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
-                        </span>
-                        <span class="menu-title">{{ __('common.claims') }}</span>
-                    </a>
+                    @feature('claims')
+                        <a class="menu-link {{ request()->routeIs('claims.index') ? 'active' : '' }}"
+                            href="{{ route('claims.index') }}">
+                            <span class="menu-icon">
+                                <i class="ki-duotone ki-arrow-circle-left fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </span>
+                            <span class="menu-title">{{ __('common.claims') }}</span>
+                        </a>
+                    @else
+                        <a class="menu-link opacity-50"
+                            href="{{ route('subscription.select') }}"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
+                            title="{{ __('subscription.claims_restricted') }}">
+                            <span class="menu-icon">
+                                <i class="ki-duotone ki-lock-2 fs-2 text-warning">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </span>
+                            <span class="menu-title text-gray-500">{{ __('common.claims') }}</span>
+                        </a>
+                    @endfeature
                 </div>
                 <!--end:Menu item-->
 
@@ -152,6 +185,31 @@
                     </a>
                 </div>
                 <!--end:Menu item-->
+
+                @auth
+                    @if(auth()->user()->isAdmin())
+                        <!--begin::Admin section-->
+                        <div class="menu-item mt-5">
+                            <div class="menu-content">
+                                <span class="menu-heading fw-bold text-uppercase fs-7 text-muted">Admin</span>
+                            </div>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {{ request()->routeIs('admin.plans.*') ? 'active' : '' }}"
+                                href="{{ route('admin.plans.index') }}">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-price-tag fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title">Plan Yönetimi</span>
+                            </a>
+                        </div>
+                        <!--end::Admin section-->
+                    @endif
+                @endauth
 
             </div>
             <!--end::Menu-->

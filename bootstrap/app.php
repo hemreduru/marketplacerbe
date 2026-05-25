@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Middleware\EnsureMarketplaceConfigured;
+use App\Http\Middleware\EnsurePlanAllowsFeature;
+use App\Http\Middleware\EnsureSubscribed;
+use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\SetLocaleFromSession;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,14 +18,21 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->alias([
+            'feature' => EnsurePlanAllowsFeature::class,
+            'admin' => IsAdmin::class,
+        ]);
+
         // Add localization middleware to API routes
         $middleware->api(append: [
-            \App\Http\Middleware\SetLocale::class,
+            SetLocale::class,
         ]);
-        
-        // Add localization middleware to web routes
+
+        // Add localization middleware and Cirotik locks to web routes
         $middleware->web(append: [
-            \App\Http\Middleware\SetLocaleFromSession::class,
+            SetLocaleFromSession::class,
+            EnsureSubscribed::class,
+            EnsureMarketplaceConfigured::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

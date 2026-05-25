@@ -176,10 +176,24 @@ class ProductController extends Controller
 
     public function sync()
     {
-        $credential = $this->marketplace->credentialFor(Auth::user());
+        $user = Auth::user();
+        $credential = $this->marketplace->credentialFor($user);
 
         if (! $credential) {
             return response()->json(['success' => false, 'message' => __('common.please_connect_trendyol')]);
+        }
+
+        // Guard: Product Limit Enforcement
+        $currentCount = Product::whereHas('credential', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->count();
+        $limit = $user->getSubscriptionLimit('products');
+
+        if ($limit !== -1 && $currentCount >= $limit) {
+            return response()->json([
+                'success' => false,
+                'message' => __('subscription.product_limit_reached', ['limit' => $limit]),
+            ], 422);
         }
 
         $log = MarketplaceSyncLog::start($credential->id, 'product');

@@ -10,16 +10,16 @@ uses(TestCase::class, RefreshDatabase::class)->in('Feature');
 uses(TestCase::class)->in('Unit');
 
 /**
- * Create a user with an active Trendyol marketplace credential.
+ * Create a user with an active subscription on the given plan and a Trendyol marketplace credential.
  *
  * @return array{0: User, 1: UserMarketplaceCredential}
  */
-function userWithTrendyol(array $credentialAttributes = []): array
+function userWithTrendyol(string $planSlug = 'growth', array $credentialAttributes = []): array
 {
     $marketplace = Marketplace::where('slug', 'trendyol')->first()
         ?? Marketplace::factory()->trendyol()->create();
 
-    $user = User::factory()->create();
+    $user = User::factory()->withPlan($planSlug)->create();
 
     $credential = UserMarketplaceCredential::factory()->create(array_merge([
         'user_id' => $user->id,

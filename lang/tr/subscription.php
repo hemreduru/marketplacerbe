@@ -1,0 +1,59 @@
+<?php
+
+return [
+    'title' => 'Cirotik Paket Seçimi',
+    'subtitle' => 'İşletmenizi büyütmek için en uygun planı seçin ve tüm e-ticaretinizi tek panelden yönetmeye hemen başlayın.',
+    'select_plan' => 'Paket Seç',
+    'plan_starter' => 'Başlangıç',
+    'plan_growth' => 'Büyüme',
+    'plan_pro' => 'Profesyonel',
+    'price_monthly' => '/ay',
+    'starter_desc' => 'E-ticarete yeni başlayan ve tek pazaryeri yöneten satıcılar için ideal.',
+    'growth_desc' => 'Birden fazla pazaryerinde büyümeyi ve satışlarını artırmayı hedefleyen orta ölçekli satıcılar.',
+    'pro_desc' => 'Tüm pazaryerlerinde sınırsız operasyon yürütmek ve akıllı araçları kullanmak isteyen profesyoneller.',
+    'popular' => 'En Popüler',
+    'try_now' => 'Hemen Deneyin',
+    'active_plan' => 'Mevcut Paketiniz',
+    'plan_activated' => 'Paketiniz başarıyla aktifleşti!',
+
+    // Limits & Features
+    'features' => 'Paket Özellikleri',
+    'limit_marketplace' => 'Pazaryeri Bağlantısı',
+    'limit_orders' => 'Aylık Sipariş Limiti',
+    'limit_products' => 'Ürün Senkronizasyonu',
+    'feature_analytics' => 'Finansal Analitik ve Raporlar',
+    'feature_repricing' => 'Buybox Fiyat Robotu',
+    'feature_claims' => 'İade & Talep Yönetimi',
+    'feature_support' => 'Müşteri Desteği',
+
+    'one_marketplace' => '1 Pazaryeri (Trendyol)',
+    'three_marketplaces' => '3 Pazaryeri (Trendyol, Hepsiburada, n11)',
+    'unlimited_marketplaces' => 'Sınırsız Pazaryeri Entegrasyonu',
+    'orders_count' => 'Aylık :count Sipariş',
+    'products_count' => ':count Ürün Eşitleme',
+    'unlimited' => 'Sınırsız',
+    'basic' => 'Temel',
+    'advanced' => 'Gelişmiş & Detaylı',
+    'priority' => 'Öncelikli Destek',
+    'standard_support' => 'Standart Destek',
+    'vip_support' => '7/24 Telefon & VIP Destek',
+
+    // New keys
+    'marketplaces' => 'Pazaryeri',
+    'orders_per_month' => 'Sipariş/ay',
+    'subscribed_success' => ':plan paketiniz başarıyla aktifleştirildi! Pazaryeri bağlantınızı ekleyin.',
+    'canceled_success' => 'Aboneliğiniz iptal edildi.',
+    'cancel_subscription' => 'Aboneliği iptal et',
+    'cancel_confirm' => 'Aboneliğinizi iptal etmek istediğinize emin misiniz?',
+    'payment_error' => 'Ödeme işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.',
+
+    // Warnings
+    'subscription_required' => 'Devam etmek için bir paket seçmeniz gerekmektedir.',
+    'subscription_expired' => 'Aboneliğinizin süresi dolmuştur. Lütfen yeni bir paket seçin.',
+    'marketplace_limit_reached' => 'Mevcut planınız en fazla :limit pazaryeri bağlantısına izin vermektedir. Daha fazla bağlantı eklemek için lütfen paketinizi yükseltin.',
+    'product_limit_reached' => 'Mevcut planınızın ürün limitine (:limit ürün) ulaştınız. Senkronizasyon durduruldu. Lütfen paketinizi yükseltin.',
+    'order_limit_reached' => 'Bu ayki işlem limitiniz olan :limit siparişe ulaştınız. Yeni sipariş akışı askıya alındı. Lütfen paketinizi yükseltin.',
+    'analytics_restricted' => 'Finansal Analitik ve Gelişmiş Raporlar Başlangıç planında kilitlidir. Kullanmak için lütfen Büyüme veya Profesyonel plana geçiş yapın.',
+    'claims_restricted' => 'Müşteri İade ve Talep Yönetimi Başlangıç planında kilitlidir. Kullanmak için lütfen Büyüme veya Profesyonel plana geçiş yapın.',
+    'repricing_restricted' => 'Buybox Akıllı Fiyat Robotu yalnızca Profesyonel planda kullanılabilir. Kullanmak için lütfen Profesyonel plana geçiş yapın.',
+];

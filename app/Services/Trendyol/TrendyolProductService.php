@@ -2,7 +2,9 @@
 
 namespace App\Services\Trendyol;
 
+use App\Exceptions\SubscriptionLimitException;
 use App\Models\Product;
+use App\Models\UserMarketplaceCredential;
 use App\Services\Contracts\ProductServiceContract;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -113,6 +115,10 @@ class TrendyolProductService implements ProductServiceContract
         $totalProcessed = 0;
         $stats = ['created' => 0, 'updated' => 0, 'failed' => 0];
 
+        $credential = UserMarketplaceCredential::with('user')->find($credentialId);
+        $user = $credential?->user;
+        $limit = $user?->getSubscriptionLimit('products') ?? 500;
+
         do {
             $response = $this->getProducts(['page' => $page, 'size' => $size]);
 
@@ -129,10 +135,25 @@ class TrendyolProductService implements ProductServiceContract
 
             foreach ($content as $item) {
                 try {
+                    $remoteId = $item['productMainId'] ?? $item['id'] ?? null;
+                    $exists = Product::where('user_marketplace_credential_id', $credentialId)
+                        ->where('remote_id', $remoteId)
+                        ->exists();
+
+                    if (! $exists && $user) {
+                        $currentCount = Product::whereHas('credential', function ($q) use ($user) {
+                            $q->where('user_id', $user->id);
+                        })->count();
+
+                        if ($limit !== -1 && $currentCount >= $limit) {
+                            throw new SubscriptionLimitException(__('subscription.product_limit_reached', ['limit' => $limit]));
+                        }
+                    }
+
                     $product = Product::updateOrCreate(
                         [
                             'user_marketplace_credential_id' => $credentialId,
-                            'remote_id' => $item['productMainId'] ?? $item['id'] ?? null,
+                            'remote_id' => $remoteId,
                         ],
                         [
                             'barcode' => $item['barcode'] ?? null,
@@ -160,6 +181,9 @@ class TrendyolProductService implements ProductServiceContract
                     }
 
                 } catch (\Exception $e) {
+                    if ($e instanceof SubscriptionLimitException) {
+                        throw $e;
+                    }
                     $stats['failed']++;
                 }
                 $totalProcessed++;
