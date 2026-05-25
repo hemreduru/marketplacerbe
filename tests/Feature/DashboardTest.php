@@ -1,0 +1,41 @@
+<?php
+
+use App\Models\FinancialDailySummary;
+use App\Models\Order;
+
+test('guests cannot view the dashboard', function () {
+    $this->get(route('dashboard'))->assertRedirect(route('login'));
+});
+
+test('a user without a credential sees the connect prompt', function () {
+    [$user] = userWithTrendyol();
+    $user->marketplaceCredentials()->update(['is_active' => false]);
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee(__('dashboard.connect_now'));
+});
+
+test('a user with a credential sees KPI figures', function () {
+    [$user, $credential] = userWithTrendyol();
+
+    FinancialDailySummary::factory()->create([
+        'user_marketplace_credential_id' => $credential->id,
+        'date' => now()->toDateString(),
+        'gross_sales' => 1000,
+        'net_profit' => 250,
+    ]);
+
+    Order::factory()->count(3)->create([
+        'user_id' => $user->id,
+        'marketplace_id' => $credential->marketplace_id,
+        'status' => 'Created',
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee(__('dashboard.this_month_sales'))
+        ->assertSee(__('dashboard.sales_net_trend'));
+});

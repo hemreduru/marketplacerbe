@@ -1,3 +1,52 @@
+# What this project is
+
+**Resbe** — a Laravel 12 Blade web app for Turkish e-commerce sellers to manage products, orders, claims, questions, and finances across multiple marketplaces from a single panel. Uses the Metronic 8 admin theme. Only Trendyol integration is live; Hepsiburada, n11, and Amazon are scaffolded in `config/marketplace.php`.
+
+This is a **server-rendered Blade app**, NOT an API-only backend. The `.github/copilot-instructions.md` describes an earlier API-only design that no longer matches the code — trust `routes/web.php` and `app/Http/Controllers/Web/` over it. Sanctum is installed but `routes/api.php` has only a stub `/user` route.
+
+## Commands
+
+```bash
+composer dev       # Run server + queue listener + pail logs + vite concurrently
+composer test      # Clears config cache then runs Pest/PHPUnit
+composer setup     # First-time: install, env, key, migrate, npm install + build
+php artisan test --compact                     # Run tests
+php artisan test --compact --filter=Name       # Single test
+php artisan migrate
+npm run build / npm run dev                    # Rebuild front-end assets
+vendor/bin/pint --dirty --format agent         # REQUIRED after editing PHP
+```
+
+Tests use in-memory SQLite (phpunit.xml sets `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`). The app itself uses MySQL.
+
+## Architecture
+
+**Request flow:** `routes/web.php` → `App\Http\Controllers\Web\*` → `App\Services\Trendyol\*` / `App\Services\MarketplaceManager` → Eloquent models. All web routes are under `auth` or `guest` middleware groups.
+
+**Marketplace integration:** `config/marketplace.php` is the single source of truth for API URLs, rate limits, endpoints, commission rates, status/sync/entity enums, and profit calculation toggles. Read it before hardcoding any marketplace constant.
+
+Services (`app/Services/Trendyol/`): `TrendyolProductService`, `TrendyolOrderService`, `TrendyolFinanceService`, `TrendyolQuestionService`, `TrendyolClaimService`. They use Laravel's `Http` facade with basic auth. Failure pattern: return `['error' => true, ...]` rather than throwing. `MarketplaceManager` is injected via container; individual services are instantiated manually with per-user credentials.
+
+**Credentials:** `user_marketplace_credentials` has per-user `api_key`/`api_secret` (hidden from serialization) and an `additional_credentials` JSON column (e.g., `seller_id`). Look up via `Marketplace::where('slug', 'trendyol')` then the user's credential row.
+
+**Product ownership:** Products belong to a credential (`Product::credential()`), not directly to a user. Scope user queries with `whereHas('credential', fn($q) => $q->where('user_id', $id))`. `User` model provides `products()` via `HasManyThrough`.
+
+**Sync:** Triggered by (1) manual button → controller `sync()`, (2) queued `App\Jobs\SyncTrendyol*Job` on the `sync` queue, (3) `routes/console.php` scheduler (every 6h / 30min intervals with `withoutOverlapping()`).
+
+**DataTables:** List pages use server-side DataTables. Controller `getData()` methods read `start`, `length`, `order.0.column`, `search.value` and return `{draw, recordsTotal, recordsFiltered, data}` where `data` rows are pre-rendered HTML strings.
+
+**Localization:** Turkish + English. `SetLocale` middleware on API, `SetLocaleFromSession` on web (registered in `bootstrap/app.php`). Translation files in `lang/{en,tr}/*.php`. All user-facing strings must use `__('key')`.
+
+**JSON responses:** `App\Http\Traits\ApiResponseTrait` provides `successResponse`/`errorResponse`/`paginatedResponse`/etc. returning `{success, message, data}`. Some controller Ajax endpoints build responses inline — match the surrounding method.
+
+**Profit model:** `net_profit = sale_price - (purchase_cost + commission + shipping_cost)`. Toggles in `config/marketplace.php` under `profit_calculation`.
+
+## Project-specific skills
+
+`.agents/skills/laravel-best-practices/` and `.agents/skills/pest-testing/` contain detailed domain rules. Load them when working in those areas.
+
+The Laravel Boost guidelines below are auto-managed by `php artisan boost:update` — do not hand-edit.
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

@@ -107,6 +107,21 @@
 
                 <!--begin:Menu item-->
                 <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('claims.index') ? 'active' : '' }}"
+                        href="{{ route('claims.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-arrow-circle-left fs-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">{{ __('common.claims') }}</span>
+                    </a>
+                </div>
+                <!--end:Menu item-->
+
+                <!--begin:Menu item-->
+                <div class="menu-item">
                     <a class="menu-link {{ request()->routeIs('questions.index') ? 'active' : '' }}"
                         href="{{ route('questions.index') }}">
                         <span class="menu-icon">

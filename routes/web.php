@@ -1,15 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\AuthController;
+use App\Http\Controllers\Web\ClaimController;
 use App\Http\Controllers\Web\DashboardController;
-use App\Http\Controllers\Web\SettingsController;
+use App\Http\Controllers\Web\FinancialController;
+use App\Http\Controllers\Web\MarketplaceSettingsController;
+use App\Http\Controllers\Web\OrderController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\ProfileController;
-use App\Http\Controllers\Web\MarketplaceSettingsController;
-use App\Http\Controllers\Web\FinancialController;
 use App\Http\Controllers\Web\QuestionController;
-use App\Http\Controllers\Web\OrderController;
+use App\Http\Controllers\Web\SettingsController;
+use Illuminate\Support\Facades\Route;
 
 // Redirect root to dashboard or login
 Route::get('/', function () {
@@ -43,9 +44,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/data', [ProductController::class, 'getData'])->name('products.data');
     Route::post('/products/sync', [ProductController::class, 'sync'])->name('products.sync');
+    Route::post('/products/update-price-stock', [ProductController::class, 'updatePriceStock'])->name('products.update-price-stock');
+
+    // Claims (returns)
+    Route::get('/claims', [ClaimController::class, 'index'])->name('claims.index');
+    Route::get('/claims/data', [ClaimController::class, 'getData'])->name('claims.data');
+    Route::post('/claims/sync', [ClaimController::class, 'sync'])->name('claims.sync');
+    Route::post('/claims/approve', [ClaimController::class, 'approve'])->name('claims.approve');
 
     // Questions
     Route::get('/questions', [QuestionController::class, 'index'])->name('questions.index');
+    Route::post('/questions/sync', [QuestionController::class, 'sync'])->name('questions.sync');
     Route::post('/questions/answer', [QuestionController::class, 'answer'])->name('questions.answer');
 
     // Orders

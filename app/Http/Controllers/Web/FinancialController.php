@@ -3,31 +3,26 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use App\Models\UserMarketplaceCredential;
-use App\Models\Marketplace;
+use App\Jobs\SyncTrendyolFinancialsJob;
 use App\Models\FinancialDailySummary;
 use App\Models\FinancialTransaction;
-use App\Services\Trendyol\TrendyolFinanceService;
-use App\Jobs\SyncTrendyolFinancialsJob;
+use App\Services\MarketplaceManager;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class FinancialController extends Controller
 {
+    public function __construct(private MarketplaceManager $marketplace) {}
+
     /**
      * Display the financial dashboard with summary stats and charts.
      */
     public function index(Request $request)
     {
-        $user = Auth::user();
-        $trendyol = Marketplace::where('slug', 'trendyol')->first();
-        $credential = UserMarketplaceCredential::where('user_id', $user->id)
-            ->where('marketplace_id', $trendyol->id)
-            ->first();
+        $credential = $this->marketplace->credentialFor(Auth::user());
 
-        if (!$credential) {
+        if (! $credential) {
             return redirect()->route('marketplace.settings')
                 ->with('warning', __('common.please_connect_trendyol'));
         }
@@ -45,13 +40,13 @@ class FinancialController extends Controller
             'gross_sales' => $dailySummaries->sum('gross_sales'),
             'net_profit' => $dailySummaries->sum('net_profit'),
             'commission' => $dailySummaries->sum('commission'),
-            'total_expense' => $dailySummaries->sum('commission') + $dailySummaries->sum('shipping_cost') + $dailySummaries->sum('platform_expense') + $dailySummaries->sum('other_expense')
+            'total_expense' => $dailySummaries->sum('commission') + $dailySummaries->sum('shipping_cost') + $dailySummaries->sum('platform_expense') + $dailySummaries->sum('other_expense'),
         ];
 
         // Calculate Previous Period Dates
         $daysDiff = (strtotime($endDate) - strtotime($startDate)) / (60 * 60 * 24);
-        $prevEndDate = date('Y-m-d', strtotime($startDate . ' -1 day'));
-        $prevStartDate = date('Y-m-d', strtotime($prevEndDate . ' -' . $daysDiff . ' days'));
+        $prevEndDate = date('Y-m-d', strtotime($startDate.' -1 day'));
+        $prevStartDate = date('Y-m-d', strtotime($prevEndDate.' -'.$daysDiff.' days'));
 
         // Fetch Previous Period Data
         $prevSummaries = FinancialDailySummary::where('user_marketplace_credential_id', $credential->id)
@@ -62,7 +57,7 @@ class FinancialController extends Controller
             'gross_sales' => $prevSummaries->sum('gross_sales'),
             'net_profit' => $prevSummaries->sum('net_profit'),
             'commission' => $prevSummaries->sum('commission'),
-            'total_expense' => $prevSummaries->sum('commission') + $prevSummaries->sum('shipping_cost') + $prevSummaries->sum('platform_expense') + $prevSummaries->sum('other_expense')
+            'total_expense' => $prevSummaries->sum('commission') + $prevSummaries->sum('shipping_cost') + $prevSummaries->sum('platform_expense') + $prevSummaries->sum('other_expense'),
         ];
 
         // Calculate Growth Percentages
@@ -82,7 +77,7 @@ class FinancialController extends Controller
         $summaryStats = array_merge($currentStats, [
             'growth' => $growth,
             'profit_margin' => $profitMargin,
-            'avg_daily_sales' => $avgDailySales
+            'avg_daily_sales' => $avgDailySales,
         ]);
 
         // Calculate Detailed Expense Breakdown from Transactions
@@ -93,12 +88,12 @@ class FinancialController extends Controller
             'intl_ops' => 0,
             'intl_service' => 0,
             'penalty' => 0,
-            'other' => 0
+            'other' => 0,
         ];
 
         $deductions = FinancialTransaction::where('user_marketplace_credential_id', $credential->id)
             ->where('transaction_type', 'Deduction')
-            ->whereBetween('transaction_date', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->whereBetween('transaction_date', [$startDate.' 00:00:00', $endDate.' 23:59:59'])
             ->get();
 
         foreach ($deductions as $d) {
@@ -127,10 +122,10 @@ class FinancialController extends Controller
 
         // Prepare Chart Data
         $chartData = [
-            'dates' => $dailySummaries->pluck('date')->map(fn($d) => date('d M', strtotime($d)))->toArray(),
+            'dates' => $dailySummaries->pluck('date')->map(fn ($d) => date('d M', strtotime($d)))->toArray(),
             'sales' => $dailySummaries->pluck('gross_sales')->toArray(),
             'net' => $dailySummaries->pluck('net_profit')->toArray(),
-            'expenses' => $expenseBreakdown
+            'expenses' => $expenseBreakdown,
         ];
 
         // Get oldest transaction date for "All Time" filter
@@ -141,7 +136,7 @@ class FinancialController extends Controller
 
         // Format dates for display (Localized)
         Carbon::setLocale(app()->getLocale());
-        $prevPeriodLabel = Carbon::parse($prevStartDate)->translatedFormat('d M') . ' - ' . Carbon::parse($prevEndDate)->translatedFormat('d M');
+        $prevPeriodLabel = Carbon::parse($prevStartDate)->translatedFormat('d M').' - '.Carbon::parse($prevEndDate)->translatedFormat('d M');
 
         return view('financial.dashboard', [
             'summaryStats' => $summaryStats,
@@ -149,7 +144,7 @@ class FinancialController extends Controller
             'startDate' => $startDate,
             'endDate' => $endDate,
             'minDate' => $minDate,
-            'prevPeriodLabel' => $prevPeriodLabel
+            'prevPeriodLabel' => $prevPeriodLabel,
         ]);
     }
 
@@ -158,30 +153,15 @@ class FinancialController extends Controller
      */
     public function sync()
     {
-        $user = Auth::user();
-        $trendyol = Marketplace::where('slug', 'trendyol')->first();
-        $credential = UserMarketplaceCredential::where('user_id', $user->id)
-            ->where('marketplace_id', $trendyol->id)
-            ->first();
+        $credential = $this->marketplace->credentialFor(Auth::user());
 
-        if ($credential) {
-            try {
-                $service = new TrendyolFinanceService(
-                    $credential->api_key,
-                    $credential->api_secret,
-                    $credential->additional_credentials['seller_id'] ?? '',
-                    false
-                );
-
-                $service->syncSmart($credential->id);
-
-                return response()->json(['success' => true, 'message' => __('common.sync_started')]);
-            } catch (\Exception $e) {
-                return response()->json(['success' => false, 'message' => $e->getMessage()]);
-            }
+        if (! $credential) {
+            return response()->json(['success' => false, 'message' => __('common.please_connect_trendyol')], 400);
         }
 
-        return response()->json(['success' => false, 'message' => __('common.error_occurred')]);
+        SyncTrendyolFinancialsJob::dispatch($credential->id);
+
+        return response()->json(['success' => true, 'message' => __('common.sync_started')]);
     }
 
     /**
@@ -196,7 +176,7 @@ class FinancialController extends Controller
         $stats = [
             'gross' => 0, 'commission' => 0, 'shipping' => 0,
             'platform' => 0, 'intl_ops' => 0, 'intl_service' => 0,
-            'penalty_other' => 0, 'net' => 0, 'orders' => 0, 'qty' => 0
+            'penalty_other' => 0, 'net' => 0, 'orders' => 0, 'qty' => 0,
         ];
 
         foreach ($summaries as $s) {
@@ -221,9 +201,10 @@ class FinancialController extends Controller
         return [
             'gross' => 0, 'commission' => 0, 'shipping' => 0,
             'platform' => 0, 'intl_ops' => 0, 'intl_service' => 0,
-            'penalty_other' => 0, 'net' => 0, 'orders' => 0, 'qty' => 0
+            'penalty_other' => 0, 'net' => 0, 'orders' => 0, 'qty' => 0,
         ];
     }
+
     /**
      * Classify deduction description into categories.
      */
@@ -233,22 +214,30 @@ class FinancialController extends Controller
 
         $platform = ['platform hizmet', 'platform hizmeti', 'hizmet bedeli', 'platform bedeli', 'phb', 'p.h.b'];
         foreach ($platform as $k) {
-            if (strpos($d, $k) !== false) return 'platform';
+            if (strpos($d, $k) !== false) {
+                return 'platform';
+            }
         }
 
         $intlOps = ['yurtdışı operasyon', 'yurt dışı operasyon', 'yd operasyon'];
         foreach ($intlOps as $k) {
-            if (strpos($d, $k) !== false) return 'intl_ops';
+            if (strpos($d, $k) !== false) {
+                return 'intl_ops';
+            }
         }
 
         $intlSrv = ['uluslararası hizmet', 'international service'];
         foreach ($intlSrv as $k) {
-            if (strpos($d, $k) !== false) return 'intl_service';
+            if (strpos($d, $k) !== false) {
+                return 'intl_service';
+            }
         }
 
         $pen = ['ceza', 'penalty', 'gecikme'];
         foreach ($pen as $k) {
-            if (strpos($d, $k) !== false) return 'penalty';
+            if (strpos($d, $k) !== false) {
+                return 'penalty';
+            }
         }
 
         return 'other';

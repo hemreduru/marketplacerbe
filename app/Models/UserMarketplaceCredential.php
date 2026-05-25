@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UserMarketplaceCredential extends Model
 {
@@ -71,5 +72,29 @@ class UserMarketplaceCredential extends Model
     public function marketplace(): BelongsTo
     {
         return $this->belongsTo(Marketplace::class);
+    }
+
+    /**
+     * Get the sync logs recorded for this credential.
+     */
+    public function syncLogs(): HasMany
+    {
+        return $this->hasMany(MarketplaceSyncLog::class);
+    }
+
+    /**
+     * Get the customer questions stored for this credential.
+     */
+    public function questions(): HasMany
+    {
+        return $this->hasMany(Question::class);
+    }
+
+    /**
+     * Get the return claims stored for this credential.
+     */
+    public function claims(): HasMany
+    {
+        return $this->hasMany(Claim::class);
     }
 }

@@ -2,14 +2,19 @@
 
 namespace App\Services\Trendyol;
 
+use App\Models\Product;
+use App\Services\Contracts\ProductServiceContract;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class TrendyolProductService
+class TrendyolProductService implements ProductServiceContract
 {
     protected string $baseUrl;
+
     protected string $apiKey;
+
     protected string $apiSecret;
+
     protected string $sellerId;
 
     public function __construct(string $apiKey, string $apiSecret, string $sellerId, bool $isStage = false)
@@ -22,19 +27,17 @@ class TrendyolProductService
 
     /**
      * Get products from the seller's inventory.
-     *
-     * @param array $filters
-     * @return array
      */
     public function getProducts(array $filters = []): array
     {
-        $url = sprintf("%s/integration/product/sellers/%s/products", $this->baseUrl, $this->sellerId);
+        $url = sprintf('%s/integration/product/sellers/%s/products', $this->baseUrl, $this->sellerId);
 
         $response = Http::withBasicAuth($this->apiKey, $this->apiSecret)
             ->get($url, $filters);
 
         if ($response->failed()) {
-            Log::error("Trendyol Product API Error (getProducts): " . $response->body());
+            Log::error('Trendyol Product API Error (getProducts): '.$response->body());
+
             return ['error' => true, 'message' => $response->body()];
         }
 
@@ -43,22 +46,19 @@ class TrendyolProductService
 
     /**
      * Get all brands.
-     *
-     * @param int $page
-     * @param int $size
-     * @return array
      */
     public function getBrands(int $page = 0, int $size = 100): array
     {
-        $url = sprintf("%s/integration/product/brands", $this->baseUrl);
+        $url = sprintf('%s/integration/product/brands', $this->baseUrl);
 
         $response = Http::get($url, [
             'page' => $page,
-            'size' => $size
+            'size' => $size,
         ]);
 
         if ($response->failed()) {
-            Log::error("Trendyol Product API Error (getBrands): " . $response->body());
+            Log::error('Trendyol Product API Error (getBrands): '.$response->body());
+
             return ['error' => true, 'message' => $response->body()];
         }
 
@@ -67,17 +67,16 @@ class TrendyolProductService
 
     /**
      * Get category tree.
-     *
-     * @return array
      */
     public function getCategories(): array
     {
-        $url = sprintf("%s/integration/product/product-categories", $this->baseUrl);
+        $url = sprintf('%s/integration/product/product-categories', $this->baseUrl);
 
         $response = Http::get($url);
 
         if ($response->failed()) {
-            Log::error("Trendyol Product API Error (getCategories): " . $response->body());
+            Log::error('Trendyol Product API Error (getCategories): '.$response->body());
+
             return ['error' => true, 'message' => $response->body()];
         }
 
@@ -86,29 +85,26 @@ class TrendyolProductService
 
     /**
      * Get attributes for a specific category.
-     *
-     * @param int $categoryId
-     * @return array
      */
     public function getCategoryAttributes(int $categoryId): array
     {
-        $url = sprintf("%s/integration/product/product-categories/%s/attributes", $this->baseUrl, $categoryId);
+        $url = sprintf('%s/integration/product/product-categories/%s/attributes', $this->baseUrl, $categoryId);
 
         $response = Http::get($url);
 
         if ($response->failed()) {
-            Log::error("Trendyol Product API Error (getCategoryAttributes): " . $response->body());
+            Log::error('Trendyol Product API Error (getCategoryAttributes): '.$response->body());
+
             return ['error' => true, 'message' => $response->body()];
         }
 
         return $response->json();
     }
+
     /**
      * Sync products from Trendyol to Database.
      *
-     * @param int $credentialId
-     * @param callable|null $onProgress function($current, $total)
-     * @return void
+     * @param  callable|null  $onProgress  function($current, $total)
      */
     public function syncProducts(int $credentialId, ?callable $onProgress = null): void
     {
@@ -133,7 +129,7 @@ class TrendyolProductService
 
             foreach ($content as $item) {
                 try {
-                    $product = \App\Models\Product::updateOrCreate(
+                    $product = Product::updateOrCreate(
                         [
                             'user_marketplace_credential_id' => $credentialId,
                             'remote_id' => $item['productMainId'] ?? $item['id'] ?? null,
@@ -157,8 +153,11 @@ class TrendyolProductService
                         ]
                     );
 
-                    if ($product->wasRecentlyCreated) $stats['created']++;
-                    else $stats['updated']++;
+                    if ($product->wasRecentlyCreated) {
+                        $stats['created']++;
+                    } else {
+                        $stats['updated']++;
+                    }
 
                 } catch (\Exception $e) {
                     $stats['failed']++;
@@ -172,8 +171,56 @@ class TrendyolProductService
 
             $page++;
             // Safety break to prevent infinite loops if API reports wrong total
-            if ($page * $size > $totalElements + $size) break;
+            if ($page * $size > $totalElements + $size) {
+                break;
+            }
 
-        } while (!empty($content));
+        } while (! empty($content));
+    }
+
+    /**
+     * Push price and/or stock updates to Trendyol.
+     *
+     * Each item must contain a barcode and at least one of quantity, salePrice
+     * or listPrice. Trendyol processes this asynchronously and returns a
+     * batchRequestId that can be polled via getBatchRequestResult().
+     *
+     * @param  array<int, array<string, mixed>>  $items
+     * @return array<string, mixed>
+     */
+    public function updatePriceAndInventory(array $items): array
+    {
+        $url = sprintf('%s/integration/inventory/sellers/%s/products/price-and-inventory', $this->baseUrl, $this->sellerId);
+
+        $response = Http::withBasicAuth($this->apiKey, $this->apiSecret)
+            ->post($url, ['items' => array_values($items)]);
+
+        if ($response->failed()) {
+            Log::error('Trendyol Product API Error (updatePriceAndInventory): '.$response->body());
+
+            return ['error' => true, 'message' => $response->body()];
+        }
+
+        return $response->json() ?: ['success' => true];
+    }
+
+    /**
+     * Poll the result of an asynchronous batch request.
+     *
+     * @return array<string, mixed>
+     */
+    public function getBatchRequestResult(string $batchRequestId): array
+    {
+        $url = sprintf('%s/integration/product/sellers/%s/products/batch-requests/%s', $this->baseUrl, $this->sellerId, $batchRequestId);
+
+        $response = Http::withBasicAuth($this->apiKey, $this->apiSecret)->get($url);
+
+        if ($response->failed()) {
+            Log::error('Trendyol Product API Error (getBatchRequestResult): '.$response->body());
+
+            return ['error' => true, 'message' => $response->body()];
+        }
+
+        return $response->json();
     }
 }

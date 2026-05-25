@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Marketplace extends Model
 {
@@ -47,26 +48,23 @@ class Marketplace extends Model
     }
 
     /**
-     * Get the marketplace products for this marketplace.
-     */
-    public function marketplaceProducts(): HasMany
-    {
-        return $this->hasMany(MarketplaceProduct::class);
-    }
-
-    /**
-     * Get the sync logs for this marketplace.
-     */
-    public function syncLogs(): HasMany
-    {
-        return $this->hasMany(MarketplaceSyncLog::class);
-    }
-
-    /**
      * Get the orders for this marketplace.
      */
     public function orders(): HasMany
     {
-        return $this->hasMany(MarketplaceOrder::class);
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get the sync logs recorded across this marketplace's credentials.
+     */
+    public function syncLogs(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            MarketplaceSyncLog::class,
+            UserMarketplaceCredential::class,
+            'marketplace_id',
+            'user_marketplace_credential_id',
+        );
     }
 }

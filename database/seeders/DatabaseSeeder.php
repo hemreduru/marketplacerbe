@@ -2,7 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Language;
+use App\Models\Marketplace;
 use App\Models\User;
+use App\Models\UserMarketplaceCredential;
+use App\Models\UserSetting;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +20,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call(LanguageSeeder::class);
 
         $user = User::factory()->create([
             'name' => 'Emre Duru',
@@ -25,12 +29,20 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('emre2000'),
         ]);
 
+        $turkish = Language::where('code', 'tr')->first();
+        $settings = UserSetting::create([
+            'user_id' => $user->id,
+            'preferred_language_id' => $turkish?->id,
+            'dark_mode' => false,
+        ]);
+        $user->update(['settings_id' => $settings->id]);
+
         $this->call(MarketplaceSeeder::class);
 
         // Add Trendyol Credentials
-        $trendyol = \App\Models\Marketplace::where('slug', 'trendyol')->first();
+        $trendyol = Marketplace::where('slug', 'trendyol')->first();
         if ($trendyol) {
-            \App\Models\UserMarketplaceCredential::create([
+            UserMarketplaceCredential::create([
                 'user_id' => $user->id,
                 'marketplace_id' => $trendyol->id,
                 'api_key' => 'PICixzvGypfjiBfTVz0z',

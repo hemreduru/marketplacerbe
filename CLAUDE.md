@@ -1,3 +1,63 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this project is
+
+**Resbe** is a Laravel 12 web application that lets Turkish e-commerce sellers manage products, orders, customer questions, and finances across multiple marketplaces (Trendyol live; Hepsiburada, n11, Amazon scaffolded in config) from one panel.
+
+It is a **server-rendered Blade app** using the Metronic 8 admin theme — NOT an API-only backend. (The `.github/copilot-instructions.md` describes an earlier API-only design that no longer matches the code; trust the actual `routes/web.php` and `app/Http/Controllers/Web/` over that doc.) Sanctum is installed but `routes/api.php` only has a stub `/user` route.
+
+## Commands
+
+```bash
+composer dev      # Run server + queue listener + pail logs + vite concurrently (primary dev loop)
+composer test     # Clears config cache then runs Pest/PHPUnit
+composer setup    # First-time: install, env, key, migrate, npm install + build
+php artisan test --compact                 # Run tests
+php artisan test --compact --filter=Name   # Run a single test by name
+php artisan migrate
+npm run build / npm run dev                # Rebuild front-end assets (needed when UI changes don't appear)
+vendor/bin/pint --dirty --format agent     # REQUIRED after editing PHP — matches project style
+```
+
+Tests run on in-memory SQLite (see `phpunit.xml`); the app itself uses MySQL (`metronic8` DB, shared with a separate Metronic panel). Test files use Pest (`tests/Feature`, `tests/Unit`).
+
+## Architecture
+
+**Request flow:** `routes/web.php` → `App\Http\Controllers\Web\*` → `App\Services\Trendyol\*` → Eloquent models. All web routes are session-auth-guarded (`auth` / `guest` middleware groups).
+
+**Marketplace integration is the core domain.** Each marketplace concern has its own service class instantiated *manually* (not via the container) with per-user credentials:
+
+```php
+$service = new TrendyolProductService($credential->api_key, $credential->api_secret,
+    $credential->additional_credentials['seller_id'] ?? '', $isStage = false);
+$service->syncProducts($credential->id);
+```
+
+Services (`app/Services/Trendyol/`): `TrendyolProductService`, `TrendyolOrderService`, `TrendyolFinanceService`, `TrendyolQuestionService`. They use Laravel's `Http` facade with basic auth and log failures via `Log::error`, returning `['error' => true, ...]` on failure rather than throwing. New marketplaces should follow this pattern: a new `app/Services/{Marketplace}/` directory.
+
+**Credentials:** `user_marketplace_credentials` stores per-user `api_key`/`api_secret` (hidden from serialization) plus an `additional_credentials` JSON column (e.g. `seller_id`). Look up via `Marketplace::where('slug', 'trendyol')` then the user's credential row. Products belong to a credential (`Product::credential()`), not directly to a user — scope user queries with `whereHas('credential', fn($q) => $q->where('user_id', $id))`.
+
+**Sync is triggered three ways:** (1) manual button → controller `sync()` method, (2) queued `App\Jobs\SyncTrendyol*Job` dispatched on the `sync` queue, (3) `routes/console.php` scheduler (every 6h / 30min). All three construct the same service the same way.
+
+**DataTables:** list pages (products, orders) use server-side DataTables. Controller `getData()` methods read DataTables request params (`search.value`, `order.0.column`, `start`, `length`) and return `{draw, recordsTotal, recordsFiltered, data}` where `data` rows are **pre-rendered HTML strings** built in PHP.
+
+**Localization:** Turkish + English. `SetLocale` middleware on API routes, `SetLocaleFromSession` on web routes. Translation files in `lang/{en,tr}/*.php`; reference with `__('common.key')`. User-facing strings must go through translation keys, not hardcoded.
+
+**Config:** `config/marketplace.php` is the central source for marketplace API URLs, rate limits, endpoints, commission rates, VAT, shipping, and the canonical status/sync/entity enum maps. Read it before hardcoding any marketplace constant.
+
+**JSON responses:** `App\Http\Traits\ApiResponseTrait` provides `successResponse`/`errorResponse`/etc. returning `{success, message, data}`. Some controller JSON endpoints (the `sync`/`getData` actions) build responses inline instead — match the surrounding method.
+
+**Profit model:** `net_profit = sale_price - (purchase_cost + commission + shipping_cost)`; toggles in `config/marketplace.php` `profit_calculation`.
+
+### Caveat: stale references
+`app/Models/User.php` and `routes/console.php` reference models/jobs that don't exist in the codebase (`MarketplaceProduct`, `MarketplaceSyncLog`, `MarketplaceOrder`, `SyncMarketplaceProductJob`). The real models are `Product`, `Order`, `OrderItem`, `FinancialTransaction`, `FinancialDailySummary`, `Marketplace`, `UserMarketplaceCredential`. Don't assume the User relationship methods or that scheduler block work as written.
+
+## Project-specific skills
+
+`.agents/skills/laravel-best-practices/` and `.agents/skills/pest-testing/` contain detailed rules (eloquent, migrations, validation, testing, etc.). The Laravel Boost guidelines below are auto-managed by `php artisan boost:update` — do not hand-edit that block.
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

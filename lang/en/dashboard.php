@@ -28,4 +28,19 @@ return [
     'amount' => 'Amount',
     'status' => 'Status',
     'date' => 'Date',
+
+    // KPI dashboard
+    'this_month_sales' => 'Sales This Month',
+    'this_month_net' => 'Net Profit This Month',
+    'pending_orders_short' => 'Pending',
+    'pending_orders_label' => 'Pending Orders',
+    'sales_net_trend' => 'Sales & Net Profit (Last 30 Days)',
+    'last_sync' => 'Last sync',
+    'never_synced' => 'Never synced',
+    'needs_attention' => 'Needs Attention',
+    'low_stock' => 'Low Stock',
+    'out_of_stock' => 'Out of Stock',
+    'connect_prompt' => 'Connect your Trendyol store to start syncing products, orders, finances and questions.',
+    'connect_now' => 'Connect Trendyol',
+    'view_all' => 'View All',
 ];

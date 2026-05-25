@@ -16,6 +16,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Write Operations Enabled
+    |--------------------------------------------------------------------------
+    |
+    | Master switch for any operation that mutates data on the marketplace
+    | (order status updates, price/stock updates, claim approvals, answering
+    | customer questions, sending invoices). When disabled, these actions are
+    | simulated and never reach the live marketplace. Keep this OFF unless the
+    | seller has explicitly authorized live writes.
+    |
+    */
+
+    'write_enabled' => env('MARKETPLACE_WRITE_ENABLED', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Default VAT Rate
     |--------------------------------------------------------------------------
     |
@@ -58,8 +73,8 @@ return [
         'trendyol' => [
             'name' => 'Trendyol',
             'code' => 'TRENDYOL',
-            'production_api_url' => 'https://api.trendyol.com/sapigw',
-            'stage_api_url' => 'https://stageapi.trendyol.com/stageapi',
+            'production_api_url' => 'https://apigw.trendyol.com',
+            'stage_api_url' => 'https://stageapigw.trendyol.com',
             'use_stage' => env('TRENDYOL_USE_STAGE', false),
             'rate_limit' => [
                 'requests_per_minute' => 60,
@@ -69,14 +84,16 @@ return [
             'auth_type' => 'basic',
             'timeout' => 30,
             'endpoints' => [
-                'products' => '/suppliers/{supplierId}/products',
-                'product_detail' => '/suppliers/{supplierId}/products',
-                'product_batch' => '/suppliers/{supplierId}/products/batch-requests/{batchRequestId}',
-                'orders' => '/suppliers/{supplierId}/orders',
-                'claims' => '/suppliers/{supplierId}/claims',
-                'questions' => '/suppliers/{supplierId}/questions',
-                'brands' => '/brands',
-                'categories' => '/product-categories',
+                'products' => '/integration/product/sellers/{sellerId}/products',
+                'price_inventory' => '/integration/inventory/sellers/{sellerId}/products/price-and-inventory',
+                'product_batch' => '/integration/product/sellers/{sellerId}/products/batch-requests/{batchRequestId}',
+                'orders' => '/integration/order/sellers/{sellerId}/orders',
+                'claims' => '/integration/order/sellers/{sellerId}/claims',
+                'questions' => '/integration/qna/sellers/{sellerId}/questions/filter',
+                'settlements' => '/integration/finance/che/sellers/{sellerId}/settlements',
+                'otherfinancials' => '/integration/finance/che/sellers/{sellerId}/otherfinancials',
+                'brands' => '/integration/product/brands',
+                'categories' => '/integration/product/product-categories',
             ],
         ],
         'hepsiburada' => [

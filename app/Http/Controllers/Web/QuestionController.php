@@ -4,56 +4,39 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SendQuestionAnswerRequest;
-use App\Models\Marketplace;
-use App\Models\UserMarketplaceCredential;
-use App\Services\Trendyol\TrendyolQuestionService;
+use App\Models\MarketplaceSyncLog;
+use App\Services\MarketplaceManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class QuestionController extends Controller
 {
-    protected function getService()
-    {
-        $user = Auth::user();
-        $trendyol = Marketplace::where('slug', 'trendyol')->first();
-        $credential = UserMarketplaceCredential::where('user_id', $user->id)
-            ->where('marketplace_id', $trendyol->id)
-            ->first();
-
-        if (!$credential) {
-            return null;
-        }
-
-        return new TrendyolQuestionService(
-            $credential->api_key,
-            $credential->api_secret,
-            $credential->additional_credentials['seller_id'] ?? '',
-            false // Assuming prod for now, or check config
-        );
-    }
+    public function __construct(private MarketplaceManager $marketplace) {}
 
     public function index(Request $request)
     {
-        $service = $this->getService();
-        if (!$service) {
+        $credential = $this->marketplace->credentialFor(Auth::user());
+
+        if (! $credential) {
             return redirect()->route('marketplace.settings')->with('error', __('common.please_connect_trendyol'));
         }
 
         $status = $request->input('status', 'WAITING_FOR_ANSWER');
-        $page = $request->input('page', 0);
+        $page = max(0, (int) $request->input('page', 0));
         $size = 20;
 
-        $response = $service->getQuestions([
-            'status' => $status,
-            'page' => $page,
-            'size' => $size,
-            'orderByDirection' => 'DESC'
-        ]);
+        $query = $credential->questions()
+            ->where('status', $status)
+            ->orderByDesc('question_date');
 
-        $questions = $response['content'] ?? [];
-        $totalElements = $response['totalElements'] ?? 0;
-        $totalPages = $response['totalPages'] ?? 0;
+        $totalElements = $query->count();
+        $totalPages = (int) ceil($totalElements / $size);
+
+        $questions = $query->skip($page * $size)->take($size)->get()
+            ->map(fn ($question) => $question->toViewArray())
+            ->all();
+
         $marketplaceName = 'Trendyol';
 
         if ($request->ajax() && $request->has('partial')) {
@@ -63,33 +46,73 @@ class QuestionController extends Controller
         return view('questions.index', compact('questions', 'status', 'page', 'totalPages', 'totalElements', 'marketplaceName'));
     }
 
+    /**
+     * Pull the latest questions from the marketplace into local storage.
+     */
+    public function sync()
+    {
+        $credential = $this->marketplace->credentialFor(Auth::user());
+
+        if (! $credential) {
+            return response()->json(['success' => false, 'message' => __('common.please_connect_trendyol')], 400);
+        }
+
+        $log = MarketplaceSyncLog::start($credential->id, 'question');
+
+        try {
+            $stats = $this->marketplace->questionService($credential)->syncQuestions($credential->id);
+
+            $credential->update(['last_sync_at' => now()]);
+            $log->succeed($stats);
+
+            return response()->json(['success' => true, 'message' => __('common.sync_completed')]);
+        } catch (\Exception $e) {
+            $log->fail($e->getMessage());
+            Log::error('Question sync exception: '.$e->getMessage());
+
+            return response()->json(['success' => false, 'message' => __('common.error_occurred')], 500);
+        }
+    }
+
     public function answer(SendQuestionAnswerRequest $request)
     {
+        $credential = $this->marketplace->credentialFor(Auth::user());
+
+        if (! $credential) {
+            return response()->json(['success' => false, 'message' => __('common.please_connect_trendyol')], 400);
+        }
+
+        // Gate live writes: never reach the marketplace unless explicitly enabled.
+        if (! config('marketplace.write_enabled')) {
+            return response()->json([
+                'success' => true,
+                'message' => __('common.action_simulated'),
+                'data' => ['text' => $request->answer],
+            ]);
+        }
+
         try {
-            // Mock response in debug mode
-            if (config('app.debug')) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Debug Mode: Answer simulated successfully.',
-                    'data' => ['text' => $request->answer]
-                ]);
-            }
-
-            $service = $this->getService();
-            if (!$service) {
-                return response()->json(['success' => false, 'message' => __('common.please_connect_trendyol')], 400);
-            }
-
-            $result = $service->answerQuestion($request->question_id, $request->answer);
+            $result = $this->marketplace->questionService($credential)
+                ->answerQuestion((int) $request->question_id, $request->answer);
 
             if (isset($result['error'])) {
-                Log::error('Question answer failed: ' . $result['message']);
+                Log::error('Question answer failed: '.$result['message']);
+
                 return response()->json(['success' => false, 'message' => $result['message']], 500);
             }
 
+            $credential->questions()
+                ->where('remote_id', (string) $request->question_id)
+                ->update([
+                    'status' => 'ANSWERED',
+                    'answer_text' => $request->answer,
+                    'answered_date' => now(),
+                ]);
+
             return response()->json(['success' => true, 'message' => __('common.answer_sent')]);
         } catch (\Exception $e) {
-            Log::error('Question answer exception: ' . $e->getMessage());
+            Log::error('Question answer exception: '.$e->getMessage());
+
             return response()->json(['success' => false, 'message' => __('common.error_occurred')], 500);
         }
     }

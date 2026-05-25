@@ -49,9 +49,9 @@
                     <button type="submit" class="btn btn-sm btn-primary">{{ __('common.filter') }}</button>
                 </form>
                 <!--end::Filter-->
-                <a href="#" class="btn btn-sm fw-bold btn-primary" id="sync_data_btn">
+                <button type="button" class="btn btn-sm fw-bold btn-primary" id="sync_data_btn">
                     {{ __('common.sync_data') }}
-                </a>
+                </button>
             </div>
         </div>
     </div>

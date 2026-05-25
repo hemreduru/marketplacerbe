@@ -3,8 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,7 +14,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -53,14 +55,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the products owned by this user.
-     */
-    public function products(): HasMany
-    {
-        return $this->hasMany(Product::class);
-    }
-
-    /**
      * Get the marketplace credentials for this user.
      */
     public function marketplaceCredentials(): HasMany
@@ -69,11 +63,40 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the marketplace products owned by this user.
+     * Get the products this user has across all of their marketplace credentials.
+     *
+     * Products belong to a credential rather than directly to a user, so this
+     * resolves them through the user_marketplace_credentials table.
      */
-    public function marketplaceProducts(): HasMany
+    public function products(): HasManyThrough
     {
-        return $this->hasMany(MarketplaceProduct::class);
+        return $this->hasManyThrough(
+            Product::class,
+            UserMarketplaceCredential::class,
+            'user_id',
+            'user_marketplace_credential_id',
+        );
+    }
+
+    /**
+     * Get the orders placed against this user's marketplaces.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get the marketplace sync logs across this user's credentials.
+     */
+    public function syncLogs(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            MarketplaceSyncLog::class,
+            UserMarketplaceCredential::class,
+            'user_id',
+            'user_marketplace_credential_id',
+        );
     }
 
     /**
@@ -82,21 +105,5 @@ class User extends Authenticatable
     public function settings(): HasOne
     {
         return $this->hasOne(UserSetting::class);
-    }
-
-    /**
-     * Get the sync logs for this user.
-     */
-    public function syncLogs(): HasMany
-    {
-        return $this->hasMany(MarketplaceSyncLog::class);
-    }
-
-    /**
-     * Get the marketplace orders for this user.
-     */
-    public function marketplaceOrders(): HasMany
-    {
-        return $this->hasMany(MarketplaceOrder::class);
     }
 }

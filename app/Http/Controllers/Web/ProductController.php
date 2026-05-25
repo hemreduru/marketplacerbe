@@ -3,15 +3,17 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\MarketplaceSyncLog;
 use App\Models\Product;
-use App\Models\Marketplace;
-use App\Models\UserMarketplaceCredential;
-use App\Services\Trendyol\TrendyolProductService;
+use App\Services\MarketplaceManager;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
+    public function __construct(private MarketplaceManager $marketplace) {}
+
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -49,8 +51,8 @@ class ProductController extends Controller
             $search = $request->input('search.value');
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('barcode', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%");
+                    ->orWhere('barcode', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
             });
         }
 
@@ -114,33 +116,43 @@ class ProductController extends Controller
         foreach ($products as $product) {
             // Product Column (Image + Title)
             $imageUrl = $product->images[0]['url'] ?? $product->images[0] ?? '';
-            $productUrl = $product->product_url ?? ('https://www.trendyol.com/sr?q=' . $product->barcode);
+            $productUrl = $product->product_url ?? ('https://www.trendyol.com/sr?q='.$product->barcode);
 
             $productHtml = '
                 <div class="d-flex align-items-center">
-                    <a href="' . $productUrl . '" target="_blank" class="symbol symbol-50px me-5">
-                        <span class="symbol-label" style="background-image:url(' . $imageUrl . ');"></span>
+                    <a href="'.$productUrl.'" target="_blank" class="symbol symbol-50px me-5">
+                        <span class="symbol-label" style="background-image:url('.$imageUrl.');"></span>
                     </a>
                     <div class="d-flex flex-column">
-                        <a href="' . $productUrl . '" target="_blank" class="text-gray-800 text-hover-primary mb-1">' . $product->title . '</a>
+                        <a href="'.$productUrl.'" target="_blank" class="text-gray-800 text-hover-primary mb-1">'.$product->title.'</a>
                     </div>
                 </div>';
 
             // Price Column
-            $priceHtml = '<span class="text-gray-800 fw-bold">' . number_format($product->price, 2) . ' ' . $product->currency . '</span>';
+            $priceHtml = '<span class="text-gray-800 fw-bold">'.number_format($product->price, 2).' '.$product->currency.'</span>';
             if ($product->list_price > $product->price) {
-                $priceHtml .= '<span class="text-muted text-decoration-line-through fs-7 ms-2">' . number_format($product->list_price, 2) . '</span>';
+                $priceHtml .= '<span class="text-muted text-decoration-line-through fs-7 ms-2">'.number_format($product->list_price, 2).'</span>';
             }
 
             // Stock Column
             $stockHtml = $product->stock > 0
-                ? '<span class="badge badge-light-success">' . $product->stock . '</span>'
-                : '<span class="badge badge-light-danger">' . __('common.no_stock') . '</span>';
+                ? '<span class="badge badge-light-success">'.$product->stock.'</span>'
+                : '<span class="badge badge-light-danger">'.__('common.no_stock').'</span>';
 
             // Status Column
             $statusHtml = $product->status == 'active'
-                ? '<span class="badge badge-light-success">' . __('common.active') . '</span>'
-                : '<span class="badge badge-light-danger">' . __('common.inactive') . '</span>';
+                ? '<span class="badge badge-light-success">'.__('common.active').'</span>'
+                : '<span class="badge badge-light-danger">'.__('common.inactive').'</span>';
+
+            $actionHtml = '<button type="button" class="btn btn-sm btn-icon btn-light-primary edit-price-stock-btn"'
+                .' data-id="'.$product->id.'"'
+                .' data-title="'.e($product->title).'"'
+                .' data-sale-price="'.$product->price.'"'
+                .' data-list-price="'.$product->list_price.'"'
+                .' data-stock="'.$product->stock.'"'
+                .' title="'.__('common.edit').'">'
+                .'<i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>'
+                .'</button>';
 
             $data[] = [
                 $productHtml,
@@ -149,7 +161,8 @@ class ProductController extends Controller
                 $product->category_name,
                 $priceHtml,
                 $stockHtml,
-                $statusHtml
+                $statusHtml,
+                $actionHtml,
             ];
         }
 
@@ -157,35 +170,95 @@ class ProductController extends Controller
             'draw' => intval($request->input('draw')),
             'recordsTotal' => $totalRecords,
             'recordsFiltered' => $filteredRecords,
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
     public function sync()
     {
-        $user = Auth::user();
-        $trendyol = Marketplace::where('slug', 'trendyol')->first();
-        $credential = UserMarketplaceCredential::where('user_id', $user->id)
-            ->where('marketplace_id', $trendyol->id)
-            ->first();
+        $credential = $this->marketplace->credentialFor(Auth::user());
 
-        if (!$credential) {
+        if (! $credential) {
             return response()->json(['success' => false, 'message' => __('common.please_connect_trendyol')]);
         }
 
+        $log = MarketplaceSyncLog::start($credential->id, 'product');
+        $stats = ['created' => 0, 'updated' => 0, 'failed' => 0];
+
         try {
-            $service = new TrendyolProductService(
-                $credential->api_key,
-                $credential->api_secret,
-                $credential->additional_credentials['seller_id'] ?? '',
-                false
+            $this->marketplace->productService($credential)->syncProducts(
+                $credential->id,
+                function ($processed, $total, $message, $progressStats) use (&$stats) {
+                    $stats = $progressStats;
+                }
             );
 
-            $service->syncProducts($credential->id);
+            $credential->update(['last_sync_at' => now()]);
+            $log->succeed($stats);
 
             return response()->json(['success' => true, 'message' => __('common.sync_completed')]);
         } catch (\Exception $e) {
+            $log->fail($e->getMessage());
+
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function updatePriceStock(Request $request)
+    {
+        $validated = $request->validate([
+            'product_id' => 'required|integer',
+            'sale_price' => 'nullable|numeric|min:0',
+            'list_price' => 'nullable|numeric|min:0',
+            'stock' => 'nullable|integer|min:0',
+        ]);
+
+        $credential = $this->marketplace->credentialFor(Auth::user());
+
+        if (! $credential) {
+            return response()->json(['success' => false, 'message' => __('common.please_connect_trendyol')], 400);
+        }
+
+        $product = Product::where('id', $validated['product_id'])
+            ->where('user_marketplace_credential_id', $credential->id)
+            ->first();
+
+        if (! $product) {
+            return response()->json(['success' => false, 'message' => __('common.no_data')], 404);
+        }
+
+        // Gate live writes: never push to the live store unless explicitly enabled.
+        if (! config('marketplace.write_enabled')) {
+            return response()->json(['success' => true, 'message' => __('common.action_simulated')]);
+        }
+
+        $item = ['barcode' => $product->barcode];
+        if ($request->filled('stock')) {
+            $item['quantity'] = (int) $validated['stock'];
+        }
+        if ($request->filled('sale_price')) {
+            $item['salePrice'] = (float) $validated['sale_price'];
+        }
+        if ($request->filled('list_price')) {
+            $item['listPrice'] = (float) $validated['list_price'];
+        }
+
+        try {
+            $result = $this->marketplace->productService($credential)->updatePriceAndInventory([$item]);
+
+            if (isset($result['error'])) {
+                return response()->json(['success' => false, 'message' => $result['message']], 500);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => __('common.sync_started'),
+                'data' => $result,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Price/stock update exception: '.$e->getMessage());
+
+            return response()->json(['success' => false, 'message' => __('common.error_occurred')], 500);
         }
     }
 }

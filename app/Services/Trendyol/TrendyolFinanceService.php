@@ -2,14 +2,21 @@
 
 namespace App\Services\Trendyol;
 
+use App\Models\FinancialDailySummary;
+use App\Models\FinancialTransaction;
+use App\Services\Contracts\FinanceServiceContract;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class TrendyolFinanceService
+class TrendyolFinanceService implements FinanceServiceContract
 {
     protected string $baseUrl;
+
     protected string $apiKey;
+
     protected string $apiSecret;
+
     protected string $sellerId;
 
     public function __construct(string $apiKey, string $apiSecret, string $sellerId, bool $isStage = false)
@@ -25,10 +32,10 @@ class TrendyolFinanceService
      */
     public function fetchCHEChunked(string $resource, array $query): array
     {
-        $startMs = (int)$query['startDate'];
-        $endMs = (int)$query['endDate'];
+        $startMs = (int) $query['startDate'];
+        $endMs = (int) $query['endDate'];
         $type = $query['transactionType'];
-        $size = (int)($query['size'] ?? 1000);
+        $size = (int) ($query['size'] ?? 1000);
         $maxSpan = 15 * 24 * 60 * 60 * 1000;
 
         $cursor = $startMs;
@@ -40,7 +47,7 @@ class TrendyolFinanceService
 
             do {
                 $url = sprintf(
-                    "%s/integration/finance/che/sellers/%s/%s",
+                    '%s/integration/finance/che/sellers/%s/%s',
                     $this->baseUrl,
                     $this->sellerId,
                     $resource
@@ -52,18 +59,18 @@ class TrendyolFinanceService
                         'endDate' => $chunkEnd,
                         'transactionType' => $type,
                         'page' => $page,
-                        'size' => $size
+                        'size' => $size,
                     ]);
 
                 if ($response->failed()) {
-                    Log::error("Trendyol API Error ({$resource}): " . $response->body());
+                    Log::error("Trendyol API Error ({$resource}): ".$response->body());
                     break;
                 }
 
                 $data = $response->json();
                 $items = $data['content'] ?? [];
                 $all = array_merge($all, $items);
-                $totalPages = (int)($data['totalPages'] ?? 1);
+                $totalPages = (int) ($data['totalPages'] ?? 1);
                 $page++;
 
             } while ($page < $totalPages);
@@ -83,19 +90,25 @@ class TrendyolFinanceService
         $seenInvoices = [];
 
         foreach ($deductionRecords as $d) {
-            $txType = (string)($d['transactionType'] ?? '');
-            $id = (string)($d['id'] ?? '');
+            $txType = (string) ($d['transactionType'] ?? '');
+            $id = (string) ($d['id'] ?? '');
 
-            if ($id === '') continue;
+            if ($id === '') {
+                continue;
+            }
 
             $t = mb_strtolower($txType, 'UTF-8');
-            if ($t !== 'kargo faturası' && $t !== 'kargo fatura') continue;
+            if ($t !== 'kargo faturası' && $t !== 'kargo fatura') {
+                continue;
+            }
 
-            if (isset($seenInvoices[$id])) continue;
+            if (isset($seenInvoices[$id])) {
+                continue;
+            }
             $seenInvoices[$id] = true;
 
             $url = sprintf(
-                "%s/integration/finance/che/sellers/%s/cargo-invoice/%s/items",
+                '%s/integration/finance/che/sellers/%s/cargo-invoice/%s/items',
                 $this->baseUrl,
                 $this->sellerId,
                 $id
@@ -104,17 +117,22 @@ class TrendyolFinanceService
             $response = Http::withBasicAuth($this->apiKey, $this->apiSecret)->get($url);
 
             if ($response->failed()) {
-                Log::error("Trendyol Cargo Invoice Error ({$id}): " . $response->body());
+                Log::error("Trendyol Cargo Invoice Error ({$id}): ".$response->body());
+
                 continue;
             }
 
             $data = $response->json();
             foreach (($data['content'] ?? []) as $item) {
-                $order = (string)($item['orderNumber'] ?? '');
-                $amt = (float)($item['amount'] ?? 0);
+                $order = (string) ($item['orderNumber'] ?? '');
+                $amt = (float) ($item['amount'] ?? 0);
 
-                if ($order === '') continue;
-                if (!isset($orderShipMap[$order])) $orderShipMap[$order] = 0.0;
+                if ($order === '') {
+                    continue;
+                }
+                if (! isset($orderShipMap[$order])) {
+                    $orderShipMap[$order] = 0.0;
+                }
                 $orderShipMap[$order] += $amt;
             }
         }
@@ -131,22 +149,30 @@ class TrendyolFinanceService
 
         $platform = ['platform hizmet', 'platform hizmeti', 'hizmet bedeli', 'platform bedeli', 'phb', 'p.h.b'];
         foreach ($platform as $k) {
-            if (strpos($d, $k) !== false) return 'platform';
+            if (strpos($d, $k) !== false) {
+                return 'platform';
+            }
         }
 
         $intlOps = ['yurtdışı operasyon', 'yurt dışı operasyon', 'yd operasyon'];
         foreach ($intlOps as $k) {
-            if (strpos($d, $k) !== false) return 'intl_ops';
+            if (strpos($d, $k) !== false) {
+                return 'intl_ops';
+            }
         }
 
         $intlSrv = ['uluslararası hizmet', 'international service'];
         foreach ($intlSrv as $k) {
-            if (strpos($d, $k) !== false) return 'intl_service';
+            if (strpos($d, $k) !== false) {
+                return 'intl_service';
+            }
         }
 
         $pen = ['ceza', 'penalty'];
         foreach ($pen as $k) {
-            if (strpos($d, $k) !== false) return 'penalty';
+            if (strpos($d, $k) !== false) {
+                return 'penalty';
+            }
         }
 
         return 'other';
@@ -155,40 +181,37 @@ class TrendyolFinanceService
     /**
      * Sync financial data for a date range to database.
      */
-    /**
-     * Sync financial data for a date range to database.
-     */
     public function syncFinancialData(int $credentialId, string $startDateYmd, string $endDateYmd): array
     {
         $stats = ['created' => 0, 'updated' => 0, 'failed' => 0];
-        $startMs = strtotime($startDateYmd . ' 00:00:00') * 1000;
-        $endMs = strtotime($endDateYmd . ' 23:59:59') * 1000;
+        $startMs = strtotime($startDateYmd.' 00:00:00') * 1000;
+        $endMs = strtotime($endDateYmd.' 23:59:59') * 1000;
 
         $sales = $this->fetchCHEChunked('settlements', [
             'transactionType' => 'Sale',
             'startDate' => $startMs,
             'endDate' => $endMs,
-            'size' => 1000
+            'size' => 1000,
         ]);
 
         $deductions = $this->fetchCHEChunked('otherfinancials', [
             'transactionType' => 'DeductionInvoices',
             'startDate' => $startMs,
             'endDate' => $endMs,
-            'size' => 1000
+            'size' => 1000,
         ]);
 
         $dailyStats = [];
 
         foreach ($sales as $s) {
-            $txDateMs = (int)($s['transactionDate'] ?? 0);
-            $txDate = date('Y-m-d H:i:s', $txDateMs / 1000);
-            $day = date('Y-m-d', $txDateMs / 1000);
-            $order = (string)($s['orderNumber'] ?? '');
-            $gross = (float)($s['credit'] ?? 0);
-            $commission = (float)($s['commissionAmount'] ?? 0);
+            $txDateMs = (int) ($s['transactionDate'] ?? 0);
+            $txDate = date('Y-m-d H:i:s', intdiv($txDateMs, 1000));
+            $day = date('Y-m-d', intdiv($txDateMs, 1000));
+            $order = (string) ($s['orderNumber'] ?? '');
+            $gross = (float) ($s['credit'] ?? 0);
+            $commission = (float) ($s['commissionAmount'] ?? 0);
 
-            $tx = \App\Models\FinancialTransaction::updateOrCreate(
+            $tx = FinancialTransaction::updateOrCreate(
                 [
                     'user_marketplace_credential_id' => $credentialId,
                     'transaction_type' => 'Sale',
@@ -199,18 +222,21 @@ class TrendyolFinanceService
                     'amount' => $gross,
                     'commission' => $commission,
                     'description' => 'Sale',
-                    'metadata' => $s
+                    'metadata' => $s,
                 ]
             );
 
-            if ($tx->wasRecentlyCreated) $stats['created']++;
-            else $stats['updated']++;
+            if ($tx->wasRecentlyCreated) {
+                $stats['created']++;
+            } else {
+                $stats['updated']++;
+            }
 
-            if (!isset($dailyStats[$day])) {
+            if (! isset($dailyStats[$day])) {
                 $dailyStats[$day] = [
                     'gross_sales' => 0, 'commission' => 0, 'shipping_cost' => 0,
                     'platform_expense' => 0, 'other_expense' => 0, 'net_profit' => 0,
-                    'order_count' => 0, 'item_count' => 0
+                    'order_count' => 0, 'item_count' => 0,
                 ];
             }
             $dailyStats[$day]['gross_sales'] += $gross;
@@ -220,15 +246,15 @@ class TrendyolFinanceService
         }
 
         foreach ($deductions as $d) {
-            $txDateMs = (int)($d['transactionDate'] ?? 0);
-            $txDate = date('Y-m-d H:i:s', $txDateMs / 1000);
-            $day = date('Y-m-d', $txDateMs / 1000);
-            $desc = (string)($d['description'] ?? '');
+            $txDateMs = (int) ($d['transactionDate'] ?? 0);
+            $txDate = date('Y-m-d H:i:s', intdiv($txDateMs, 1000));
+            $day = date('Y-m-d', intdiv($txDateMs, 1000));
+            $desc = (string) ($d['description'] ?? '');
             $cat = $this->classifyDeduction($desc);
-            $amt = (float)($d['debt'] ?? 0) - (float)($d['credit'] ?? 0);
+            $amt = (float) ($d['debt'] ?? 0) - (float) ($d['credit'] ?? 0);
             $val = max(0, $amt);
 
-            $tx = \App\Models\FinancialTransaction::updateOrCreate(
+            $tx = FinancialTransaction::updateOrCreate(
                 [
                     'user_marketplace_credential_id' => $credentialId,
                     'transaction_type' => 'Deduction',
@@ -237,40 +263,46 @@ class TrendyolFinanceService
                 ],
                 [
                     'amount' => -$val,
-                    'metadata' => $d
+                    'metadata' => $d,
                 ]
             );
 
-            if ($tx->wasRecentlyCreated) $stats['created']++;
-            else $stats['updated']++;
+            if ($tx->wasRecentlyCreated) {
+                $stats['created']++;
+            } else {
+                $stats['updated']++;
+            }
 
-            if (!isset($dailyStats[$day])) {
+            if (! isset($dailyStats[$day])) {
                 $dailyStats[$day] = [
                     'gross_sales' => 0, 'commission' => 0, 'shipping_cost' => 0,
                     'platform_expense' => 0, 'other_expense' => 0, 'net_profit' => 0,
-                    'order_count' => 0, 'item_count' => 0
+                    'order_count' => 0, 'item_count' => 0,
                 ];
             }
 
-            if ($cat === 'platform') $dailyStats[$day]['platform_expense'] += $val;
-            else $dailyStats[$day]['other_expense'] += $val;
+            if ($cat === 'platform') {
+                $dailyStats[$day]['platform_expense'] += $val;
+            } else {
+                $dailyStats[$day]['other_expense'] += $val;
+            }
         }
 
         foreach ($deductions as $d) {
-            $txDateMs = (int)($d['transactionDate'] ?? 0);
-            $day = date('Y-m-d', $txDateMs / 1000);
-            $txType = (string)($d['transactionType'] ?? '');
+            $txDateMs = (int) ($d['transactionDate'] ?? 0);
+            $day = date('Y-m-d', intdiv($txDateMs, 1000));
+            $txType = (string) ($d['transactionType'] ?? '');
             $t = mb_strtolower($txType, 'UTF-8');
 
-            $amt = (float)($d['debt'] ?? 0) - (float)($d['credit'] ?? 0);
+            $amt = (float) ($d['debt'] ?? 0) - (float) ($d['credit'] ?? 0);
             $val = max(0, $amt);
 
             if ($t === 'kargo faturası' || $t === 'kargo fatura') {
-                if (!isset($dailyStats[$day])) {
-                     $dailyStats[$day] = [
+                if (! isset($dailyStats[$day])) {
+                    $dailyStats[$day] = [
                         'gross_sales' => 0, 'commission' => 0, 'shipping_cost' => 0,
                         'platform_expense' => 0, 'other_expense' => 0, 'net_profit' => 0,
-                        'order_count' => 0, 'item_count' => 0
+                        'order_count' => 0, 'item_count' => 0,
                     ];
                 }
                 $dailyStats[$day]['shipping_cost'] += $val;
@@ -284,10 +316,10 @@ class TrendyolFinanceService
                 - $s['platform_expense']
                 - $s['other_expense'];
 
-            \App\Models\FinancialDailySummary::updateOrCreate(
+            FinancialDailySummary::updateOrCreate(
                 [
                     'user_marketplace_credential_id' => $credentialId,
-                    'date' => $day
+                    'date' => $day,
                 ],
                 $s
             );
@@ -302,33 +334,30 @@ class TrendyolFinanceService
     /**
      * Smart sync: fetches only missing/recent data (last 7 days if exists, else 5 years).
      *
-     * @param int $credentialId
-     * @param callable|null $onProgress function($current, $total)
+     * @param  callable|null  $onProgress  function($current, $total)
      */
     /**
      * Smart sync: fetches only missing/recent data (last 7 days if exists, else 5 years).
      *
-     * @param int $credentialId
-     * @param int|null $startYear
-     * @param callable|null $onProgress function($current, $total, $msg, $stats)
+     * @param  callable|null  $onProgress  function($current, $total, $msg, $stats)
      */
     public function syncSmart(int $credentialId, ?int $startYear = null, ?callable $onProgress = null): void
     {
-        $latestTx = \App\Models\FinancialTransaction::where('user_marketplace_credential_id', $credentialId)
+        $latestTx = FinancialTransaction::where('user_marketplace_credential_id', $credentialId)
             ->orderBy('transaction_date', 'desc')
             ->first();
 
-        $endDate = \Carbon\Carbon::now();
+        $endDate = Carbon::now();
 
         if ($startYear) {
             // Explicit start year
-            $startDate = \Carbon\Carbon::createFromDate($startYear, 1, 1)->startOfDay();
+            $startDate = Carbon::createFromDate($startYear, 1, 1)->startOfDay();
         } elseif ($latestTx) {
             // Data exists: Sync from 7 days before latest transaction
-            $startDate = \Carbon\Carbon::parse($latestTx->transaction_date)->subDays(7);
+            $startDate = Carbon::parse($latestTx->transaction_date)->subDays(7);
         } else {
             // No data or full sync: Sync last 5 years
-            $startDate = \Carbon\Carbon::now()->subYears(5);
+            $startDate = Carbon::now()->subYears(5);
         }
 
         $chunkSize = 15; // days
@@ -358,7 +387,7 @@ class TrendyolFinanceService
                 $onProgress(
                     $currentChunkIndex,
                     $totalChunks,
-                    "Syncing period: " . $currentDate->format('Y-m-d') . " to " . $chunkEnd->format('Y-m-d'),
+                    'Syncing period: '.$currentDate->format('Y-m-d').' to '.$chunkEnd->format('Y-m-d'),
                     $chunkStats
                 );
             }

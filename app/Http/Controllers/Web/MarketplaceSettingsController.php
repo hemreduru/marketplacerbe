@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Http\Requests\UpdateMarketplaceSettingsRequest;
+use App\Jobs\SyncTrendyolClaimsJob;
+use App\Jobs\SyncTrendyolFinancialsJob;
+use App\Jobs\SyncTrendyolOrdersJob;
+use App\Jobs\SyncTrendyolProductsJob;
+use App\Jobs\SyncTrendyolQuestionsJob;
 use App\Models\Marketplace;
 use App\Models\UserMarketplaceCredential;
-use App\Http\Requests\UpdateMarketplaceSettingsRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MarketplaceSettingsController extends Controller
 {
@@ -26,7 +29,7 @@ class MarketplaceSettingsController extends Controller
         return view('marketplace.settings', [
             'user' => $user,
             'marketplaces' => $marketplaces,
-            'credentials' => $credentials
+            'credentials' => $credentials,
         ]);
     }
 
@@ -56,10 +59,13 @@ class MarketplaceSettingsController extends Controller
 
             DB::commit();
 
-            $marketplace = \App\Models\Marketplace::find($validated['marketplace_id']);
+            $marketplace = Marketplace::find($validated['marketplace_id']);
             if ($marketplace && $marketplace->slug === 'trendyol') {
-                \App\Jobs\SyncTrendyolFinancialsJob::dispatch($credential->id);
-                \App\Jobs\SyncTrendyolProductsJob::dispatch($credential->id);
+                SyncTrendyolProductsJob::dispatch($credential->id)->onQueue('sync');
+                SyncTrendyolOrdersJob::dispatch($credential->id)->onQueue('sync');
+                SyncTrendyolFinancialsJob::dispatch($credential->id)->onQueue('sync');
+                SyncTrendyolQuestionsJob::dispatch($credential->id)->onQueue('sync');
+                SyncTrendyolClaimsJob::dispatch($credential->id)->onQueue('sync');
             }
 
             return response()->json([
@@ -68,12 +74,12 @@ class MarketplaceSettingsController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update marketplace credentials: ' . $e->getMessage());
+            Log::error('Failed to update marketplace credentials: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
                 'message' => __('common.error_occurred'),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

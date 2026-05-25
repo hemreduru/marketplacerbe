@@ -118,7 +118,7 @@
 
                 axios.post('{{ route('questions.answer') }}', {
                         question_id: id,
-                        text: text
+                        answer: text
                     })
                     .then(function(response) {
                         if (response.data.success) {
@@ -140,20 +140,23 @@
                     });
             });
 
-            // Refresh Button
+            // Refresh Button: pull latest from the marketplace, then re-render the list.
             $('#refresh_questions_btn').click(function() {
                 var btn = $(this);
                 var icon = btn.find('i');
 
-                icon.addClass('spin'); // Add custom spin class or use Metronic's indicator
+                icon.addClass('spin');
                 btn.attr('data-kt-indicator', 'on');
 
-                axios.get('{{ route('questions.index') }}', {
-                        params: {
-                            status: '{{ $status }}',
-                            page: 0, // Always reset to first page on refresh
-                            partial: 1
-                        }
+                axios.post('{{ route('questions.sync') }}')
+                    .then(function() {
+                        return axios.get('{{ route('questions.index') }}', {
+                            params: {
+                                status: '{{ $status }}',
+                                page: 0,
+                                partial: 1
+                            }
+                        });
                     })
                     .then(function(response) {
                         $('#questions_container').html(response.data);

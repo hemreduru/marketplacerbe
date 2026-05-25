@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class MarketplaceSeeder extends Seeder
@@ -17,11 +16,11 @@ class MarketplaceSeeder extends Seeder
                 'name' => 'Trendyol',
                 'slug' => 'trendyol',
                 'code' => 'TRENDYOL',
-                'api_base_url' => 'https://api.trendyol.com/sapigw',
+                'api_base_url' => 'https://apigw.trendyol.com',
                 'logo' => null,
                 'is_active' => true,
                 'config' => json_encode([
-                    'stage_api_url' => 'https://stageapi.trendyol.com/stageapi',
+                    'stage_api_url' => 'https://stageapigw.trendyol.com',
                     'user_agent_format' => '{supplier_id} - {integrator_name}',
                     'auth_type' => 'basic',
                     'rate_limit' => [
@@ -29,14 +28,16 @@ class MarketplaceSeeder extends Seeder
                         'requests_per_hour' => 3600,
                     ],
                     'endpoints' => [
-                        'products' => '/suppliers/{supplierId}/products',
-                        'product_detail' => '/suppliers/{supplierId}/products',
-                        'product_batch' => '/suppliers/{supplierId}/products/batch-requests/{batchRequestId}',
-                        'orders' => '/suppliers/{supplierId}/orders',
-                        'claims' => '/suppliers/{supplierId}/claims',
-                        'questions' => '/suppliers/{supplierId}/questions',
-                        'brands' => '/brands',
-                        'categories' => '/product-categories',
+                        'products' => '/integration/product/sellers/{sellerId}/products',
+                        'price_inventory' => '/integration/inventory/sellers/{sellerId}/products/price-and-inventory',
+                        'product_batch' => '/integration/product/sellers/{sellerId}/products/batch-requests/{batchRequestId}',
+                        'orders' => '/integration/order/sellers/{sellerId}/orders',
+                        'claims' => '/integration/order/sellers/{sellerId}/claims',
+                        'questions' => '/integration/qna/sellers/{sellerId}/questions/filter',
+                        'settlements' => '/integration/finance/che/sellers/{sellerId}/settlements',
+                        'otherfinancials' => '/integration/finance/che/sellers/{sellerId}/otherfinancials',
+                        'brands' => '/integration/product/brands',
+                        'categories' => '/integration/product/product-categories',
                     ],
                 ]),
                 'created_at' => now(),

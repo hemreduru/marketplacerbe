@@ -2,14 +2,21 @@
 
 namespace App\Services\Trendyol;
 
+use App\Models\Order;
+use App\Services\Contracts\OrderServiceContract;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class TrendyolOrderService
+class TrendyolOrderService implements OrderServiceContract
 {
     protected string $baseUrl;
+
     protected string $apiKey;
+
     protected string $apiSecret;
+
     protected string $sellerId;
 
     public function __construct(string $apiKey, string $apiSecret, string $sellerId, bool $isStage = false)
@@ -23,12 +30,11 @@ class TrendyolOrderService
     /**
      * Get shipment packages (orders).
      *
-     * @param array $filters (status, startDate, endDate, page, size, etc.)
-     * @return array
+     * @param  array  $filters  (status, startDate, endDate, page, size, etc.)
      */
     public function getOrders(array $filters = []): array
     {
-        $url = sprintf("%s/integration/order/sellers/%s/orders", $this->baseUrl, $this->sellerId);
+        $url = sprintf('%s/integration/order/sellers/%s/orders', $this->baseUrl, $this->sellerId);
 
         // Add sellerId to query params as required by some endpoints, though usually auth header is enough
         // $filters['supplierId'] = $this->sellerId;
@@ -37,7 +43,8 @@ class TrendyolOrderService
             ->get($url, $filters);
 
         if ($response->failed()) {
-            Log::error("Trendyol Order API Error (getOrders): " . $response->body());
+            Log::error('Trendyol Order API Error (getOrders): '.$response->body());
+
             return ['error' => true, 'message' => $response->body()];
         }
 
@@ -47,10 +54,6 @@ class TrendyolOrderService
     /**
      * Update package status (Picking, Invoiced, Shipped, etc.)
      * Note: Endpoint varies by status type, simplified here for 'Picking'/'Invoiced'.
-     *
-     * @param int $packageId
-     * @param string $status
-     * @return array
      */
     public function updateStatus(int $packageId, string $status): array
     {
@@ -58,18 +61,19 @@ class TrendyolOrderService
         // For 'Shipped', we use updateTrackingNumber usually, but let's assume standard status update for now.
         // This is a simplified implementation.
 
-        $url = sprintf("%s/integration/oms/core/v1/shipment-packages/%s", $this->baseUrl, $packageId);
+        $url = sprintf('%s/integration/oms/core/v1/shipment-packages/%s', $this->baseUrl, $packageId);
 
         $body = [
-            'status' => $status
+            'status' => $status,
         ];
 
         $response = Http::withBasicAuth($this->apiKey, $this->apiSecret)
             ->put($url, $body);
 
         if ($response->failed()) {
-             Log::error("Trendyol Order API Error (updateStatus): " . $response->body());
-             return ['error' => true, 'message' => $response->body()];
+            Log::error('Trendyol Order API Error (updateStatus): '.$response->body());
+
+            return ['error' => true, 'message' => $response->body()];
         }
 
         return $response->json();
@@ -78,10 +82,6 @@ class TrendyolOrderService
     /**
      * Sync orders to database with chunking.
      *
-     * @param int $marketplaceId
-     * @param int $userId
-     * @param int|null $startYear
-     * @param callable|null $onProgress
      * @return array stats
      */
     public function syncOrders(int $marketplaceId, int $userId, ?int $startYear = null, ?callable $onProgress = null): array
@@ -89,14 +89,14 @@ class TrendyolOrderService
         $totalStats = ['created' => 0, 'updated' => 0, 'failed' => 0];
 
         // Smart Sync Logic
-        $lastOrder = \App\Models\Order::where('marketplace_id', $marketplaceId)
+        $lastOrder = Order::where('marketplace_id', $marketplaceId)
             ->where('user_id', $userId)
             ->orderBy('order_date', 'desc')
             ->first();
 
         if ($startYear) {
             // Explicit start year
-            $startDate = \Carbon\Carbon::createFromDate($startYear, 1, 1)->startOfDay();
+            $startDate = Carbon::createFromDate($startYear, 1, 1)->startOfDay();
         } elseif ($lastOrder) {
             // Fetch from 7 days before last order
             $startDate = $lastOrder->order_date->subDays(7);
@@ -132,11 +132,11 @@ class TrendyolOrderService
                     'page' => $page,
                     'size' => $size,
                     'orderByDirection' => 'ASC',
-                    'orderByField' => 'PackageLastModifiedDate'
+                    'orderByField' => 'PackageLastModifiedDate',
                 ]);
 
                 if (isset($response['error'])) {
-                    Log::error("Sync Orders Failed for chunk {$currentDate->format('Y-m-d')}: " . $response['message']);
+                    Log::error("Sync Orders Failed for chunk {$currentDate->format('Y-m-d')}: ".$response['message']);
                     break;
                 }
 
@@ -148,10 +148,10 @@ class TrendyolOrderService
 
                 foreach ($orders as $orderData) {
                     try {
-                        \Illuminate\Support\Facades\DB::transaction(function () use ($orderData, $marketplaceId, $userId, &$chunkStats, &$totalStats) {
-                            $orderDate = isset($orderData['orderDate']) ? \Carbon\Carbon::createFromTimestampMs($orderData['orderDate']) : null;
+                        DB::transaction(function () use ($orderData, $marketplaceId, $userId, &$chunkStats, &$totalStats) {
+                            $orderDate = isset($orderData['orderDate']) ? Carbon::createFromTimestampMs($orderData['orderDate']) : null;
 
-                            $order = \App\Models\Order::updateOrCreate(
+                            $order = Order::updateOrCreate(
                                 [
                                     'marketplace_id' => $marketplaceId,
                                     'user_id' => $userId,
@@ -197,7 +197,7 @@ class TrendyolOrderService
                             }
                         });
                     } catch (\Exception $e) {
-                        Log::error("Failed to sync order " . ($orderData['orderNumber'] ?? '?') . ": " . $e->getMessage());
+                        Log::error('Failed to sync order '.($orderData['orderNumber'] ?? '?').': '.$e->getMessage());
                         $chunkStats['failed']++;
                         $totalStats['failed']++;
                     }
@@ -214,7 +214,7 @@ class TrendyolOrderService
 
             if ($onProgress) {
                 $onProgress(
-                    "Syncing period: " . $currentDate->format('Y-m-d') . " to " . $chunkEnd->format('Y-m-d'),
+                    'Syncing period: '.$currentDate->format('Y-m-d').' to '.$chunkEnd->format('Y-m-d'),
                     $chunkStats
                 );
             }
@@ -224,18 +224,20 @@ class TrendyolOrderService
 
         return $totalStats;
     }
+
     public function createCommonLabel(string $trackingNumber): array
     {
-        $url = sprintf("%s/integration/oms/core/v1/common-label", $this->baseUrl);
+        $url = sprintf('%s/integration/oms/core/v1/common-label', $this->baseUrl);
 
         $response = Http::withBasicAuth($this->apiKey, $this->apiSecret)
             ->post($url, [
-                'cargoTrackingNumber' => $trackingNumber
+                'cargoTrackingNumber' => $trackingNumber,
             ]);
 
         if ($response->failed()) {
-             Log::error("Trendyol Order API Error (createCommonLabel): " . $response->body());
-             return ['error' => true, 'message' => $response->body()];
+            Log::error('Trendyol Order API Error (createCommonLabel): '.$response->body());
+
+            return ['error' => true, 'message' => $response->body()];
         }
 
         return $response->json();
@@ -244,19 +246,19 @@ class TrendyolOrderService
     /**
      * Get Common Label (Retrieve content)
      *
-     * @param string $trackingNumber
      * @return mixed (PDF content or array)
      */
     public function getCommonLabel(string $trackingNumber)
     {
-        $url = sprintf("%s/integration/oms/core/v1/common-label/%s", $this->baseUrl, $trackingNumber);
+        $url = sprintf('%s/integration/oms/core/v1/common-label/%s', $this->baseUrl, $trackingNumber);
 
         $response = Http::withBasicAuth($this->apiKey, $this->apiSecret)
             ->get($url);
 
         if ($response->failed()) {
-             Log::error("Trendyol Order API Error (getCommonLabel): " . $response->body());
-             return ['error' => true, 'message' => $response->body()];
+            Log::error('Trendyol Order API Error (getCommonLabel): '.$response->body());
+
+            return ['error' => true, 'message' => $response->body()];
         }
 
         return $response->body(); // Returns raw content (e.g. ZPL or PDF stream)

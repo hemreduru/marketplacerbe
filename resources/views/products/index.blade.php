@@ -145,6 +145,7 @@
                         <th>{{ __('common.price') }}</th>
                         <th>{{ __('common.stock') }}</th>
                         <th>{{ __('common.status') }}</th>
+                        <th class="text-end">{{ __('common.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="fw-semibold text-gray-600">
@@ -154,6 +155,41 @@
         </div>
     </div>
     <!--end::Content-->
+
+    <!--begin::Edit Price/Stock Modal-->
+    <div class="modal fade" id="kt_edit_price_stock_modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mw-500px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="fw-bold" id="edit_product_title">{{ __('common.edit') }}</h2>
+                    <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    @include('components.production-warning')
+                    <input type="hidden" id="edit_product_id" />
+                    <div class="mb-5">
+                        <label class="form-label">{{ __('common.stock') }}</label>
+                        <input type="number" min="0" class="form-control form-control-solid" id="edit_stock" />
+                    </div>
+                    <div class="mb-5">
+                        <label class="form-label">{{ __('common.price') }}</label>
+                        <input type="number" min="0" step="0.01" class="form-control form-control-solid" id="edit_sale_price" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">{{ __('common.list_price') ?? 'List Price' }}</label>
+                        <input type="number" min="0" step="0.01" class="form-control form-control-solid" id="edit_list_price" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('common.cancel') }}</button>
+                    <button type="button" class="btn btn-primary" id="save_price_stock_btn">{{ __('common.save') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::Edit Price/Stock Modal-->
 @endsection
 
 @push('scripts')
@@ -200,6 +236,11 @@
                     },
                     {
                         data: 6
+                    },
+                    {
+                        data: 7,
+                        orderable: false,
+                        className: 'text-end'
                     }
                 ],
                 info: true,
@@ -221,6 +262,48 @@
             // Apply Filters Button
             $('#apply_filters_btn').click(function() {
                 table.draw();
+            });
+
+            // Open edit modal (delegated for AJAX-rendered rows)
+            var editModal = new bootstrap.Modal(document.getElementById('kt_edit_price_stock_modal'));
+            $(document).on('click', '.edit-price-stock-btn', function() {
+                var btn = $(this);
+                $('#edit_product_id').val(btn.data('id'));
+                $('#edit_product_title').text(btn.data('title'));
+                $('#edit_stock').val(btn.data('stock'));
+                $('#edit_sale_price').val(btn.data('sale-price'));
+                $('#edit_list_price').val(btn.data('list-price'));
+                editModal.show();
+            });
+
+            // Save price/stock
+            $('#save_price_stock_btn').click(function() {
+                var btn = $(this);
+                btn.attr('data-kt-indicator', 'on');
+                btn.prop('disabled', true);
+
+                axios.post('{{ route('products.update-price-stock') }}', {
+                        product_id: $('#edit_product_id').val(),
+                        stock: $('#edit_stock').val(),
+                        sale_price: $('#edit_sale_price').val(),
+                        list_price: $('#edit_list_price').val()
+                    })
+                    .then(function(response) {
+                        if (response.data.success) {
+                            toastr.success(response.data.message);
+                            editModal.hide();
+                            table.ajax.reload();
+                        } else {
+                            toastr.error(response.data.message);
+                        }
+                    })
+                    .catch(function() {
+                        toastr.error('{{ __('common.error_occurred') }}');
+                    })
+                    .finally(function() {
+                        btn.removeAttr('data-kt-indicator');
+                        btn.prop('disabled', false);
+                    });
             });
 
             // Sync Button

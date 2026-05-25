@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\MarketplaceSyncLog;
 use App\Models\UserMarketplaceCredential;
 use App\Services\Trendyol\TrendyolFinanceService;
 use Illuminate\Bus\Queueable;
@@ -10,25 +11,19 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class SyncTrendyolFinancialsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $credentialId;
-    protected $startDate;
-    protected $endDate;
-
     /**
      * Create a new job instance.
+     *
+     * The finance service performs a smart incremental sync that determines
+     * its own date window from the latest stored transaction, so no explicit
+     * date range is needed here.
      */
-    public function __construct(int $credentialId, ?string $startDate = null, ?string $endDate = null)
-    {
-        $this->credentialId = $credentialId;
-        $this->startDate = $startDate ?? date('Y-m-d', strtotime('-30 days'));
-        $this->endDate = $endDate ?? date('Y-m-d');
-    }
+    public function __construct(protected int $credentialId) {}
 
     /**
      * Execute the job.
@@ -39,10 +34,13 @@ class SyncTrendyolFinancialsJob implements ShouldQueue
 
         try {
             $credential = UserMarketplaceCredential::find($this->credentialId);
-            if (!$credential) {
+            if (! $credential) {
                 Log::error("Credential not found: {$this->credentialId}");
+
                 return;
             }
+
+            $log = MarketplaceSyncLog::start($credential->id, 'finance');
 
             $service = new TrendyolFinanceService(
                 $credential->api_key,
@@ -51,12 +49,19 @@ class SyncTrendyolFinancialsJob implements ShouldQueue
                 false
             );
 
-            $service->syncSmart($this->credentialId);
+            try {
+                $service->syncSmart($this->credentialId);
 
-            Log::info("Financial sync completed for credential ID: {$this->credentialId}");
+                $credential->update(['last_sync_at' => now()]);
+                $log->succeed();
 
+                Log::info("Financial sync completed for credential ID: {$this->credentialId}");
+            } catch (\Exception $e) {
+                $log->fail($e->getMessage());
+                throw $e;
+            }
         } catch (\Exception $e) {
-            Log::error("Financial sync failed: " . $e->getMessage());
+            Log::error('Financial sync failed: '.$e->getMessage());
             throw $e;
         }
     }

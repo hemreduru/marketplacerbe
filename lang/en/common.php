@@ -49,7 +49,7 @@ return [
     'confirm' => 'Confirm',
 
     // Error Messages
-        // Error Messages
+    // Error Messages
     'error_occurred' => 'An error occurred. Please try again.',
     'forbidden' => 'You do not have permission for this action.',
     'not_found' => 'The resource you are looking for was not found.',
@@ -58,7 +58,7 @@ return [
     'unexpected_error' => 'An unexpected error occurred. Please try again.',
 
     // Language
-        'language_updated' => 'Language updated successfully.',
+    'language_updated' => 'Language updated successfully.',
     'theme_updated' => 'Theme updated successfully.',
     'api_key' => 'API Key',
     'api_secret' => 'API Secret',
@@ -102,6 +102,7 @@ return [
     'brand' => 'Brand',
     'category' => 'Category',
     'price' => 'Price',
+    'list_price' => 'List Price',
     'stock' => 'Stock',
     'clear' => 'Clear',
     'sync_completed' => 'Sync completed successfully.',
@@ -130,6 +131,8 @@ return [
     'debug_mode_active' => 'Debug Mode Active',
     'action_simulated' => 'This action will be simulated and NOT sent to the marketplace.',
     'orders' => 'Orders',
+    'claims' => 'Returns',
+    'accepted' => 'Accepted',
     'status_updated' => 'Status updated successfully.',
     'label_created' => 'Label created successfully.',
     'created' => 'Created',
