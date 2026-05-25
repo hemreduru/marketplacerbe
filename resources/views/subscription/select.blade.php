@@ -38,6 +38,39 @@
                 </div>
                 <!--end::Heading-->
 
+                <!--begin::Trial Card-->
+                @if(!$hasUsedTrial && !$user->hasActiveSubscription())
+                <div class="row justify-content-center mb-13">
+                    <div class="col-xl-8">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-5 border border-success border-2 bg-light-success rounded-3 px-10 py-8 shadow-sm">
+                            <div class="d-flex align-items-center gap-5">
+                                <span class="badge badge-success badge-circle p-5 fs-2">
+                                    <i class="ki-duotone ki-rocket fs-2 text-white"><span class="path1"></span><span class="path2"></span></i>
+                                </span>
+                                <div>
+                                    <h3 class="text-success fw-bold mb-1">{{ __('subscription.trial_card_title') }}</h3>
+                                    <div class="text-gray-700 fw-semibold fs-6">{{ __('subscription.trial_card_desc') }}</div>
+                                </div>
+                            </div>
+                            <form action="{{ route('subscription.trial') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-success px-8 py-3 fw-bold fs-6 hover-scale">
+                                    <i class="ki-duotone ki-gift fs-4 me-2"><span class="path1"></span><span class="path2"></span></i>
+                                    {{ __('subscription.trial_card_btn') }}
+                                </button>
+                            </form>
+                        </div>
+                        <div class="text-center mt-3">
+                            <span class="text-muted fs-7">
+                                <i class="ki-duotone ki-shield-tick fs-6 text-success me-1"><span class="path1"></span><span class="path2"></span></i>
+                                {{ __('subscription.no_credit_card') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                <!--end::Trial Card-->
+
                 <!--begin::Billing Toggle-->
                 <div class="d-flex justify-content-center align-items-center mb-13">
                     <span class="fw-semibold text-gray-700 me-3" id="label-monthly">{{ __('subscription.billing_monthly') }}</span>

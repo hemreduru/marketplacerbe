@@ -3,13 +3,9 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use App\Mail\WelcomeTrialMail;
-use App\Models\Plan;
 use App\Models\User;
-use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -87,12 +83,6 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
-
-        $trialPlan = Plan::where('name', 'growth')->first();
-        if ($trialPlan) {
-            app(SubscriptionService::class)->startTrial($user, $trialPlan);
-            Mail::to($user->email)->queue(new WelcomeTrialMail($user, $trialPlan->trial_days));
-        }
 
         Auth::login($user);
         $request->session()->regenerate();

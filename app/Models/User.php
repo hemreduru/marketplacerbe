@@ -124,6 +124,11 @@ class User extends Authenticatable
         return $subscription->plan->getLimit($resource);
     }
 
+    public function hasUsedTrial(): bool
+    {
+        return $this->subscriptions()->whereNotNull('trial_ends_at')->exists();
+    }
+
     public function isAdmin(): bool
     {
         return (bool) $this->is_admin;

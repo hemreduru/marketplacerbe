@@ -51,6 +51,14 @@ return [
     'cancel_confirm' => 'Are you sure you want to cancel your subscription?',
     'payment_error' => 'A payment error occurred. Please try again.',
 
+    // Trial card
+    'trial_card_title' => '3-Day Free Trial',
+    'trial_card_desc' => 'Start with all Growth plan features. No credit card required.',
+    'trial_card_btn' => 'Try for Free',
+    'no_credit_card' => 'No credit card required',
+    'trial_started' => 'Your :days-day trial has started! Connect your marketplace.',
+    'trial_already_used' => 'You have already used your free trial. Please select a plan.',
+
     // Warnings
     'subscription_required' => 'Please select a subscription plan to continue.',
     'subscription_expired' => 'Your subscription has expired. Please select a plan to renew.',

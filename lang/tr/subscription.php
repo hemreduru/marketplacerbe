@@ -51,6 +51,14 @@ return [
     'cancel_confirm' => 'Aboneliğinizi iptal etmek istediğinize emin misiniz?',
     'payment_error' => 'Ödeme işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.',
 
+    // Trial card
+    'trial_card_title' => '3 Günlük Ücretsiz Deneme',
+    'trial_card_desc' => 'Growth planının tüm özellikleriyle başlayın. Kredi kartı gerekmez.',
+    'trial_card_btn' => 'Ücretsiz Dene',
+    'no_credit_card' => 'Kredi kartı gerekmez',
+    'trial_started' => ':days günlük denemeniz başladı! Pazaryerinizi bağlayın.',
+    'trial_already_used' => 'Ücretsiz deneme hakkınızı daha önce kullandınız. Lütfen bir paket seçin.',
+
     // Warnings
     'subscription_required' => 'Devam etmek için bir paket seçmeniz gerekmektedir.',
     'subscription_expired' => 'Aboneliğinizin süresi dolmuştur. Lütfen yeni bir paket seçin.',

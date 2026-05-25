@@ -39,6 +39,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware('auth')->group(function () {
     // Subscription
     Route::get('/subscription/select', [SubscriptionController::class, 'select'])->name('subscription.select');
+    Route::post('/subscription/trial', [SubscriptionController::class, 'startTrial'])->name('subscription.trial');
     Route::post('/subscription/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscription.subscribe');
     Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
 

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeTrialMail;
 use App\Models\Plan;
 use App\Services\IyzicoService;
 use App\Services\SubscriptionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class SubscriptionController extends Controller
@@ -20,14 +22,33 @@ class SubscriptionController extends Controller
 
     public function select(): View
     {
+        $user = Auth::user();
         $plans = Plan::where('is_active', true)
             ->orderBy('sort_order')
             ->get();
 
         return view('subscription.select', [
             'plans' => $plans,
-            'user' => Auth::user(),
+            'user' => $user,
+            'hasUsedTrial' => $user->hasUsedTrial(),
         ]);
+    }
+
+    public function startTrial(): RedirectResponse
+    {
+        $user = Auth::user();
+
+        if ($user->hasUsedTrial()) {
+            return redirect()->route('subscription.select')
+                ->with('error', __('subscription.trial_already_used'));
+        }
+
+        $plan = Plan::where('name', 'growth')->firstOrFail();
+        $this->subscriptionService->startTrial($user, $plan);
+        Mail::to($user->email)->queue(new WelcomeTrialMail($user, $plan->trial_days));
+
+        return redirect()->route('dashboard')
+            ->with('success', __('subscription.trial_started', ['days' => $plan->trial_days]));
     }
 
     public function subscribe(Request $request): RedirectResponse
