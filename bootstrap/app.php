@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\SubscriptionLimitException;
 use App\Http\Middleware\EnsureMarketplaceConfigured;
 use App\Http\Middleware\EnsurePlanAllowsFeature;
 use App\Http\Middleware\EnsureSubscribed;
@@ -36,5 +37,15 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (SubscriptionLimitException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 402);
+            }
+
+            return redirect()->route('subscription.select')
+                ->with('error', $e->getMessage());
+        });
     })->create();

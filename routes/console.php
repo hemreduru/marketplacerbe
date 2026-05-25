@@ -57,3 +57,8 @@ Schedule::call(function () use ($activeTrendyolCredentials) {
         SyncTrendyolFinancialsJob::dispatch($credentialId)->onQueue('sync');
     }
 })->dailyAt('03:00')->name('sync-trendyol-financials')->withoutOverlapping();
+
+Schedule::command('subscriptions:process-expired')
+    ->dailyAt('00:05')
+    ->name('process-expired-subscriptions')
+    ->withoutOverlapping();

@@ -38,6 +38,19 @@
                 </div>
                 <!--end::Heading-->
 
+                <!--begin::Billing Toggle-->
+                <div class="d-flex justify-content-center align-items-center mb-13">
+                    <span class="fw-semibold text-gray-700 me-3" id="label-monthly">{{ __('subscription.billing_monthly') }}</span>
+                    <div class="form-check form-switch form-check-custom form-check-solid">
+                        <input class="form-check-input" type="checkbox" id="billing-toggle" value="" style="width: 50px; height: 26px;" />
+                    </div>
+                    <span class="fw-semibold text-gray-700 ms-3" id="label-yearly">
+                        {{ __('subscription.billing_yearly') }}
+                        <span class="badge badge-light-success ms-2">{{ __('subscription.yearly_discount') }}</span>
+                    </span>
+                </div>
+                <!--end::Billing Toggle-->
+
                 <!--begin::Plans Row-->
                 <div class="row g-10 justify-content-center">
                     @foreach($plans as $plan)
@@ -86,10 +99,12 @@
 
                                 <!--begin::Price-->
                                 <div class="d-flex align-items-center mb-10">
-                                    <span class="fs-3x fw-bold {{ $priceColor }}">
+                                    <span class="fs-3x fw-bold {{ $priceColor }} price-amount"
+                                        data-monthly="{{ number_format($plan->price_monthly, 0, ',', '.') }}"
+                                        data-yearly="{{ number_format($plan->price_yearly, 0, ',', '.') }}">
                                         ₺{{ number_format($plan->price_monthly, 0, ',', '.') }}
                                     </span>
-                                    <span class="text-gray-500 fs-7 fw-semibold ms-2">{{ __('subscription.price_monthly') }}</span>
+                                    <span class="text-gray-500 fs-7 fw-semibold ms-2 price-period">{{ __('subscription.price_monthly') }}</span>
                                 </div>
                                 <!--end::Price-->
 
@@ -158,7 +173,7 @@
                                 <form action="{{ route('subscription.subscribe') }}" method="POST" class="w-100 mt-auto">
                                     @csrf
                                     <input type="hidden" name="plan" value="{{ $plan->name }}" />
-                                    <input type="hidden" name="billing_period" value="monthly" />
+                                    <input type="hidden" name="billing_period" value="monthly" class="billing-period-input" />
                                     <button type="submit" class="btn {{ $btnClass }} w-100 hover-scale">
                                         {{ __('subscription.try_now') }}
                                     </button>
@@ -187,4 +202,26 @@
             </div>
         </div>
     </div>
+@push('scripts')
+<script>
+    document.getElementById('billing-toggle').addEventListener('change', function () {
+        const isYearly = this.checked;
+        const period = isYearly ? 'yearly' : 'monthly';
+        const periodLabel = isYearly ? '{{ __('subscription.price_yearly') }}' : '{{ __('subscription.price_monthly') }}';
+
+        document.querySelectorAll('.price-amount').forEach(el => {
+            el.textContent = '₺' + (isYearly ? el.dataset.yearly : el.dataset.monthly);
+        });
+
+        document.querySelectorAll('.price-period').forEach(el => {
+            el.textContent = periodLabel;
+        });
+
+        document.querySelectorAll('.billing-period-input').forEach(el => {
+            el.value = period;
+        });
+    });
+</script>
+@endpush
+
 @endsection

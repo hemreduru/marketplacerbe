@@ -31,4 +31,16 @@ return [
     'not_member_yet' => 'Henüz üye değil misiniz?',
     'already_member' => 'Zaten üye misiniz?',
     'back_to_login' => 'Girişe dön',
+
+    // Password reset
+    'forgot_password_title' => 'Şifremi Sıfırla',
+    'forgot_password_subtitle' => 'E-posta adresinizi girin, sıfırlama bağlantısı göndereceğiz.',
+    'send_reset_link' => 'Sıfırlama Bağlantısı Gönder',
+    'reset_link_sent' => 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.',
+    'new_password' => 'Yeni Şifre',
+    'new_password_confirm' => 'Yeni Şifre (Tekrar)',
+    'reset_password_title' => 'Yeni Şifre Belirle',
+    'reset_password_btn' => 'Şifremi Güncelle',
+    'password_reset_success' => 'Şifreniz başarıyla güncellendi.',
+    'error' => 'Hata',
 ];

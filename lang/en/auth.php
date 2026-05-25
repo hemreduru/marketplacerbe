@@ -31,4 +31,16 @@ return [
     'not_member_yet' => 'Not a member yet?',
     'already_member' => 'Already a member?',
     'back_to_login' => 'Back to login',
+
+    // Password reset
+    'forgot_password_title' => 'Reset Password',
+    'forgot_password_subtitle' => 'Enter your email address and we\'ll send you a reset link.',
+    'send_reset_link' => 'Send Reset Link',
+    'reset_link_sent' => 'Password reset link has been sent to your email address.',
+    'new_password' => 'New Password',
+    'new_password_confirm' => 'Confirm New Password',
+    'reset_password_title' => 'Set New Password',
+    'reset_password_btn' => 'Update Password',
+    'password_reset_success' => 'Your password has been updated successfully.',
+    'error' => 'Error',
 ];

@@ -75,7 +75,7 @@
                             <!--begin::Wrapper-->
                             <div class="d-flex flex-stack flex-wrap gap-3 fs-base fw-semibold mb-8">
                                 <div></div>
-                                <a href="#" class="link-primary">{{ __('auth.forgot_password') }}</a>
+                                <a href="{{ route('password.request') }}" class="link-primary">{{ __('auth.forgot_password') }}</a>
                             </div>
                             <!--end::Wrapper-->
 
