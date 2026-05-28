@@ -29,44 +29,61 @@
     @else
         <!--begin::KPI Row-->
         <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
-            <div class="col-md-6 col-xl-3">
+            <div class="col-md-4 col-xl-2">
                 <x-stat-card
-                    :value="$kpis['month_gross']"
-                    :title="__('dashboard.this_month_sales')"
+                    :value="$kpis['revenue']"
+                    :title="__('dashboard.revenue')"
                     icon="ki-basket"
                     color="primary"
-                    :link-label="__('common.this_month')"
+                    :change="$kpis['revenue_change']"
                 />
             </div>
-            <div class="col-md-6 col-xl-3">
+            <div class="col-md-4 col-xl-2">
                 <x-stat-card
-                    :value="$kpis['month_net']"
-                    :title="__('dashboard.this_month_net')"
+                    :value="$kpis['net_profit']"
+                    :title="__('dashboard.net_profit')"
                     icon="ki-dollar"
                     color="success"
-                    :link-label="__('common.this_month')"
+                    :change="$kpis['profit_change']"
                 />
             </div>
-            <div class="col-md-6 col-xl-3">
+            <div class="col-md-4 col-xl-2">
                 <x-stat-card
-                    :value="$kpis['total_orders']"
-                    :title="__('dashboard.total_orders')"
+                    :value="$kpis['order_count']"
+                    :title="__('dashboard.order_count')"
                     icon="ki-time"
                     color="warning"
                     format="integer"
+                    :change="$kpis['order_change']"
                     :link="route('orders.index')"
-                    :link-label="$kpis['waiting_orders'] . ' ' . __('dashboard.pending_orders_short')"
                 />
             </div>
-            <div class="col-md-6 col-xl-3">
+            <div class="col-md-4 col-xl-2">
                 <x-stat-card
-                    :value="$kpis['total_products']"
-                    :title="__('dashboard.total_products')"
+                    :value="$kpis['margin']"
+                    :title="__('dashboard.margin')"
+                    icon="ki-graph"
+                    color="info"
+                    format="pct"
+                />
+            </div>
+            <div class="col-md-4 col-xl-2">
+                <x-stat-card
+                    :value="$kpis['return_rate']"
+                    :title="__('dashboard.return_rate')"
+                    icon="ki-arrow-cycle"
+                    color="secondary"
+                    format="pct"
+                />
+            </div>
+            <div class="col-md-4 col-xl-2">
+                <x-stat-card
+                    :value="$kpis['critical_stock']"
+                    :title="__('dashboard.critical_stock')"
                     icon="ki-cross-circle"
                     color="danger"
                     format="integer"
                     :link="route('products.index')"
-                    :link-label="$kpis['out_of_stock'] . ' ' . __('common.no_stock')"
                 />
             </div>
         </div>

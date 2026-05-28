@@ -36,6 +36,6 @@ test('a user with a credential sees KPI figures', function () {
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee(__('dashboard.this_month_sales'))
+        ->assertSee(__('dashboard.revenue'))
         ->assertSee(__('dashboard.sales_net_trend'));
 });

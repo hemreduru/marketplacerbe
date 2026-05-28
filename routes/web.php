@@ -7,11 +7,13 @@ use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\ClaimController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\FinancialController;
+use App\Http\Controllers\Web\MailWebhookController;
 use App\Http\Controllers\Web\MarketplaceSettingsController;
 use App\Http\Controllers\Web\MasterProductController;
 use App\Http\Controllers\Web\OrderController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\ProfileController;
+use App\Http\Controllers\Web\ProfitReportController;
 use App\Http\Controllers\Web\QuestionController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\SubscriptionController;
@@ -21,6 +23,8 @@ use Illuminate\Support\Facades\Route;
 
 // Webhooks (public, marketplace'a özel endpoint'ler)
 Route::post('/webhooks/trendyol/{credentialUuid}', WebhookController::class)->name('webhooks.trendyol');
+Route::post('/webhooks/ses/bounce', [MailWebhookController::class, 'bounce'])->name('webhooks.ses.bounce');
+Route::post('/webhooks/ses/complaint', [MailWebhookController::class, 'complaint'])->name('webhooks.ses.complaint');
 
 // Redirect root to dashboard or login
 Route::get('/', function () {
@@ -113,4 +117,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/financial', [FinancialController::class, 'index'])->name('financial.index');
         Route::post('/financial/sync', [FinancialController::class, 'sync'])->name('financial.sync');
     });
+
+    // Reports
+    Route::get('/reports/sku-profit', [ProfitReportController::class, 'skuProfit'])->name('reports.sku-profit');
+    Route::get('/reports/reconciliation', [ProfitReportController::class, 'reconciliation'])->name('reports.reconciliation');
 });

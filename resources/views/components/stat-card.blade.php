@@ -2,8 +2,9 @@
     'value',
     'title',
     'icon',
-    'color',
+    'color' => 'primary',
     'growth' => null,
+    'change' => null,
     'prevPeriodLabel' => null,
     'link' => null,
     'linkLabel' => null,
@@ -16,6 +17,8 @@
             <span class="fs-2hx fw-bold text-gray-900 lh-1 ls-n2">
                 @if($format === 'integer')
                     {{ number_format($value, 0) }}
+                @elseif($format === 'pct')
+                    {{ $value }}%
                 @else
                     @money($value)
                 @endif
@@ -42,7 +45,8 @@
             @endif
         </div>
 
-        @if($growth !== null)
+        @php $changeValue = $growth ?? $change; @endphp
+        @if($changeValue !== null)
             <div class="d-flex align-items-center flex-column mt-3 w-100">
                 <div class="d-flex justify-content-between w-100 mt-auto mb-2">
                     <span class="fw-semibold fs-6 text-gray-400">
@@ -51,15 +55,18 @@
                             <span class="fs-8">({{ $prevPeriodLabel }})</span>
                         @endif
                     </span>
-                    <span class="fw-bold fs-6 {{ $growth >= 0 ? 'text-success' : 'text-danger' }}">
-                        {{ $growth >= 0 ? '+' : '' }}{{ number_format($growth, 1) }}%
+                    <span class="fw-bold fs-6 {{ $changeValue >= 0 ? 'text-success' : 'text-danger' }}">
+
+
+                        {{ $changeValue >= 0 ? '+' : '' }}{{ $changeValue }}%
+
                     </span>
                 </div>
-                <div class="h-8px mx-3 w-100 bg-light-{{ $growth >= 0 ? 'success' : 'danger' }} rounded">
-                    <div class="bg-{{ $growth >= 0 ? 'success' : 'danger' }} rounded h-8px"
+                <div class="h-8px mx-3 w-100 bg-light-{{ $changeValue >= 0 ? 'success' : 'danger' }} rounded">
+                    <div class="bg-{{ $changeValue >= 0 ? 'success' : 'danger' }} rounded h-8px"
                         role="progressbar"
-                        style="width: {{ min(abs($growth), 100) }}%"
-                        aria-valuenow="{{ abs($growth) }}"
+                        style="width: {{ min(abs((int)$changeValue), 100) }}%"
+                        aria-valuenow="{{ abs((int)$changeValue) }}"
                         aria-valuemin="0"
                         aria-valuemax="100">
                     </div>

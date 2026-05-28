@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\SendDigestMail;
 use App\Jobs\SyncTrendyolClaimsJob;
 use App\Jobs\SyncTrendyolFinancialsJob;
 use App\Jobs\SyncTrendyolOrdersJob;
@@ -61,4 +62,29 @@ Schedule::call(function () use ($activeTrendyolCredentials) {
 Schedule::command('subscriptions:process-expired')
     ->dailyAt('00:05')
     ->name('process-expired-subscriptions')
+    ->withoutOverlapping();
+
+/*
+|--------------------------------------------------------------------------
+| Digest Mail Schedule
+|--------------------------------------------------------------------------
+|
+| Daily digest at 09:00, weekly every Monday, monthly on the 1st day.
+| Each job iterates over active users and sends per their preferences.
+|
+*/
+
+Schedule::job(new SendDigestMail('daily_digest'))
+    ->dailyAt('09:00')
+    ->name('send-daily-digest')
+    ->withoutOverlapping();
+
+Schedule::job(new SendDigestMail('weekly_digest'))
+    ->weeklyOn(1, '09:00')
+    ->name('send-weekly-digest')
+    ->withoutOverlapping();
+
+Schedule::job(new SendDigestMail('monthly_digest'))
+    ->monthlyOn(1, '09:00')
+    ->name('send-monthly-digest')
     ->withoutOverlapping();
