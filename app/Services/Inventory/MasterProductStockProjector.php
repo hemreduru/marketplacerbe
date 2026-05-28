@@ -16,8 +16,10 @@ use Throwable;
  * Stok olayını append-only ledger'a yaz, master_products.current_stock'u
  * atomik UPDATE + optimistic lock ile yansıt.
  *
- * Bu sınıf event'leri SIRAYLA tek transaction içinde işler. Race condition
- * önlemi {@see MasterProduct::version} kolonu üzerinden yapılır.
+ * Event önce kendi transaction'ında commit edilir (kaybolmaması için).
+ * Projeksiyon güncellemesi her retry'de yeni bir transaction açar, böylece
+ * MySQL REPEATABLE READ altında bile taze version okuyabilir.
+ * Race condition önlemi {@see MasterProduct::version} kolonu üzerinden yapılır.
  */
 class MasterProductStockProjector
 {
@@ -39,17 +41,30 @@ class MasterProductStockProjector
         $payload['marketplace_listing_id'] ??= null;
 
         try {
-            return DB::transaction(function () use ($payload) {
-                /** @var StockEvent $event */
-                $event = StockEvent::create($payload + ['processed_at' => now()]);
+            /** @var StockEvent $event */
+            // 1. Önce StockEvent'i kendi transaction'ında yarat (idempotency kontrolü için atomik)
+            $event = DB::transaction(function () use ($payload) {
+                return StockEvent::create($payload + ['processed_at' => now()]);
+            });
 
+            // 2. Projeksiyonu ayrı bir işlem olarak uygula.
+            //    Her retry kendi transaction'ını açar → REPEATABLE READ'de taze version okur.
+            try {
                 $this->applyToMaster(
                     (int) $payload['master_product_id'],
                     (int) $payload['quantity_delta']
                 );
+            } catch (\RuntimeException $e) {
+                // Event zaten commit edildi — projeksiyon hatasını logla ama event'i kaybetme
+                Log::error('Stock projection failed after all retries', [
+                    'stock_event_id' => $event->id,
+                    'master_product_id' => (int) $payload['master_product_id'],
+                    'delta' => (int) $payload['quantity_delta'],
+                    'error' => $e->getMessage(),
+                ]);
+            }
 
-                return ServiceResult::ok($event);
-            });
+            return ServiceResult::ok($event);
         } catch (QueryException $e) {
             // İdempotency violation (unique constraint) → sessiz skip
             if ($this->isUniqueViolation($e)) {
@@ -63,9 +78,11 @@ class MasterProductStockProjector
     }
 
     /**
-     * Optimistic lock ile master kaydını güncelle. Aynı satıra eşzamanlı
-     * UPDATE'lerde sadece version eşleşeni başarılı olur; diğeri retry
-     * eder.
+     * Optimistic lock ile master kaydını güncelle. Her deneme kendi
+     * DB::transaction() içinde çalışır, böylece REPEATABLE READ
+     * izolasyonunda bile commit edilmiş version değişiklikleri görünür.
+     * Aynı satıra eşzamanlı UPDATE'lerde sadece version eşleşeni
+     * başarılı olur; diğeri retry eder.
      */
     private function applyToMaster(int $masterId, int $delta): void
     {
@@ -75,17 +92,19 @@ class MasterProductStockProjector
         while (true) {
             $attempt++;
 
-            $master = MasterProduct::query()
-                ->whereKey($masterId)
-                ->firstOrFail();
+            $affected = DB::transaction(function () use ($masterId, $delta) {
+                $master = MasterProduct::query()
+                    ->whereKey($masterId)
+                    ->firstOrFail();
 
-            $affected = MasterProduct::query()
-                ->whereKey($masterId)
-                ->where('version', $master->version)
-                ->update([
-                    'current_stock' => DB::raw('current_stock + ('.(int) $delta.')'),
-                    'version' => DB::raw('version + 1'),
-                ]);
+                return MasterProduct::query()
+                    ->whereKey($masterId)
+                    ->where('version', $master->version)
+                    ->update([
+                        'current_stock' => DB::raw('current_stock + ('.(int) $delta.')'),
+                        'version' => DB::raw('version + 1'),
+                    ]);
+            });
 
             if ($affected === 1) {
                 return;

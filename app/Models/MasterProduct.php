@@ -31,6 +31,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $stock_buffer_strategy
  * @property int $stock_buffer_value
  * @property int $version
+ * @property int $critical_stock_threshold
+ * @property bool $stock_alert_enabled
  * @property array<string, mixed>|null $marketplace_specific_attributes
  */
 class MasterProduct extends Model
@@ -55,6 +57,8 @@ class MasterProduct extends Model
         'pricing_strategy',
         'stock_buffer_strategy',
         'stock_buffer_value',
+        'critical_stock_threshold',
+        'stock_alert_enabled',
         'version',
         'marketplace_specific_attributes',
     ];
@@ -72,6 +76,8 @@ class MasterProduct extends Model
             'packaging_cost' => 'decimal:4',
             'current_price' => 'decimal:4',
             'current_stock' => 'integer',
+            'critical_stock_threshold' => 'integer',
+            'stock_alert_enabled' => 'boolean',
             'weight_g' => 'integer',
             'stock_buffer_value' => 'integer',
             'version' => 'integer',

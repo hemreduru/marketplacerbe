@@ -8,6 +8,7 @@ use App\Support\ServiceResult;
 use Carbon\CarbonInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -59,12 +60,10 @@ class MasterProductPriceProjector
                 /** @var PriceEvent $event */
                 $event = PriceEvent::create($payload + ['processed_at' => now()]);
 
-                MasterProduct::query()
-                    ->whereKey($payload['master_product_id'])
-                    ->update([
-                        'current_price' => $payload['new_price'],
-                        'version' => DB::raw('version + 1'),
-                    ]);
+                $this->applyToMaster(
+                    (int) $payload['master_product_id'],
+                    $payload['new_price'],
+                );
 
                 return ServiceResult::ok($event);
             });
@@ -76,6 +75,44 @@ class MasterProductPriceProjector
                 );
             }
             throw $e;
+        }
+    }
+
+    private function applyToMaster(int $masterId, mixed $newPrice): void
+    {
+        $maxAttempts = 5;
+        $attempt = 0;
+
+        while (true) {
+            $attempt++;
+
+            $master = MasterProduct::query()
+                ->whereKey($masterId)
+                ->firstOrFail();
+
+            $affected = MasterProduct::query()
+                ->whereKey($masterId)
+                ->where('version', $master->version)
+                ->update([
+                    'current_price' => $newPrice,
+                    'version' => DB::raw('version + 1'),
+                ]);
+
+            if ($affected === 1) {
+                return;
+            }
+
+            if ($attempt >= $maxAttempts) {
+                Log::warning('price projector retry exhausted', [
+                    'master_product_id' => $masterId,
+                    'new_price' => $newPrice,
+                    'attempts' => $attempt,
+                ]);
+
+                throw new \RuntimeException("Price projector retry exhausted for master {$masterId}");
+            }
+
+            usleep(10_000);
         }
     }
 

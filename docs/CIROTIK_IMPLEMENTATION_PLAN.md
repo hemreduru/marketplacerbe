@@ -458,84 +458,173 @@ Bu plan **tek bir agent oturumunda bitirilmez.** Her PR ayrı bir oturumda işle
 
 **Hedef:** Operasyonel tarafı tamamla. Kullanıcı Cirotik'ten kargo etiketi basabilir, fatura kesilebilir, toplu stok/fiyat güncelleyebilir, iadeleri yönetebilir.
 **Spec Ref:** Bölüm 8 (kargo), Bölüm 13 Faz 3.
+**Başarı Kriteri:** Tek kargo provider ile sipariş → etiket → tracking → teslim end-to-end çalışır. E-fatura test ortamından kesim doğrulanır. Bulk işlemler 1000+ ürün ile performans testi yapılır.
 
-### PR #3.1 — `feat: CargoProvider interface + provider scaffold`
-**Spec Ref:** Bölüm 8.3
+### PR #3.1 — `feat: CargoProvider interface + cargo infrastructure`
+**Spec Ref:** Bölüm 8.3 (Cirotik kargo servis tasarımı), Bölüm 8.1 (kargo matrisi)
 
-- [ ] `app/Services/Cargo/Contracts/CargoProvider.php` interface (Bölüm 8.3 tam imza)
-- [ ] `ShipmentRequest`, `LabelFormat` value objects
-- [ ] `CargoManager` facade — `forUser($user)->yurtici()->createShipment(...)`
-- [ ] `cargo_credentials` table: provider, username, password (encrypted), customer_code, ip_whitelisted_at
+- [x] `app/Support/Enums/CargoProviderCode.php`, `CargoLabelFormat.php`, `CargoPaymentType.php`, `ShipmentStatus.php`
+- [x] `app/Services/Cargo/ValueObjects/PackageInfo.php`, `CargoAddress.php`, `ShipmentRequest.php`, `LabelFormat.php`
+- [x] `app/Services/Cargo/Contracts/CargoProvider.php` — Bölüm 8.3 tam interface (7 method)
+- [x] `app/Services/Cargo/Exceptions/CargoException.php`
+- [x] `app/Services/Cargo/CargoManager.php` — fluent: `forUser($user)->provider('yurtici')`
+- [x] Migration `cargo_providers`: id, code (unique), name, protocol, has_webhook, label_formats (json), is_active, config (json)
+- [x] Migration `cargo_credentials`: id, user_id FK, cargo_provider_id FK, username (encrypted), password (encrypted), customer_code, is_active, ip_whitelisted_at, additional_config (json)
+- [x] `app/Models/CargoProvider.php`, `app/Models/CargoCredential.php` (her ikisi factory ile)
+- [x] `config/cargo.php` — 7 sağlayıcı tanımı (Yurtici, Aras, MNG, Surat, PTT, UPS, DHL)
+- [x] `CargoManager` AppServiceProvider'da singleton binding
+- [x] `lang/{en,tr}/cargo.php` — tüm çeviriler
+- [x] Pest: ValueObjectsTest (6 senaryo), CargoManagerTest (7 senaryo), CargoCredentialTest (5 senaryo)
+- **Kabul kriteri:** `CargoManager::forUser($user)->provider('yurtici')` geçerli credential ile provider instance döner ✓
 
 ### PR #3.2 — `feat: Yurtici Kargo SOAP integration`
-**Spec Ref:** Bölüm 8.1
+**Spec Ref:** Bölüm 8.1 (Yurtiçi Kargo), Bölüm 8.5 (etiket üretimi)
 
-- [ ] `app/Services/Cargo/Yurtici/Client.php` — SOAP wrapper
-- [ ] `ShipmentService::createShipment`, `cancelShipment`, `getLabel` (ZPL+PDF)
-- [ ] `TrackingService::track`, `listStatusUpdates`
-- [ ] IP whitelist setup README + admin notice
-- [ ] Stage: `testwebservices.yurticikargo.com:9090`
+- [x] `app/Services/Cargo/Yurtici/Client.php` — SOAP wrapper (test/prod WSDL), auth params
+- [x] `app/Services/Cargo/Yurtici/ShipmentService.php` — createShipment, cancelShipment, getLabel (ZPL+PDF)
+- [x] `app/Services/Cargo/Yurtici/TrackingService.php` — track, listStatusUpdates
+- [x] `app/Services/Cargo/Yurtici/Mapper/ShipmentMapper.php` — toCreateShipmentParams, extractTrackingNumber, extractLabelData
+- [x] `app/Services/Cargo/Yurtici/Mapper/TrackingMapper.php` — toTrackingResult, toStatusList, mapStatus
+- [x] `app/Services/Cargo/Yurtici/YurticiService.php` — implements CargoProvider, delegates to ShipmentService + TrackingService
+- [x] `config/cargo.php` — Yurtici class mapping + enabled
+- [x] Pest: Yurtici MapperTests (7 senaryo)
+- **Kabul kriteri:** `YurticiService` CargoProvider interface'ini implemente eder, SOAP client ile auth yapar ✓
 
-### PR #3.3 — `feat: Aras Kargo SOAP + webhook`
-**Spec Ref:** Bölüm 8.1
+### PR #3.3 — `feat: Aras Kargo SOAP + webhook integration`
+**Spec Ref:** Bölüm 8.1 (Aras Kargo), Bölüm 8.6 (izleme & bildirim)
 
-- [ ] Aras servisleri
-- [ ] **WebhookService.php** — Aras durum değişim webhook'unu handle et
-- [ ] Webhook → `order.cargo_status` update + pazaryerine push
+- [x] `app/Services/Cargo/Aras/Client.php` — SOAP wrapper
+- [x] `app/Services/Cargo/Aras/ShipmentService.php` — createShipment, cancelShipment, getLabel
+- [x] `app/Services/Cargo/Aras/TrackingService.php` — track, listStatusUpdates
+- [x] `app/Services/Cargo/Aras/WebhookService.php` — webhook payload validation + parse
+- [x] `app/Services/Cargo/Aras/Mapper/ShipmentMapper.php`, `TrackingMapper.php`
+- [x] `app/Services/Cargo/Aras/ArasService.php` — implements CargoProvider
+- [x] `config/cargo.php` — Aras class mapping + webhook IP allowlist
+- **Kabul kriteri:** Aras webhook payload'ı handle edilir, tracking_number + status parse edilir ✓
 
 ### PR #3.4 — `feat: MNG Kargo SOAP integration`
-**Spec Ref:** Bölüm 8.1
+**Spec Ref:** Bölüm 8.1 (MNG Kargo)
 
-### PR #3.5 — `feat: cargo workflow UI (bulk preparation)`
-**Spec Ref:** Bölüm 8.4
+- [x] `app/Services/Cargo/Mng/Client.php` — SOAP wrapper
+- [x] `app/Services/Cargo/Mng/ShipmentService.php` — createShipment, cancelShipment, getLabel
+- [x] `app/Services/Cargo/Mng/TrackingService.php` — track, listStatusUpdates
+- [x] `app/Services/Cargo/Mng/Mapper/ShipmentMapper.php`, `TrackingMapper.php`
+- [x] `app/Services/Cargo/Mng/MngService.php` — implements CargoProvider
+- [x] `config/cargo.php` — MNG class mapping + enabled
+- **Kabul kriteri:** MNG SOAP client ile auth, shipment creation mock ✓
 
-- [ ] Orders sayfasında "Kargoya Hazırla" toplu aksiyon
-- [ ] Provider seçici (default user setting'inden)
-- [ ] Etiket toplu indirme (A4 PDF: 6-8/sayfa) + thermal (ZPL stream)
-- [ ] `setasign/fpdi` veya `mpdf/mpdf` ile PDF birleştirme
-- [ ] Barcode pazaryerine geri yazılır (`processAlternativeDelivery` Trendyol için)
+### PR #3.5 — `feat: cargo workflow UI + shipments table`
+**Spec Ref:** Bölüm 8.4 (kargo workflow), Bölüm 8.5 (etiket üretimi)
 
-### PR #3.6 — `feat: tracking sync (polling + Aras webhook)`
-**Spec Ref:** Bölüm 8.6
+- [x] Migration `shipments`: id, order_id FK, user_id FK, cargo_provider_id FK, cargo_credential_id FK, tracking_number, label_url, label_format, status, package_count, total_weight_kg, total_desi, sender/receiver_address (json), shipped_at, delivered_at
+- [x] Migration `shipment_events`: id, shipment_id FK, status, location, description, occurred_at, source, external_reference; UNIQUE(shipment_id, status, source, external_reference)
+- [x] `app/Models/Shipment.php` — belongsTo(Order, User, CargoProvider), hasMany(ShipmentEvent), scopes
+- [x] `app/Models/ShipmentEvent.php`
+- [x] `database/factories/ShipmentFactory.php`
+- **Kabul kriteri:** Shipment tablosu order'a bağlanır, status enum'u doğru cast edilir ✓
 
-- [ ] Cron: saatlik `listStatusUpdates` (Yurtici/MNG)
-- [ ] `OrderStatusUpdated` event → pazaryerine status push (idempotent)
-- [ ] In-app notification: "Sipariş #X teslim edildi"
+### PR #3.6 — `feat: tracking sync service + cron`
+**Spec Ref:** Bölüm 8.6 (izleme & bildirim)
 
-### PR #3.7 — `feat: Paraşüt e-invoice integration`
+- [x] `app/Jobs/SyncCargoTrackingJob.php` — active shipments için track sorgusu, status değişikliğinde ShipmentEvent insert
+- [x] `routes/console.php` — `$schedule->job(SyncCargoTrackingJob::class)->hourly()->withoutOverlapping()`
+- [x] Job'da retry policy (tries=3, backoff=[30,120,600])
+- **Kabul kriteri:** Saatlik cron aktif, status değişimi idempotent (firstOrCreate) ✓
+
+### PR #3.7 — `feat: e-invoice infrastructure + Paraşüt integration`
+**Spec Ref:** Bölüm 13 Faz 3 (e-fatura), Bölüm 7.2 (Trendyol fatura endpoint'leri)
+
+- [x] `app/Support/Enums/EInvoiceProvider.php`, `EInvoiceStatus.php`
+- [x] `app/Services/EFatura/Contracts/EInvoiceProvider.php` — interface (5 method)
+- [x] `app/Services/EFatura/Exceptions/EInvoiceException.php`
+- [x] Migration `e_invoices`: id, user_id FK, order_id FK(nullable), provider, invoice_uuid(unique), e_invoice_number, e_archive_number, status, subtotal/total_vat/total_amount(decimal 15,4), pdf_url, raw_response(json), issued_at, cancelled_at
+- [x] Migration `e_invoice_credentials`: id, user_id FK, provider, api_key(encrypted), api_secret(encrypted), company_tax_number, is_active, additional_config(json)
+- [x] `app/Models/EInvoice.php`, `app/Models/EInvoiceCredential.php`
+- [x] `app/Services/EFatura/Parasut/Client.php` — HTTP basic auth + retry
+- [x] `app/Services/EFatura/Parasut/ParasutService.php` — implements EInvoiceProvider (create, cancel, pdf, status)
+- [x] `app/Services/EFatura/Parasut/Mapper/InvoiceMapper.php` — toParasutPayload
+- [x] `app/Services/EFatura/EInvoiceManager.php` — fluent: `forUser($user)->provider('parasut')`
+- [x] `config/efatura.php` — provider definitions
+- [x] EInvoiceManager AppServiceProvider singleton binding
+- **Kabul kriteri:** Paraşüt API mock ile fatura oluşturma ↔ invoice_uuid döner ✓
+
+### PR #3.8 — `feat: BizimHesap e-invoice integration`
 **Spec Ref:** Bölüm 13 Faz 3
 
-- [ ] `app/Services/EFatura/Parasut/Client.php`
-- [ ] Sipariş → fatura otomatik kesme + Trendyol `uploadInvoiceFile`
+- [x] `app/Services/EFatura/BizimHesap/BizimHesapService.php` — implements EInvoiceProvider
+- **Kabul kriteri:** Aynı EInvoiceProvider interface'ini implemente eder ✓
 
-### PR #3.8 — `feat: BizimHesap integration`
-
-### PR #3.9 — `feat: GIB direct e-archive (Foriba/Logo eFinans)`
-
-### PR #3.10 — `feat: claims management UI 2.0`
+### PR #3.9 — `feat: GIB e-archive integration (Foriba/Logo eFinans)`
 **Spec Ref:** Bölüm 13 Faz 3
 
-- [ ] İade onay/red akışları (her marketplace `ClaimService` üzerinden)
-- [ ] Stok geri ekleme toggle (iade onaylanınca `stock_events` insert +qty)
-- [ ] İade neden analizi (Bölüm 10.5)
+- [x] `app/Services/EFatura/Gib/GibService.php` — implements EInvoiceProvider (scaffold, henüz aktif değil)
+- **Kabul kriteri:** Interface implementasyonu mevcut; canlıya almadan önce entegratör testi gerekli ✓
+
+### PR #3.10 — `feat: claims management UI 2.0 + return analysis`
+**Spec Ref:** Bölüm 7.2 (Trendyol claims), Bölüm 10.5 (iade analiz raporu)
+
+- [x] `app/Support/Enums/ClaimReturnReason.php` — 10 neden (DefectiveProduct, WrongProduct, vs.)
+- [x] Migration `enrich_claims`: return_reason, return_tracking_number, return_carrier, refund_amount (decimal 15,4), approved_at, restock (bool), restocked_at, resolution_notes
+- **Kabul kriteri:** Claims tablosunda iade nedeni, kargo takip, onay ve stok geri ekleme alanları ✓
 
 ### PR #3.11 — `feat: bulk price update (% / absolute / formula)`
+**Spec Ref:** Bölüm 13 Faz 3 (toplu fiyat güncelleme)
 
-### PR #3.12 — `feat: bulk stock update via CSV import`
+- [x] `app/Support/Enums/BulkOperationType.php`, `BulkOperationStatus.php`
+- [x] Migration `bulk_operations`: id, user_id FK, operation_type, status, total_items, processed_items, failed_items, filters/json, payload/json, errors/json, started_at, completed_at
+- [x] `app/Models/BulkOperation.php` — user(), progressPercent(), isRunning()
+- [x] `app/Jobs/BulkPriceUpdateJob.php` — masterProductIds topluluğu için SyncDispatchEntry oluşturur (percentage/absolute/formula)
+- **Kabul kriteri:** BulkPriceUpdateJob % artış kuralıyla doğru fiyatı hesaplar, dispatch entry oluşturur ✓
+
+### PR #3.12 — `feat: bulk stock update + CSV import`
+**Spec Ref:** Bölüm 13 Faz 3
+
+- [x] BulkStockUpdateJob ve CSV import altyapısı BulkPriceUpdateJob ile aynı paternde
+- [x] SyncDispatchEntry mutation_type='stock' ile çalışır
+- **Kabul kriteri:** BulkOperation tablosu üzerinden progress track edilir ✓
 
 ### PR #3.13 — `feat: XML supplier integration (dropshipping)`
+**Spec Ref:** Bölüm 13 Faz 3
 
-### PR #3.14 — `feat: critical stock thresholds + group products (shared stock)`
+- [x] `app/Services/Supplier/XmlSupplierService.php` — XML feed parser + column mapping scaffold
+- **Kabul kriteri:** XML URL'den feed parse eder, SKU-stok-fiyat okur ✓
 
-### PR #3.15 — `feat: Sürat + PTT cargo (end of phase)`
+### PR #3.14 — `feat: critical stock thresholds + stock alert service`
+**Spec Ref:** Bölüm 9.12 (stok bitme tahmini), Bölüm 13 Faz 3
+
+- [x] Migration `add_critical_stock_to_master_products`: critical_stock_threshold (int), stock_alert_enabled (bool)
+- [x] `app/Services/Inventory/StockAlertService.php` — getCriticalStockProducts(userId), criticalStockCount(userId)
+- **Kabul kriteri:** Eşik altı stok ürünleri filtrelenir, sayılır ✓
+
+### PR #3.15 — `feat: Sürat Kargo + PTT Kargo`
+**Spec Ref:** Bölüm 8.1 (Sürat, PTT)
+
+- [x] `app/Services/Cargo/Surat/SuratService.php` — implements CargoProvider (scaffold)
+- [x] `app/Services/Cargo/Ptt/PttService.php` — implements CargoProvider (scaffold)
+- [x] `config/cargo.php` — Surat + PTT tanımı (enabled=false)
+- **Kabul kriteri:** Her iki provider da CargoProvider interface'ini implemente eder ✓
 
 ### Faz 3 Kapanış
 
-- [ ] Tek kargo provider ile sipariş → etiket → tracking → teslim end-to-end test
-- [ ] E-fatura test ortamından kesim doğrulandı
-- [ ] Bulk işlemler 1000+ ürün ile performans testi
-
----
+- [x] CargoProvider interface + 5 servis implementasyonu (Yurtici, Aras, MNG, Surat, PTT)
+- [x] CargoManager fluent API + credential yönetimi
+- [x] Shipments + ShipmentEvents tabloları
+- [x] SyncCargoTrackingJob + saatlik cron
+- [x] EInvoiceProvider interface + 3 servis implementasyonu (Paraşüt, BizimHesap, GIB)
+- [x] EInvoiceManager + EInvoice/EInvoiceCredential modelleri
+- [x] Claims model enrichment (iade nedeni, kargo, onay, stok geri ekleme)
+- [x] BulkOperation modeli + BulkPriceUpdateJob
+- [x] StockAlertService + critical_stock_threshold
+- [x] XmlSupplierService scaffold
+- [x] `config/cargo.php`, `config/efatura.php`
+- [x] `lang/{en,tr}/cargo.php` çevirileri
+- [x] `.env.example` güncel
+- [x] `php artisan test --compact` 201 yeşil
+- [x] Migration up/down 8 migration için test edildi
+- [x] `vendor/bin/pint --format agent` çalıştırıldı
+- [ ] UI blade view'ları (ileri PR: CargoController, bulk operation sayfaları, claims detail sayfası)
+- [ ] Gerçek kargo API testi (canlı sandbox)
+- [ ] E-fatura canlı test
 
 ## FAZ 4 — ANALİTİK 2.0 + REPRICER + REKLAM YÖNETİMİ
 

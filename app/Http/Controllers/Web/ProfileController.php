@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -42,19 +41,19 @@ class ProfileController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => __('settings.profile_updated'),
-                    'data' => $user
+                    'data' => $user,
                 ]);
             }
 
             return back()->with('success', __('settings.profile_updated'));
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update profile: ' . $e->getMessage());
+            Log::error('Failed to update profile: '.$e->getMessage());
 
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('common.error_occurred')
+                    'message' => __('common.error_occurred'),
                 ], 500);
             }
 
@@ -67,15 +66,16 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         // Check if current password is correct
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             $errorMessage = __('settings.current_password_incorrect');
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => $errorMessage,
-                    'errors' => ['current_password' => [$errorMessage]]
+                    'errors' => ['current_password' => [$errorMessage]],
                 ], 422);
             }
+
             return back()->withErrors(['current_password' => $errorMessage]);
         }
 
@@ -91,19 +91,19 @@ class ProfileController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => __('settings.password_updated')
+                    'message' => __('settings.password_updated'),
                 ]);
             }
 
             return back()->with('success', __('settings.password_updated'));
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update password: ' . $e->getMessage());
+            Log::error('Failed to update password: '.$e->getMessage());
 
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('common.error_occurred')
+                    'message' => __('common.error_occurred'),
                 ], 500);
             }
 

@@ -45,6 +45,7 @@ class SyncMarketplaceBrandsCommand extends Command
 
         if ($credentials->isEmpty()) {
             $this->error('Aktif marketplace kimlik bilgisi bulunamadı.');
+
             return Command::FAILURE;
         }
 
@@ -61,6 +62,7 @@ class SyncMarketplaceBrandsCommand extends Command
 
                 if (empty($brands)) {
                     $this->warn("{$marketplace->name} için marka bulunamadı.");
+
                     continue;
                 }
 
@@ -73,7 +75,7 @@ class SyncMarketplaceBrandsCommand extends Command
                     MarketplaceBrand::updateOrCreate(
                         [
                             'marketplace_id' => $marketplace->id,
-                            'marketplace_brand_id' => (string)$brand['id'],
+                            'marketplace_brand_id' => (string) $brand['id'],
                         ],
                         [
                             'name' => $brand['name'] ?? '',
@@ -92,13 +94,15 @@ class SyncMarketplaceBrandsCommand extends Command
                 $this->info("✓ {$synced} marka senkronize edildi");
 
             } catch (\Exception $e) {
-                Log::channel('resbe')->error("[SyncMarketplaceBrandsCommand] {$marketplace->name} hatası: " . $e->getMessage());
-                $this->error("Hata: " . $e->getMessage());
+                Log::channel('resbe')->error("[SyncMarketplaceBrandsCommand] {$marketplace->name} hatası: ".$e->getMessage());
+                $this->error('Hata: '.$e->getMessage());
+
                 return Command::FAILURE;
             }
         }
 
         $this->info('Tüm markalar başarıyla senkronize edildi.');
+
         return Command::SUCCESS;
     }
 }

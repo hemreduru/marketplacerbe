@@ -53,8 +53,9 @@ test('tek kalem net kâr — 200 TL satış, düşük maliyet', function () {
     expect((float) $result->netProfit)->toBeGreaterThan(0);
     expect((float) $result->margin)->toBeGreaterThan(0);
     expect($result->deductions)->toHaveKeys([
-        'cost_of_goods', 'commission', 'service_fee', 'shipping', 'return_cost', 'ad_cost', 'packaging',
+        'cost_of_goods', 'commission', 'shipping', 'return_cost', 'ad_cost', 'packaging',
     ]);
+    expect($result->deductions)->not->toHaveKey('service_fee');
 });
 
 test('multi-item order — platform fee sipariş başına 1 kez', function () {

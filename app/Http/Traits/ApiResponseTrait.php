@@ -8,12 +8,6 @@ trait ApiResponseTrait
 {
     /**
      * Return a success JSON response.
-     *
-     * @param mixed $data
-     * @param string|null $message
-     * @param int $statusCode
-     * @param array $meta
-     * @return JsonResponse
      */
     protected function successResponse(
         mixed $data = null,
@@ -27,7 +21,7 @@ trait ApiResponseTrait
             'data' => $data,
         ];
 
-        if (!empty($meta)) {
+        if (! empty($meta)) {
             $response['meta'] = $meta;
         }
 
@@ -36,11 +30,6 @@ trait ApiResponseTrait
 
     /**
      * Return an error JSON response.
-     *
-     * @param string|null $message
-     * @param int $statusCode
-     * @param mixed $errors
-     * @return JsonResponse
      */
     protected function errorResponse(
         ?string $message = null,
@@ -61,10 +50,6 @@ trait ApiResponseTrait
 
     /**
      * Return a validation error JSON response.
-     *
-     * @param mixed $errors
-     * @param string|null $message
-     * @return JsonResponse
      */
     protected function validationErrorResponse(
         mixed $errors,
@@ -79,9 +64,6 @@ trait ApiResponseTrait
 
     /**
      * Return a not found JSON response.
-     *
-     * @param string|null $message
-     * @return JsonResponse
      */
     protected function notFoundResponse(?string $message = null): JsonResponse
     {
@@ -93,9 +75,6 @@ trait ApiResponseTrait
 
     /**
      * Return an unauthorized JSON response.
-     *
-     * @param string|null $message
-     * @return JsonResponse
      */
     protected function unauthorizedResponse(?string $message = null): JsonResponse
     {
@@ -107,9 +86,6 @@ trait ApiResponseTrait
 
     /**
      * Return a forbidden JSON response.
-     *
-     * @param string|null $message
-     * @return JsonResponse
      */
     protected function forbiddenResponse(?string $message = null): JsonResponse
     {
@@ -121,10 +97,6 @@ trait ApiResponseTrait
 
     /**
      * Return a server error JSON response.
-     *
-     * @param string|null $message
-     * @param \Throwable|null $exception
-     * @return JsonResponse
      */
     protected function serverErrorResponse(
         ?string $message = null,
@@ -151,10 +123,6 @@ trait ApiResponseTrait
 
     /**
      * Return a paginated success JSON response.
-     *
-     * @param mixed $data
-     * @param string|null $message
-     * @return JsonResponse
      */
     protected function paginatedResponse(
         mixed $data,
@@ -179,10 +147,6 @@ trait ApiResponseTrait
 
     /**
      * Return a created resource JSON response.
-     *
-     * @param mixed $data
-     * @param string|null $message
-     * @return JsonResponse
      */
     protected function createdResponse(
         mixed $data = null,
@@ -197,8 +161,6 @@ trait ApiResponseTrait
 
     /**
      * Return a no content JSON response.
-     *
-     * @return JsonResponse
      */
     protected function noContentResponse(): JsonResponse
     {

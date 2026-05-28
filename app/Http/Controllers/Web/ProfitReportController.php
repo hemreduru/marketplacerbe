@@ -6,6 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\FinancialDailySummary;
 use App\Models\MasterProduct;
 use App\Models\OrderItem;
+use App\Services\Calculations\AdAllocator;
+use App\Services\Calculations\CommissionCalculator;
+use App\Services\Calculations\PackagingCostCalculator;
+use App\Services\Calculations\ProfitCalculator;
+use App\Services\Calculations\ReturnCostEstimator;
+use App\Services\Calculations\ServiceFeeCalculator;
+use App\Services\Calculations\ShippingCostCalculator;
+use App\Services\Calculations\VatCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,29 +35,65 @@ class ProfitReportController extends Controller
             ->get()
             ->groupBy('master_product_id');
 
+        $vat = new VatCalculator;
+        $calculator = new ProfitCalculator(
+            vat: $vat,
+            commission: new CommissionCalculator($vat),
+            serviceFee: new ServiceFeeCalculator($vat),
+            shipping: new ShippingCostCalculator($vat),
+            returnCost: new ReturnCostEstimator,
+            packaging: new PackagingCostCalculator($vat),
+            ads: new AdAllocator,
+        );
+
+        $commissionRate = (float) config('marketplaces.trendyol.commission.default_rate', 15.0);
+        $commissionBaseType = config('marketplaces.trendyol.commission.base_type', 'vat_excluded');
+        $shippingTariff = config('marketplaces.trendyol.shipping.default_tariff', []);
+
         $rows = [];
         foreach ($items as $masterId => $groupedItems) {
-            $master = MasterProduct::find($masterId);
+            $firstItem = $groupedItems->first();
+            $master = $firstItem?->master;
             if (! $master) {
                 continue;
             }
 
-            $qty = $groupedItems->sum('quantity');
-            $revenue = $groupedItems->sum(fn ($i) => (float) $i->price * $i->quantity);
-            $vatRate = (float) $master->vat_rate;
-            $netRevenue = $revenue > 0 ? round($revenue / (1 + $vatRate / 100), 2) : 0;
-            $cost = (float) $master->cost_price * $qty;
-            $netProfit = $netRevenue - ($cost / (1 + (float) $master->cost_price_vat_rate / 100));
+            $qty = 0;
+            $revenue = '0.0000';
+            $netRevenue = '0.0000';
+            $netProfit = '0.0000';
+            $costOfGoodsTotal = '0.0000';
+
+            foreach ($groupedItems as $item) {
+                $qty += $item->quantity;
+                $revenue = bcadd($revenue, bcmul((string) $item->price, (string) $item->quantity, 4), 4);
+
+                $breakdown = $calculator->forOrderItem(
+                    $item,
+                    $master,
+                    commissionRate: $commissionRate,
+                    commissionBaseType: $commissionBaseType,
+                    shippingTariff: $shippingTariff,
+                );
+
+                $netRevenue = bcadd($netRevenue, $breakdown->netRevenue, 6);
+                $netProfit = bcadd($netProfit, $breakdown->netProfit, 6);
+                $costOfGoodsTotal = bcadd($costOfGoodsTotal, $breakdown->deductions['cost_of_goods'], 6);
+            }
+
+            $margin = bccomp($netRevenue, '0.0000', 6) === 0
+                ? '0.00'
+                : bcround(bcmul(bcdiv($netProfit, $netRevenue, 6), '100', 6), 2);
 
             $rows[] = [
                 'sku' => $master->sku,
                 'title' => $master->title,
                 'qty' => $qty,
                 'revenue' => $revenue,
-                'net_revenue' => $netRevenue,
-                'cost' => $cost,
-                'net_profit' => $netProfit,
-                'margin' => $netRevenue > 0 ? round(($netProfit / $netRevenue) * 100, 1) : 0,
+                'net_revenue' => bcround($netRevenue, 4),
+                'cost' => bcround($costOfGoodsTotal, 4),
+                'net_profit' => bcround($netProfit, 4),
+                'margin' => $margin,
             ];
         }
 

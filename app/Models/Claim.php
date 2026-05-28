@@ -19,13 +19,25 @@ class Claim extends Model
         'item_count',
         'claim_date',
         'raw_data',
+        'return_reason',
+        'return_tracking_number',
+        'return_carrier',
+        'refund_amount',
+        'approved_at',
+        'restock',
+        'restocked_at',
+        'resolution_notes',
     ];
 
     protected function casts(): array
     {
         return [
             'claim_date' => 'datetime',
+            'approved_at' => 'datetime',
+            'restocked_at' => 'datetime',
             'item_count' => 'integer',
+            'refund_amount' => 'decimal:4',
+            'restock' => 'boolean',
             'raw_data' => 'array',
         ];
     }

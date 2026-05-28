@@ -1,6 +1,7 @@
 <?php
 
 use App\Jobs\SendDigestMail;
+use App\Jobs\SyncCargoTrackingJob;
 use App\Jobs\SyncTrendyolClaimsJob;
 use App\Jobs\SyncTrendyolFinancialsJob;
 use App\Jobs\SyncTrendyolOrdersJob;
@@ -87,4 +88,18 @@ Schedule::job(new SendDigestMail('weekly_digest'))
 Schedule::job(new SendDigestMail('monthly_digest'))
     ->monthlyOn(1, '09:00')
     ->name('send-monthly-digest')
+    ->withoutOverlapping();
+
+/*
+|--------------------------------------------------------------------------
+| Cargo Tracking Sync Schedule
+|--------------------------------------------------------------------------
+|
+| Saatlik kargo takip durumu sorgulama. Webhook desteklemeyen
+| kargo firmaları için polling mekanizması.
+|
+*/
+Schedule::job(SyncCargoTrackingJob::class)
+    ->hourly()
+    ->name('sync-cargo-tracking')
     ->withoutOverlapping();

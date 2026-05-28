@@ -64,9 +64,6 @@ class ProfitCalculator
         $commissionAmt = $this->commission->amount($totalIncVat, $vatRate, $commissionRate, $commissionBaseType);
         $deductions['commission'] = bcround($commissionAmt, 4);
 
-        $serviceFeeResult = $this->serviceFee->calculate('trendyol', $orderType, 1);
-        $deductions['service_fee'] = $serviceFeeResult['amount_excl_vat'];
-
         $shippingTariff = $shippingTariff ?: config('marketplaces.trendyol.shipping.default_tariff');
         $shippingResult = $this->shipping->compute(
             $master ? (float) $master->desi : 1.0,
@@ -116,7 +113,6 @@ class ProfitCalculator
                 'sale_inc_vat' => $totalIncVat,
                 'commission_rate' => $commissionRate,
                 'shipping_result' => $shippingResult,
-                'service_fee_result' => $serviceFeeResult,
             ],
         );
     }

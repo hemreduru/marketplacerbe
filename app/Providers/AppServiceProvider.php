@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\Cargo\CargoManager;
+use App\Services\EFatura\EInvoiceManager;
 use App\Services\MarketplaceServiceFactory;
 use App\Services\MarketplaceServiceInterface;
 use Illuminate\Support\Facades\Blade;
@@ -17,6 +19,38 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(MarketplaceServiceInterface::class, function ($app) {
             return $app->make(MarketplaceServiceFactory::class);
+        });
+
+        $this->app->singleton(CargoManager::class, function ($app) {
+            $manager = new CargoManager;
+            $providers = config('cargo.providers', []);
+
+            foreach ($providers as $code => $cfg) {
+                if (isset($cfg['enabled']) && $cfg['enabled'] === false) {
+                    continue;
+                }
+                if (isset($cfg['class'])) {
+                    $manager->register($code, $cfg['class']);
+                }
+            }
+
+            return $manager;
+        });
+
+        $this->app->singleton(EInvoiceManager::class, function ($app) {
+            $manager = new EInvoiceManager;
+            $providers = config('efatura.providers', []);
+
+            foreach ($providers as $code => $cfg) {
+                if (isset($cfg['enabled']) && $cfg['enabled'] === false) {
+                    continue;
+                }
+                if (isset($cfg['class'])) {
+                    $manager->register($code, $cfg['class']);
+                }
+            }
+
+            return $manager;
         });
     }
 

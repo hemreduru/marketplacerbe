@@ -37,4 +37,3 @@ return [
 
     'view_dashboard' => 'View Dashboard',
 ];
-

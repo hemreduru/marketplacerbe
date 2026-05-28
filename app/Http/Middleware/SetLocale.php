@@ -15,7 +15,7 @@ class SetLocale
      * 2. Accept-Language header
      * 3. App default locale
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -32,7 +32,7 @@ class SetLocale
         }
 
         // Priority 2: Accept-Language header from frontend
-        if (!Auth::check() && $request->hasHeader('Accept-Language')) {
+        if (! Auth::check() && $request->hasHeader('Accept-Language')) {
             $headerLocale = $request->header('Accept-Language');
             // Normalize locale (handle cases like 'tr-TR' -> 'tr')
             $headerLocale = substr($headerLocale, 0, 2);

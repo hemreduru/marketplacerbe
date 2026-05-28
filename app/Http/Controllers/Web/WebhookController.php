@@ -9,7 +9,6 @@ use App\Models\UserMarketplaceCredential;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 /**
  * Trendyol webhook alımı — POST /webhooks/trendyol/{credentialUuid}
@@ -38,15 +37,25 @@ class WebhookController extends Controller
             return response()->noContent(200);
         }
 
-        $ipAllowed = $this->isIpAllowed($request->ip());
-        if (! $ipAllowed) {
-            Log::warning('Trendyol webhook: IP izin verilmedi', [
+        // IP allowlist denetimi: yapılandırılmışsa zorla, yoksa geriye dönük uyumlu olarak izin ver.
+        if (! $this->isIpAllowed($request->ip())) {
+            Log::warning('Trendyol webhook: IP izin verilmedi — istek engellendi', [
                 'ip' => $request->ip(),
                 'uuid' => $credentialUuid,
             ]);
+
+            return response()->noContent(403);
         }
 
-        $eventUuid = $payload['eventId'] ?? (string) Str::uuid();
+        // İdempotent event UUID: Trendyol'un gönderdiği eventId varsa onu,
+        // yoksa payload'daki tanımlayıcı alanlardan deterministik hash kullan.
+        $eventUuid = $payload['eventId']
+            ?? md5(
+                ($payload['orderNumber'] ?? $payload['claimId'] ?? 'fallback')
+                .'|'.($payload['notificationType'] ?? 'unknown')
+                .'|'.($payload['status'] ?? $payload['orderStatus'] ?? $payload['claimStatus'] ?? '')
+            );
+
         $eventType = match ($payload['notificationType'] ?? '') {
             'ORDER_CREATED', 'ORDER_STATUS_CHANGED' => 'order_status_changed',
             'CLAIM_CREATED', 'CLAIM_STATUS_CHANGED' => 'claim_status_changed',
@@ -81,11 +90,20 @@ class WebhookController extends Controller
         return response()->noContent(200);
     }
 
+    /**
+     * Webhook kaynağının IP'si izin listesinde mi?
+     *
+     * İzin listesi boşsa (yapılandırılmamışsa) geriye dönük uyumluluk için
+     * true döner ve bir uyarı log'lar. Yapılandırılmışsa yalnızca listedeki
+     * IP'lere izin verir.
+     */
     protected function isIpAllowed(string $ip): bool
     {
         $allowedIps = config('marketplaces.trendyol.webhook.allowed_ips', []);
 
         if (empty($allowedIps)) {
+            Log::warning('Trendyol webhook: IP izin listesi yapılandırılmamış, tüm IP\'lere izin veriliyor.');
+
             return true;
         }
 
