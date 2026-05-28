@@ -1,11 +1,9 @@
-@import 'tailwindcss';
+/* Theme mode icon visibility */
+[data-bs-theme="light"] .theme-light-show { display: inline-block !important; }
+[data-bs-theme="light"] .theme-dark-show  { display: none !important; }
+[data-bs-theme="dark"]  .theme-light-show { display: none !important; }
+[data-bs-theme="dark"]  .theme-dark-show  { display: inline-block !important; }
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-}
+/* NProgress — Metronic primary blue */
+#nprogress .bar { background: #3699FF !important; height: 3px !important; z-index: 99999 !important; }
+#nprogress .peg { box-shadow: 0 0 10px #3699FF, 0 0 5px #3699FF !important; }

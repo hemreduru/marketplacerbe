@@ -3,37 +3,26 @@
 @section('title', __('common.orders'))
 
 @section('content')
-@section('content')
-    {{-- User Guidance Section --}}
-    <div class="alert alert-dismissible bg-light-info d-flex flex-column flex-sm-row p-5 mb-5">
-        <i class="ki-duotone ki-information-5 fs-2hx text-info me-4 mb-5 mb-sm-0">
-            <span class="path1"></span>
-            <span class="path2"></span>
-            <span class="path3"></span>
-        </i>
-        <div class="d-flex flex-column pe-0 pe-sm-10">
-            <h4 class="mb-2 text-dark">{{ __('common.order_actions_guide') }}</h4>
-            <ul class="mb-0">
-                <li><i class="ki-duotone ki-check fs-6 text-success me-1"><span class="path1"></span><span
-                            class="path2"></span></i> <strong>{{ __('common.picking') }}:</strong>
-                    {{ __('common.picking_description') }}</li>
-                <li><i class="ki-duotone ki-file fs-6 text-warning me-1"><span class="path1"></span><span
-                            class="path2"></span></i> <strong>{{ __('common.invoiced') }}:</strong>
-                    {{ __('common.invoiced_description') }}</li>
-                <li><i class="ki-duotone ki-printer fs-6 text-primary me-1"><span class="path1"></span><span
-                            class="path2"></span><span class="path3"></span><span class="path4"></span><span
-                            class="path5"></span></i> <strong>{{ __('common.get_label') }}:</strong>
-                    {{ __('common.get_label_description') }}</li>
-                <li><i class="ki-duotone ki-arrows-circle fs-6 text-info me-1"><span class="path1"></span><span
-                            class="path2"></span></i> <strong>{{ __('common.sync_data') }}:</strong>
-                    {{ __('common.sync_description') }}</li>
-            </ul>
-        </div>
-        <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto"
-            data-bs-dismiss="alert">
-            <i class="ki-duotone ki-cross fs-1 text-info"><span class="path1"></span><span class="path2"></span></i>
-        </button>
-    </div>
+    <x-guide-alert color="info" icon="ki-information-5" :title="__('common.order_actions_guide')">
+        <ul class="mb-0">
+            <li>
+                <i class="ki-duotone ki-check fs-6 text-success me-1"><span class="path1"></span><span class="path2"></span></i>
+                <strong>{{ __('common.picking') }}:</strong> {{ __('common.picking_description') }}
+            </li>
+            <li>
+                <i class="ki-duotone ki-file fs-6 text-warning me-1"><span class="path1"></span><span class="path2"></span></i>
+                <strong>{{ __('common.invoiced') }}:</strong> {{ __('common.invoiced_description') }}
+            </li>
+            <li>
+                <i class="ki-duotone ki-printer fs-6 text-primary me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                <strong>{{ __('common.get_label') }}:</strong> {{ __('common.get_label_description') }}
+            </li>
+            <li>
+                <i class="ki-duotone ki-arrows-circle fs-6 text-info me-1"><span class="path1"></span><span class="path2"></span></i>
+                <strong>{{ __('common.sync_data') }}:</strong> {{ __('common.sync_description') }}
+            </li>
+        </ul>
+    </x-guide-alert>
 
     <div class="card card-flush">
         <div class="card-header align-items-center py-5 gap-2 gap-md-5">

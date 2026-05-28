@@ -29,63 +29,45 @@
     @else
         <!--begin::KPI Row-->
         <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
-            @php
-                $cards = [
-                    ['title' => __('dashboard.this_month_sales'), 'value' => $kpis['month_gross'], 'icon' => 'ki-basket', 'color' => 'primary'],
-                    ['title' => __('dashboard.this_month_net'), 'value' => $kpis['month_net'], 'icon' => 'ki-dollar', 'color' => 'success'],
-                ];
-            @endphp
-            @foreach ($cards as $card)
-                <div class="col-md-6 col-xl-3">
-                    <div class="card card-flush h-100">
-                        <div class="card-header pt-5">
-                            <div class="card-title d-flex flex-column">
-                                <span class="fs-2hx fw-bold text-gray-900 lh-1 ls-n2">{{ number_format($card['value'], 2) }} ₺</span>
-                                <span class="text-gray-500 pt-1 fw-semibold fs-6">{{ $card['title'] }}</span>
-                            </div>
-                        </div>
-                        <div class="card-body pt-2 pb-4">
-                            <span class="badge badge-light-{{ $card['color'] }} fs-base">
-                                <i class="ki-duotone {{ $card['icon'] }} fs-5 text-{{ $card['color'] }} ms-n1"><span class="path1"></span><span class="path2"></span></i>
-                                {{ __('common.this_month') }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-
             <div class="col-md-6 col-xl-3">
-                <div class="card card-flush h-100">
-                    <div class="card-header pt-5">
-                        <div class="card-title d-flex flex-column">
-                            <span class="fs-2hx fw-bold text-gray-900 lh-1 ls-n2">{{ number_format($kpis['total_orders']) }}</span>
-                            <span class="text-gray-500 pt-1 fw-semibold fs-6">{{ __('dashboard.total_orders') }}</span>
-                        </div>
-                    </div>
-                    <div class="card-body pt-2 pb-4">
-                        <a href="{{ route('orders.index') }}" class="badge badge-light-warning fs-base">
-                            <i class="ki-duotone ki-time fs-5 text-warning ms-n1"><span class="path1"></span><span class="path2"></span></i>
-                            {{ $kpis['waiting_orders'] }} {{ __('dashboard.pending_orders_short') }}
-                        </a>
-                    </div>
-                </div>
+                <x-stat-card
+                    :value="$kpis['month_gross']"
+                    :title="__('dashboard.this_month_sales')"
+                    icon="ki-basket"
+                    color="primary"
+                    :link-label="__('common.this_month')"
+                />
             </div>
-
             <div class="col-md-6 col-xl-3">
-                <div class="card card-flush h-100">
-                    <div class="card-header pt-5">
-                        <div class="card-title d-flex flex-column">
-                            <span class="fs-2hx fw-bold text-gray-900 lh-1 ls-n2">{{ number_format($kpis['total_products']) }}</span>
-                            <span class="text-gray-500 pt-1 fw-semibold fs-6">{{ __('dashboard.total_products') }}</span>
-                        </div>
-                    </div>
-                    <div class="card-body pt-2 pb-4">
-                        <a href="{{ route('products.index') }}" class="badge badge-light-danger fs-base">
-                            <i class="ki-duotone ki-cross-circle fs-5 text-danger ms-n1"><span class="path1"></span><span class="path2"></span></i>
-                            {{ $kpis['out_of_stock'] }} {{ __('common.no_stock') }}
-                        </a>
-                    </div>
-                </div>
+                <x-stat-card
+                    :value="$kpis['month_net']"
+                    :title="__('dashboard.this_month_net')"
+                    icon="ki-dollar"
+                    color="success"
+                    :link-label="__('common.this_month')"
+                />
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <x-stat-card
+                    :value="$kpis['total_orders']"
+                    :title="__('dashboard.total_orders')"
+                    icon="ki-time"
+                    color="warning"
+                    format="integer"
+                    :link="route('orders.index')"
+                    :link-label="$kpis['waiting_orders'] . ' ' . __('dashboard.pending_orders_short')"
+                />
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <x-stat-card
+                    :value="$kpis['total_products']"
+                    :title="__('dashboard.total_products')"
+                    icon="ki-cross-circle"
+                    color="danger"
+                    format="integer"
+                    :link="route('products.index')"
+                    :link-label="$kpis['out_of_stock'] . ' ' . __('common.no_stock')"
+                />
             </div>
         </div>
         <!--end::KPI Row-->

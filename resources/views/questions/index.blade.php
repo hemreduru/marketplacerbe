@@ -3,29 +3,18 @@
 @section('title', __('common.questions'))
 
 @section('content')
-    {{-- User Guidance Section --}}
-    <div class="alert alert-dismissible bg-light-warning d-flex flex-column flex-sm-row p-5 mb-5">
-        <i class="ki-duotone ki-information-5 fs-2hx text-warning me-4 mb-5 mb-sm-0">
-            <span class="path1"></span>
-            <span class="path2"></span>
-            <span class="path3"></span>
-        </i>
-        <div class="d-flex flex-column pe-0 pe-sm-10">
-            <h4 class="mb-2 text-dark">{{ __('common.questions_management_guide') }}</h4>
-            <ul class="mb-0">
-                <li><i class="ki-duotone ki-message-text-2 fs-6 text-primary me-1"><span class="path1"></span><span
-                            class="path2"></span><span class="path3"></span></i>
-                    <strong>{{ __('common.answer') }}:</strong> {{ __('common.question_answer_description') }}</li>
-                <li><i class="ki-duotone ki-arrows-circle fs-6 text-info me-1"><span class="path1"></span><span
-                            class="path2"></span></i> <strong>{{ __('common.sync_data') }}:</strong>
-                    {{ __('common.question_sync_description') }}</li>
-            </ul>
-        </div>
-        <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto"
-            data-bs-dismiss="alert">
-            <i class="ki-duotone ki-cross fs-1 text-warning"><span class="path1"></span><span class="path2"></span></i>
-        </button>
-    </div>
+    <x-guide-alert color="warning" icon="ki-information-5" :title="__('common.questions_management_guide')">
+        <ul class="mb-0">
+            <li>
+                <i class="ki-duotone ki-message-text-2 fs-6 text-primary me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                <strong>{{ __('common.answer') }}:</strong> {{ __('common.question_answer_description') }}
+            </li>
+            <li>
+                <i class="ki-duotone ki-arrows-circle fs-6 text-info me-1"><span class="path1"></span><span class="path2"></span></i>
+                <strong>{{ __('common.sync_data') }}:</strong> {{ __('common.question_sync_description') }}
+            </li>
+        </ul>
+    </x-guide-alert>
 
     <div class="d-flex flex-column flex-lg-row">
         <!--begin::Sidebar-->

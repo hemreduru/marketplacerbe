@@ -3,29 +3,18 @@
 @section('title', 'Financial Dashboard')
 
 @section('content')
-    {{-- User Guidance Section --}}
-    <div class="alert alert-dismissible bg-light-primary d-flex flex-column flex-sm-row p-5 mb-5">
-        <i class="ki-duotone ki-information-5 fs-2hx text-primary me-4 mb-5 mb-sm-0">
-            <span class="path1"></span>
-            <span class="path2"></span>
-            <span class="path3"></span>
-        </i>
-        <div class="d-flex flex-column pe-0 pe-sm-10">
-            <h4 class="mb-2 text-dark">{{ __('common.financial_management_guide') }}</h4>
-            <ul class="mb-0">
-                <li><i class="ki-duotone ki-calendar fs-6 text-success me-1"><span class="path1"></span><span
-                            class="path2"></span></i> <strong>{{ __('common.date_range') }}:</strong>
-                    {{ __('common.financial_filter_description') }}</li>
-                <li><i class="ki-duotone ki-arrows-circle fs-6 text-info me-1"><span class="path1"></span><span
-                            class="path2"></span></i> <strong>{{ __('common.sync_data') }}:</strong>
-                    {{ __('common.financial_sync_description') }}</li>
-            </ul>
-        </div>
-        <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto"
-            data-bs-dismiss="alert">
-            <i class="ki-duotone ki-cross fs-1 text-primary"><span class="path1"></span><span class="path2"></span></i>
-        </button>
-    </div>
+    <x-guide-alert color="primary" icon="ki-information-5" :title="__('common.financial_management_guide')">
+        <ul class="mb-0">
+            <li>
+                <i class="ki-duotone ki-calendar fs-6 text-success me-1"><span class="path1"></span><span class="path2"></span></i>
+                <strong>{{ __('common.date_range') }}:</strong> {{ __('common.financial_filter_description') }}
+            </li>
+            <li>
+                <i class="ki-duotone ki-arrows-circle fs-6 text-info me-1"><span class="path1"></span><span class="path2"></span></i>
+                <strong>{{ __('common.sync_data') }}:</strong> {{ __('common.financial_sync_description') }}
+            </li>
+        </ul>
+    </x-guide-alert>
 
     <!--begin::Toolbar-->
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
@@ -61,26 +50,26 @@
     <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
         <!--begin::Col-->
         <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
-            @include('financial.partials.summary-card', [
-                'title' => __('common.gross_sales'),
-                'value' => $summaryStats['gross_sales'],
-                'color' => 'primary',
-                'icon' => 'ki-basket',
-                'growth' => $summaryStats['growth']['gross_sales'] ?? 0,
-                'prevPeriodLabel' => $prevPeriodLabel,
-            ])
+            <x-stat-card
+                :value="$summaryStats['gross_sales']"
+                :title="__('common.gross_sales')"
+                icon="ki-basket"
+                color="primary"
+                :growth="$summaryStats['growth']['gross_sales'] ?? 0"
+                :prev-period-label="$prevPeriodLabel"
+            />
         </div>
         <!--end::Col-->
         <!--begin::Col-->
         <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
-            @include('financial.partials.summary-card', [
-                'title' => __('common.net_profit'),
-                'value' => $summaryStats['net_profit'],
-                'color' => 'success',
-                'icon' => 'ki-wallet',
-                'growth' => $summaryStats['growth']['net_profit'] ?? 0,
-                'prevPeriodLabel' => $prevPeriodLabel,
-            ])
+            <x-stat-card
+                :value="$summaryStats['net_profit']"
+                :title="__('common.net_profit')"
+                icon="ki-wallet"
+                color="success"
+                :growth="$summaryStats['growth']['net_profit'] ?? 0"
+                :prev-period-label="$prevPeriodLabel"
+            />
         </div>
         <!--end::Col-->
         <!--begin::Col-->
@@ -112,14 +101,14 @@
         <!--end::Col-->
         <!--begin::Col-->
         <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
-            @include('financial.partials.summary-card', [
-                'title' => __('common.total_expense'),
-                'value' => $summaryStats['total_expense'],
-                'color' => 'danger',
-                'icon' => 'ki-graph-down',
-                'growth' => $summaryStats['growth']['total_expense'] ?? 0,
-                'prevPeriodLabel' => $prevPeriodLabel,
-            ])
+            <x-stat-card
+                :value="$summaryStats['total_expense']"
+                :title="__('common.total_expense')"
+                icon="ki-graph-down"
+                color="danger"
+                :growth="$summaryStats['growth']['total_expense'] ?? 0"
+                :prev-period-label="$prevPeriodLabel"
+            />
         </div>
         <!--end::Col-->
     </div>

@@ -18,38 +18,9 @@
     <link href="{{ asset('assets/plugins/nprogress/nprogress.css') }}" rel="stylesheet" type="text/css" />
     <!--end::Global Stylesheets Bundle-->
 
-    <!--begin::Custom Styles-->
-    <style>
-        /* Theme mode icons */
-        [data-bs-theme="light"] .theme-light-show {
-            display: inline-block !important;
-        }
-
-        [data-bs-theme="light"] .theme-dark-show {
-            display: none !important;
-        }
-
-        [data-bs-theme="dark"] .theme-light-show {
-            display: none !important;
-        }
-
-        [data-bs-theme="dark"] .theme-dark-show {
-            display: inline-block !important;
-        }
-
-        /* NProgress Customization */
-        #nprogress .bar {
-            background: #3699FF !important;
-            /* Metronic Primary Blue */
-            height: 3px !important;
-            z-index: 99999 !important;
-        }
-
-        #nprogress .peg {
-            box-shadow: 0 0 10px #3699FF, 0 0 5px #3699FF !important;
-        }
-    </style>
-    <!--end::Custom Styles-->
+    <!--begin::App Custom Styles-->
+    @vite(['resources/css/app.css'])
+    <!--end::App Custom Styles-->
 
     @stack('styles')
 </head>

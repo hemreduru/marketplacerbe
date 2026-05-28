@@ -7,29 +7,18 @@
 @endsection
 
 @section('content')
-    {{-- User Guidance Section --}}
-    <div class="alert alert-dismissible bg-light-success d-flex flex-column flex-sm-row p-5 mb-5">
-        <i class="ki-duotone ki-information-5 fs-2hx text-success me-4 mb-5 mb-sm-0">
-            <span class="path1"></span>
-            <span class="path2"></span>
-            <span class="path3"></span>
-        </i>
-        <div class="d-flex flex-column pe-0 pe-sm-10">
-            <h4 class="mb-2 text-dark">{{ __('common.product_management_guide') }}</h4>
-            <ul class="mb-0">
-                <li><i class="ki-duotone ki-filter fs-6 text-primary me-1"><span class="path1"></span><span
-                            class="path2"></span></i> <strong>{{ __('common.filter') }}:</strong>
-                    {{ __('common.product_filter_description') }}</li>
-                <li><i class="ki-duotone ki-arrows-circle fs-6 text-info me-1"><span class="path1"></span><span
-                            class="path2"></span></i> <strong>{{ __('common.sync_data') }}:</strong>
-                    {{ __('common.product_sync_description') }}</li>
-            </ul>
-        </div>
-        <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto"
-            data-bs-dismiss="alert">
-            <i class="ki-duotone ki-cross fs-1 text-success"><span class="path1"></span><span class="path2"></span></i>
-        </button>
-    </div>
+    <x-guide-alert color="success" icon="ki-information-5" :title="__('common.product_management_guide')">
+        <ul class="mb-0">
+            <li>
+                <i class="ki-duotone ki-filter fs-6 text-primary me-1"><span class="path1"></span><span class="path2"></span></i>
+                <strong>{{ __('common.filter') }}:</strong> {{ __('common.product_filter_description') }}
+            </li>
+            <li>
+                <i class="ki-duotone ki-arrows-circle fs-6 text-info me-1"><span class="path1"></span><span class="path2"></span></i>
+                <strong>{{ __('common.sync_data') }}:</strong> {{ __('common.product_sync_description') }}
+            </li>
+        </ul>
+    </x-guide-alert>
 
     <!--begin::Content-->
     <div class="card card-flush">
