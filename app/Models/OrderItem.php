@@ -20,4 +20,9 @@ class OrderItem extends Model
     {
         return $this->hasOne(Product::class, 'barcode', 'barcode');
     }
+
+    public function master()
+    {
+        return $this->belongsTo(MasterProduct::class, 'master_product_id');
+    }
 }

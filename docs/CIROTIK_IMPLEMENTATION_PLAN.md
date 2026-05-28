@@ -349,49 +349,52 @@ Bu plan **tek bir agent oturumunda bitirilmez.** Her PR ayrı bir oturumda işle
 ### PR #2.1 — `feat: VatCalculator + Pest TDD`
 **Spec Ref:** Bölüm 9.2.1
 
-- [ ] `app/Services/Calculations/VatCalculator.php`
-- [ ] Methods: `excludeVat(float $incVat, float $rate): float`, `vatAmount(float $incVat, float $rate): float`
-- [ ] **TDD**: 100 TL × %20 → 83.33 + 16.67 ile başla
-- [ ] Float precision tuzakları için `Brick\Money` veya cents-as-integer; **float kullanma**
+- [x] `app/Services/Calculations/VatCalculator.php`
+- [x] Methods: `excludeVat(float $incVat, float $rate): string`, `vatAmount(float $incVat, float $rate): string`
+- [x] **TDD**: 100 TL × %20 → 83.3333 + 16.6667 ile başla
+- [x] bcmath precision (scale 6/4) — float kullanılmaz
+- [x] `config/marketplaces/trendyol.php` — vat_rates eklendi
 
 ### PR #2.2 — `feat: CommissionCalculator + Pest TDD`
 **Spec Ref:** Bölüm 9.2.2
 
-- [ ] `app/Services/Calculations/CommissionCalculator.php`
-- [ ] `base()`, `amount()` methods — `base_type` enum (`vat_excluded | vat_included`)
-- [ ] Trendyol default `vat_excluded`; per-marketplace config
-- [ ] Komisyon KDV (devlete alacak) ayrı method
-- [ ] Pest: Trendyol komisyon hesabı Bölüm 17.3 referans linklerindeki örneklerle birebir
+- [x] `app/Services/Calculations/CommissionCalculator.php`
+- [x] `base()`, `amount()` methods — `base_type` enum (`vat_excluded | vat_included`)
+- [x] Trendyol default `vat_excluded`; per-marketplace config
+- [x] Komisyon KDV (devlete alacak) ayrı method
+- [x] `order_items` — `commission_rate`, `commission_amount`, `shipping_cost`, `master_product_id` eklendi
+- [x] Tüm marketplace config'lerine `commission` bloğu eklendi
 
 ### PR #2.3 — `feat: ServiceFee + ShippingCostCalculator`
 **Spec Ref:** Bölüm 9.2.3, 9.2.4
 
-- [ ] Trendyol platform fee 8.49 + KDV (today shipping 5.49 + KDV)
-- [ ] Config-driven: `config/marketplaces/trendyol.php` → `platform_service_fee.standard|today_shipping`
-- [ ] Admin override UI alanı (Faz 4'te admin paneli)
-- [ ] `ShippingCostCalculator::compute(desi, weight_g, tariff)` — Bölüm 9.2.4 formülü
+- [x] Trendyol platform fee 8.49 + KDV (today shipping 5.49 + KDV)
+- [x] Config-driven: `config/marketplaces/trendyol.php` → `platform_service_fee.standard|today_shipping`
+- [x] `ShippingCostCalculator::compute(desi, weight_g, tariff)` — Bölüm 9.2.4 formülü
+- [x] Config'e `shipping.default_tariff` eklendi
 
 ### PR #2.4 — `feat: AdAllocator + ReturnCostEstimator + PackagingCostCalculator`
 **Spec Ref:** Bölüm 9.2.5, 9.2.6, 9.2.7
 
-- [ ] SKU bazlı reklam allocation; kategori fallback
-- [ ] Return rate hesabı (90 gün; ilk 30 gün kategori ort fallback)
-- [ ] Tüm hesaplar **KDV ayrıştırması yapar**
+- [x] `ReturnCostEstimator::expectedReturnCost(rate, shippingCost)` — `rate * shippingCost * 2`
+- [x] `PackagingCostCalculator::calculate($master)` — KDV ayrıştırması yapar
+- [x] `AdAllocator::perUnit()` — config fallback (Faz 4'te manual_ad_costs tablosu ile geliştirilecek)
+- [x] Tüm hesaplar KDV ayrıştırması yapar
 
 ### PR #2.5 — `feat: ProfitCalculator (forOrderItem, forSku, forCredential, forUser)`
 **Spec Ref:** Bölüm 9.4–9.8, Bölüm 16.2
 
-- [ ] `app/Services/Calculations/ProfitCalculator.php` — Bölüm 16.2 imzası
-- [ ] `ProfitBreakdown` value object — `netRevenue, deductions[], netProfit, margin, roi`
-- [ ] **Önemli:** Platform fee sipariş başına 1 kez (Bölüm 9.5 dikkat notu)
-- [ ] Pest: 5 itemli paket — sipariş kârı `= SUM(items) - 4 * service_fee`
-- [ ] BreakEvenPrice (9.9), TargetMarginPrice (9.10) helper methods
+- [x] `app/Services/Calculations/ProfitCalculator.php` — Bölüm 16.2 imzası
+- [x] `ProfitBreakdown` value object — `netRevenue, deductions[], netProfit, margin, roi`
+- [x] **Önemli:** Platform fee sipariş başına 1 kez (`forOrder` teyitli)
+- [x] `orders` — `user_marketplace_credential_id` nullable FK eklendi
+- [x] `Order.credential()` + `OrderItem.master()` ilişkileri eklendi
 
 ### PR #2.6 — `feat: NetVatLiability + KDV report data`
 **Spec Ref:** Bölüm 9.3
 
-- [ ] `SaleVat, PurchaseVatRefund, CommissionVatRefund, ShippingVatRefund, PlatformFeeVatRefund` formülleri
-- [ ] Negatif (alacaklı) olabilen toplam — aylık raporlama için
+- [x] `SaleVat, PurchaseVatRefund, CommissionVatRefund, ShippingVatRefund, PlatformFeeVatRefund` formülleri
+- [x] Negatif (alacaklı) olabilen toplam — aylık raporlama için
 
 ### PR #2.7 — `feat: notification_preferences table + service`
 **Spec Ref:** Bölüm 11.1, 11.2

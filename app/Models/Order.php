@@ -41,4 +41,9 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function credential()
+    {
+        return $this->belongsTo(UserMarketplaceCredential::class, 'user_marketplace_credential_id');
+    }
 }

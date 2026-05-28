@@ -31,6 +31,10 @@ return [
         'buybox' => false,
         'ads_api' => true,
     ],
+    'commission' => [
+        'default_rate' => 15.0,
+        'base_type' => 'vat_included',
+    ],
     'limits' => [
         'product_title_max' => 100,
         'product_description_max' => 5000,

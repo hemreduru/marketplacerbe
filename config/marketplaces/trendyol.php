@@ -36,6 +36,32 @@ return [
         'buybox' => true,
         'ads_api' => true,
     ],
+    'vat_rates' => [
+        'sale_default' => 20,
+        'purchase_default' => 20,
+        'commission' => 20,
+    ],
+    'commission' => [
+        'default_rate' => 15.0,
+        'base_type' => 'vat_excluded',
+    ],
+    'platform_service_fee' => [
+        'standard' => [
+            'amount_excl_vat' => 8.49,
+            'vat_rate' => 20,
+        ],
+        'today_shipping' => [
+            'amount_excl_vat' => 5.49,
+            'vat_rate' => 20,
+        ],
+    ],
+    'shipping' => [
+        'default_tariff' => [
+            'base_desi' => 5,
+            'base_price' => 40.00,
+            'per_extra_desi_price' => 5.00,
+        ],
+    ],
     'limits' => [
         'product_title_max' => 100,
         'product_description_max' => 30000,

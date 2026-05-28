@@ -28,6 +28,10 @@ return [
         'buybox' => false,
         'ads_api' => false,
     ],
+    'commission' => [
+        'default_rate' => 15.0,
+        'base_type' => 'vat_included',
+    ],
     'limits' => [
         'product_title_max' => 100,
         'polling_interval_seconds' => 600,
