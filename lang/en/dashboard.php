@@ -30,6 +30,12 @@ return [
     'date' => 'Date',
 
     // KPI dashboard
+    'revenue' => 'Revenue',
+    'net_profit' => 'Net Profit',
+    'order_count' => 'Orders',
+    'margin' => 'Margin',
+    'return_rate' => 'Return Rate',
+    'critical_stock' => 'Critical Stock',
     'this_month_sales' => 'Sales This Month',
     'this_month_net' => 'Net Profit This Month',
     'pending_orders_short' => 'Pending',

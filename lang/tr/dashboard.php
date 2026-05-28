@@ -30,6 +30,12 @@ return [
     'date' => 'Tarih',
 
     // KPI dashboard
+    'revenue' => 'Ciro',
+    'net_profit' => 'Net Kâr',
+    'order_count' => 'Sipariş',
+    'margin' => 'Marj',
+    'return_rate' => 'İade Oranı',
+    'critical_stock' => 'Kritik Stok',
     'this_month_sales' => 'Bu Ay Satış',
     'this_month_net' => 'Bu Ay Net Kâr',
     'pending_orders_short' => 'Bekleyen',
