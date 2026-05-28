@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateOrderStatusRequest;
 use App\Jobs\SyncTrendyolOrdersJob;
 use App\Models\Order;
-use App\Services\Contracts\OrderServiceContract;
 use App\Services\MarketplaceManager;
+use App\Services\Marketplaces\Trendyol\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +16,7 @@ class OrderController extends Controller
 {
     public function __construct(private MarketplaceManager $marketplace) {}
 
-    protected function getService(): ?OrderServiceContract
+    protected function getService(): ?OrderService
     {
         $credential = $this->marketplace->credentialFor(Auth::user());
 
@@ -262,10 +262,10 @@ class OrderController extends Controller
 
             $result = $service->updateStatus($request->package_id, $request->status);
 
-            if (isset($result['error'])) {
-                Log::error('Order status update failed: '.$result['message']);
+            if (! $result->ok) {
+                Log::error('Order status update failed: '.$result->errorMessage);
 
-                return response()->json(['success' => false, 'message' => $result['message']], 500);
+                return response()->json(['success' => false, 'message' => $result->errorMessage], 500);
             }
 
             return response()->json(['success' => true, 'message' => __('common.status_updated')]);
@@ -299,12 +299,12 @@ class OrderController extends Controller
             $service->createCommonLabel($request->tracking_number);
 
             // Then retrieve (might need delay in real world, but for now direct call)
-            $content = $service->getCommonLabel($request->tracking_number);
+            $result = $service->getCommonLabel($request->tracking_number);
 
-            if (is_array($content) && isset($content['error'])) {
-                Log::error('Label creation failed: '.$content['message']);
+            if (! $result->ok) {
+                Log::error('Label creation failed: '.$result->errorMessage);
 
-                return response()->json(['success' => false, 'message' => $content['message']], 500);
+                return response()->json(['success' => false, 'message' => $result->errorMessage], 500);
             }
 
             // Assuming content is PDF stream or link. For simplicity returning success for now.

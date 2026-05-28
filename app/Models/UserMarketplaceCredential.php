@@ -6,12 +6,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class UserMarketplaceCredential extends Model
 {
     use HasFactory, LogsActivity;
+
+    protected static function booted(): void
+    {
+        static::creating(function (UserMarketplaceCredential $credential) {
+            if ($credential->webhook_uuid === null) {
+                $credential->webhook_uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -38,6 +48,7 @@ class UserMarketplaceCredential extends Model
     protected $fillable = [
         'user_id',
         'marketplace_id',
+        'webhook_uuid',
         'api_key',
         'api_secret',
         'additional_credentials',

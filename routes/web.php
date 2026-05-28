@@ -8,6 +8,7 @@ use App\Http\Controllers\Web\ClaimController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\FinancialController;
 use App\Http\Controllers\Web\MarketplaceSettingsController;
+use App\Http\Controllers\Web\MasterProductController;
 use App\Http\Controllers\Web\OrderController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\ProfileController;
@@ -15,7 +16,11 @@ use App\Http\Controllers\Web\QuestionController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\SubscriptionController;
 use App\Http\Controllers\Web\TwoFactorController;
+use App\Http\Controllers\Web\WebhookController;
 use Illuminate\Support\Facades\Route;
+
+// Webhooks (public, marketplace'a özel endpoint'ler)
+Route::post('/webhooks/trendyol/{credentialUuid}', WebhookController::class)->name('webhooks.trendyol');
 
 // Redirect root to dashboard or login
 Route::get('/', function () {
@@ -75,6 +80,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/products/data', [ProductController::class, 'getData'])->name('products.data');
     Route::post('/products/sync', [ProductController::class, 'sync'])->name('products.sync');
     Route::post('/products/update-price-stock', [ProductController::class, 'updatePriceStock'])->name('products.update-price-stock');
+
+    // Master Products
+    Route::get('/master-products/{id}', [MasterProductController::class, 'show'])->name('master-products.show');
 
     // Claims (returns)
     Route::middleware('feature:claims')->group(function () {

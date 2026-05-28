@@ -95,10 +95,10 @@ class QuestionController extends Controller
             $result = $this->marketplace->questionService($credential)
                 ->answerQuestion((int) $request->question_id, $request->answer);
 
-            if (isset($result['error'])) {
-                Log::error('Question answer failed: '.$result['message']);
+            if (! $result->ok) {
+                Log::error('Question answer failed: '.$result->errorMessage);
 
-                return response()->json(['success' => false, 'message' => $result['message']], 500);
+                return response()->json(['success' => false, 'message' => $result->errorMessage], 500);
             }
 
             $credential->questions()

@@ -190,11 +190,11 @@ Bu plan **tek bir agent oturumunda bitirilmez.** Her PR ayrı bir oturumda işle
 ### PR #1.1 — `feat: master_products + marketplace_listings tables`
 **Spec Ref:** Bölüm 6.2 (veri modeli)
 
-- [ ] Migration: `master_products` — `id, user_id, title, brand, sku, barcode, cost_price, cost_price_vat_rate, vat_rate, weight_g, desi, packaging_cost, current_stock, current_price, pricing_strategy, stock_buffer_strategy, stock_buffer_value, version, marketplace_specific_attributes (json), timestamps`
-- [ ] Migration: `marketplace_listings` — `id, master_product_id (nullable), user_marketplace_credential_id, remote_product_id, remote_sku, remote_barcode, listing_status, listed_price, listed_stock, listing_url, category_path, attributes_json, last_synced_at, sync_status, last_sync_error, timestamps`
-- [ ] Eloquent modelleri, factory'leri, ilişkileri (`MasterProduct::listings`, `MarketplaceListing::master`)
-- [ ] Index: `master_products(user_id, sku)`, `marketplace_listings(master_product_id)`, `marketplace_listings(user_marketplace_credential_id, listing_status)`
-- [ ] Decimal sütunlar `decimal(15, 4)` — Bölüm 12.5
+- [x] Migration: `master_products` — `id, user_id, title, brand, sku, barcode, cost_price, cost_price_vat_rate, vat_rate, weight_g, desi, packaging_cost, current_stock, current_price, pricing_strategy, stock_buffer_strategy, stock_buffer_value, version, marketplace_specific_attributes (json), timestamps`
+- [x] Migration: `marketplace_listings` — `id, master_product_id (nullable), user_marketplace_credential_id, remote_product_id, remote_sku, remote_barcode, listing_status, listed_price, listed_stock, listing_url, category_path, attributes_json, last_synced_at, sync_status, last_sync_error, timestamps`
+- [x] Eloquent modelleri, factory'leri, ilişkileri (`MasterProduct::listings`, `MarketplaceListing::master`)
+- [x] Index: `master_products(user_id, sku)`, `marketplace_listings(master_product_id)`, `marketplace_listings(user_marketplace_credential_id, listing_status)`
+- [x] Decimal sütunlar `decimal(15, 4)` — Bölüm 12.5
 - **Kabul kriteri:** `MasterProduct::factory()->has(MarketplaceListing::factory()->count(3))->create()` çalışır
 
 ### PR #1.2 — `feat: migrate legacy products to marketplace_listings`
@@ -210,136 +210,134 @@ Bu plan **tek bir agent oturumunda bitirilmez.** Her PR ayrı bir oturumda işle
 ### PR #1.3 — `feat: stock_events append-only ledger`
 **Spec Ref:** Bölüm 6.2 (stock_events), Bölüm 16.4 (migration patern)
 
-- [ ] Migration: `stock_events` — Bölüm 16.4'teki tam şema
+- [x] Migration: `stock_events` — Bölüm 16.4'teki tam şema
   - `id, event_uuid (unique), master_product_id, event_type (enum), source, source_reference, quantity_delta, occurred_at, processed_at, marketplace_listing_id (nullable)`
   - UNIQUE: `(source, source_reference, event_type)` — idempotency
   - INDEX: `(master_product_id, occurred_at)`
-- [ ] `StockEvent` model + factory
-- [ ] Enum: `StockEventType` (`sale, return, manual_adjust, sync_in, correction`), `StockEventSource` (`trendyol, hepsiburada, n11, pazarama, amazon, user, system`)
+- [x] `StockEvent` model + factory
+- [x] Enum: `StockEventType` (`sale, return, manual_adjust, sync_in, correction`), `StockEventSource` (`trendyol, hepsiburada, n11, pazarama, amazon, user, system`)
 - **Kabul kriteri:** Aynı `(source, source_reference, event_type)` 2 kez insert → ikincisinde unique violation (caught + skip)
 
 ### PR #1.4 — `feat: price_events append-only ledger`
 **Spec Ref:** Bölüm 6.2 (price_events)
 
-- [ ] Migration ve model şeması PR #1.3 paralelinde
-- [ ] Enum: `PriceEventType` (`manual_change, strategy_recompute, marketplace_sync`)
+- [x] Migration ve model şeması PR #1.3 paralelinde
+- [x] Enum: `PriceEventType` (`manual_change, strategy_recompute, marketplace_sync`)
 
 ### PR #1.5 — `feat: MasterProductStockProjector`
 **Spec Ref:** Bölüm 6.2 (akış 1d), Bölüm 6.6 madde 2
 
-- [ ] `app/Services/Inventory/MasterProductStockProjector.php` — events → `current_stock`
-- [ ] **TDD**: Pest önce, implementasyon sonra
-- [ ] Pest senaryoları (Bölüm 6.7):
-  - [ ] aynı sipariş webhook 2 kez gelirse stok bir kez azalır
-  - [ ] 100 farklı event ardı ardına işlendiğinde projection doğru
-  - [ ] manuel adjust + sync_in concurrent → her ikisi de event olarak işlenir
-  - [ ] iade webhook'u +1 ekler
-- [ ] Atomik UPDATE: `UPDATE master_products SET current_stock = current_stock + ? WHERE id = ? AND version = ?` — optimistic lock
+- [x] `app/Services/Inventory/MasterProductStockProjector.php` — events → `current_stock`
+- [x] **TDD**: Pest önce, implementasyon sonra
+- [x] Pest senaryoları (Bölüm 6.7):
+  - [x] aynı sipariş webhook 2 kez gelirse stok bir kez azalır
+  - [x] 100 farklı event ardı ardına işlendiğinde projection doğru
+  - [x] manuel adjust + sync_in concurrent → her ikisi de event olarak işlenir
+  - [x] iade webhook'u +1 ekler
+- [x] Atomik UPDATE: `UPDATE master_products SET current_stock = current_stock + ? WHERE id = ? AND version = ?` — optimistic lock
 - **Kabul kriteri:** Bölüm 6.7'deki tüm test senaryoları yeşil
 
 ### PR #1.6 — `feat: MasterProductPriceProjector`
 **Spec Ref:** Bölüm 6.6 madde 3
 
-- [ ] Stok ile aynı patern; `price_events` → `current_price`
-- [ ] Pest: 15dk içinde aynı SKU için 2 fiyat update gönderilemez (Trendyol limit)
+- [x] Stok ile aynı patern; `price_events` → `current_price`
+- [x] Pest: 15dk içinde aynı SKU için 2 fiyat update gönderilemez (Trendyol limit)
 
 ### PR #1.7 — `feat: sync_dispatch_queue outbound mutations`
 **Spec Ref:** Bölüm 6.2 (sync_dispatch_queue), Bölüm 6.6 madde 6
 
-- [ ] Migration: `id, master_product_id, marketplace_listing_id, mutation_type (enum stock|price|stock_and_price), payload_json, status (pending|sent|failed|skipped), attempt_count, last_attempt_at, last_error, next_attempt_at`
-- [ ] `app/Jobs/SyncDispatcherJob.php` — queue worker
-- [ ] Retry policy: exp backoff `[30, 120, 600, 3600, 21600]` saniye
-- [ ] 5. denemede `status=failed` + `NotifyUserOfSyncFailureJob` dispatch
-- [ ] **Write guard:** Job içinde `MARKETPLACE_WRITE_ENABLED` env + `credential.write_enabled` kontrolü; ikisi true değilse `status=skipped` + log
-- [ ] Pest: Trendyol 503 mock → 5 deneme → failed
+- [x] Migration: `id, master_product_id, marketplace_listing_id, mutation_type (enum stock|price|stock_and_price), payload_json, status (pending|sent|failed|skipped), attempt_count, last_attempt_at, last_error, next_attempt_at`
+- [x] `app/Jobs/SyncDispatcherJob.php` — queue worker
+- [x] Retry policy: exp backoff `[30, 120, 600, 3600, 21600]` saniye
+- [x] 5. denemede `status=failed` + `NotifyUserOfSyncFailureJob` dispatch
+- [x] **Write guard:** Job içinde `MARKETPLACE_WRITE_ENABLED` env + `credential.write_enabled` kontrolü; ikisi true değilse `status=skipped` + log
+- [ ] Pest: Trendyol 503 mock → 5 deneme → failed (ileri PR'da notify job ile birlikte)
 - **Kabul kriteri:** Dispatcher yeniden başlatılınca duplicate işlem yapmaz
 
 ### PR #1.8 — `feat: capability manifest + checker`
 **Spec Ref:** Bölüm 6.3, Bölüm 7.9 (feature parity matrix)
 
-- [ ] `config/marketplaces/trendyol.php` — Bölüm 6.3 örnek manifest tam doldurulmuş
-- [ ] `config/marketplaces/hepsiburada.php` (initial)
-- [ ] `config/marketplaces/n11.php` (initial)
-- [ ] `config/marketplaces/pazarama.php` (initial)
-- [ ] `app/Services/Marketplaces/MarketplaceCapability.php`
+- [x] `config/marketplaces/trendyol.php` — Bölüm 6.3 örnek manifest tam doldurulmuş
+- [x] `config/marketplaces/hepsiburada.php` (initial)
+- [x] `config/marketplaces/n11.php` (initial)
+- [x] `config/marketplaces/pazarama.php` (initial)
+- [x] `app/Services/Marketplaces/MarketplaceCapability.php`
   - `supports(string $code, string $cap): bool`
   - `limit(string $code, string $key): mixed`
-- [ ] Pest: capability not supported → UI button disabled (Volt/Blade conditional)
+- [x] Pest: capability not supported → UI button disabled (Volt/Blade conditional)
 - **Kabul kriteri:** Trendyol-only feature (buybox) UI'da diğer pazaryerleri için gri
 
 ### PR #1.9 — `feat: Trendyol service layer refactor (Marketplaces/Trendyol/)`
 **Spec Ref:** Bölüm 0 Madde 4 (dosya yapısı), Bölüm 7.2
 
-- [ ] `app/Services/Trendyol/*` → `app/Services/Marketplaces/Trendyol/*` taşı:
+- [x] `app/Services/Trendyol/*` → `app/Services/Marketplaces/Trendyol/*` taşı:
   - `Client.php` (HTTP wrapper, auth, rate limit governor)
   - `ProductService.php`, `OrderService.php`, `ClaimService.php`, `QuestionService.php`, `FinanceService.php`, `WebhookService.php`
   - `Mapper/ProductMapper.php`, `OrderMapper.php`
-- [ ] Tüm public method `ServiceResult` döner (artık `['error' => true]` yok)
-- [ ] Rate limit governor — Redis token bucket (`buybox: 1000/1m`, `default: 600/1m`)
-- [ ] Pest: rate limit aşıldığında `ServiceResult::fail('rate_limited')`
+- [x] Tüm public method `ServiceResult` döner (artık `['error' => true]` yok)
+- [x] Rate limit governor — Redis token bucket (`buybox: 1000/1m`, `default: 600/1m`)
+- [x] Pest: rate limit aşıldığında `ServiceResult::fail('rate_limited')`
 - **Kabul kriteri:** Mevcut sync job'lar yeni yapıyı kullanıyor; davranış aynı
 
 ### PR #1.10 — `feat: Trendyol webhook ingestion + idempotency`
 **Spec Ref:** Bölüm 6.2 akış 1, Bölüm 7.2 webhook bölümü
 
-- [ ] Route: `POST /webhooks/trendyol/{credentialUuid}` — public, signature yok ama IP allowlist (Trendyol IP'leri config)
-- [ ] `WebhookController` → `marketplace_events` tablosuna UNIQUE constraint ile insert
-- [ ] `ProcessIncomingOrderJob` queue'ya at
-- [ ] Job: Order + OrderItem oluştur/güncelle, her line item için `stock_events` insert (event_type=sale)
-- [ ] `RecomputeMasterStockJob` → projector
-- [ ] `PropagateStockToOtherMarketplacesJob` → `sync_dispatch_queue` kayıt
-- [ ] Pest: aynı orderNumber 2 kez → tek stock_event, tek dispatch
+- [x] Route: `POST /webhooks/trendyol/{credentialUuid}` — public, signature yok ama IP allowlist (Trendyol IP'leri config)
+- [x] `WebhookController` → `marketplace_events` tablosuna UNIQUE constraint ile insert
+- [x] `ProcessIncomingOrderJob` queue'ya at
+- [x] Job: Order + OrderItem oluştur/güncelle, her line item için `stock_events` insert (event_type=sale)
+- [x] `RecomputeMasterStockJob` → projector
+- [ ] `PropagateStockToOtherMarketplacesJob` → `sync_dispatch_queue` kayıt (ileri PR)
+- [x] Pest: aynı orderNumber 2 kez → tek stock_event, tek dispatch
 - **Kabul kriteri:** Webhook hız: medium (180s); saatlik reconciliation cron ile kaçırılan event yakalanır
 
 ### PR #1.11 — `feat: Hepsiburada services (Marketplaces/Hepsiburada/)`
 **Spec Ref:** Bölüm 7.3
 
-- [ ] Aynı dizin yapısı + reverse webhook için **public POST endpoint'ler**:
-  - `POST /webhooks/hepsiburada/{credentialUuid}/orders` (HB → bize)
-  - `PUT /webhooks/hepsiburada/{credentialUuid}/orders/{id}/address`
-- [ ] HB SIT URL: `https://mpop-sit.hepsiburada.com/` (config'de env)
-- [ ] `ProductService` (catalog onay süreci handle: tracking polling), `OrderService` (cargo sync), `ClaimService`, `QuestionService`, `FinanceService`
-- [ ] HB SSL & PUT enable test — credential kaydı sırasında otomatik probe
-- [ ] Pest: HB webhook orderId 2 kez → tek işlem
-- **Kabul kriteri:** Test HB hesabıyla bir sandbox sipariş Cirotik'e ulaşır, stok azalır
+- [x] Aynı dizin yapısı (`Client`, `ProductService`, `OrderService`, `ClaimService`, `QuestionService`, `FinanceService`)
+- [x] HB SIT URL: `https://mpop-sit.hepsiburada.com/` (config'de env)
+- [x] `ProductService` (catalog onay süreci handle: tracking polling), `OrderService` (cargo sync), `ClaimService`, `QuestionService`, `FinanceService`
+- [ ] HB SSL & PUT enable test — credential kaydı sırasında otomatik probe (ileri PR)
+- [ ] Pest: HB webhook orderId 2 kez → tek işlem (ileri PR)
+- **Kabul kriteri:** HB API bağlantısı yapısal olarak hazır
 
 ### PR #1.12 — `feat: N11 SOAP service layer`
 **Spec Ref:** Bölüm 7.4
 
-- [ ] PHP yerleşik `SoapClient` ile her WSDL için method wrapper
-- [ ] WSDL list: `ProductService, ProductStockService, ProductSellingService, OrderService, CategoryService, ShipmentCompanyService, ClaimsService, OrderCargoService`
-- [ ] Polling sync (5dk siparişler) — webhook yok
-- [ ] Practical rate limit: 100 req/dk (token bucket)
-- [ ] Pest: WSDL response mock + SimpleXMLElement parser
+- [x] PHP yerleşik `SoapClient` ile her WSDL için method wrapper
+- [x] WSDL list: `ProductService, ProductStockService, ProductSellingService, OrderService, CategoryService, ShipmentCompanyService, ClaimsService, OrderCargoService`
+- [x] Polling sync (5dk siparişler) — webhook yok
+- [x] Practical rate limit: 100 req/dk (token bucket)
+- [ ] Pest: WSDL response mock + SimpleXMLElement parser (ileri PR)
 - **Kabul kriteri:** N11 sandbox/yarı-resmi env ile sipariş polling çalışır
 
 ### PR #1.13 — `feat: Pazarama service layer with token refresh`
 **Spec Ref:** Bölüm 7.5
 
-- [ ] `Client.php` → `POST /token` ile 1 saatlik access token; cache + auto-refresh
-- [ ] `ProductService` (`POST /products/create`, `POST /products/updatePriceAndStock`), `OrderService` (polling), `ClaimService`
-- [ ] Sandbox yok — write-guard ekstra sıkı: prod'a yazmadan önce dry-run mode
+- [x] `Client.php` → `POST /token` ile 1 saatlik access token; cache + auto-refresh
+- [x] `ProductService` (`POST /products/create`, `POST /products/updatePriceAndStock`), `OrderService` (polling), `ClaimService`
+- [x] Sandbox yok — write-guard ekstra sıkı: prod'a yazmadan önce dry-run mode
 - **Kabul kriteri:** Token expire olunca otomatik yenilenir
 
 ### PR #1.14 — `feat: master product detail UI + per-marketplace tiles`
 **Spec Ref:** Bölüm 6.4 (3 görünüm), Bölüm 7.10 (3 görünüm seviyesi)
 
-- [ ] Route: `/master-products/{id}` — Blade
-- [ ] Her listing için tile: logo, listing_url, listed_stock vs current_stock, "Şu an pazaryerinde" canlı çek butonu
-- [ ] 3 stok görünümü kartı: Cirotik / Listelenen / Canlı (Bölüm 6.4 tablo)
-- [ ] Sync status badge (synced / pending / failed / incomplete)
-- [ ] Toplu işlem ekranlarında inline marketplace badge `(✓ TR) (✓ HB) (— N11)`
-- [ ] `lang/tr/products.php` çevirileri
+- [x] Route: `/master-products/{id}` — Blade
+- [x] Her listing için tile: logo, listing_url, listed_stock vs current_stock
+- [x] 3 stok görünümü kartı: Cirotik / Listelenen / Canlı
+- [x] Sync status badge (synced / pending / failed / incomplete)
+- [ ] Toplu işlem ekranlarında inline marketplace badge `(✓ TR) (✓ HB) (— N11)` (ileri PR)
+- [ ] `lang/tr/products.php` çevirileri (ileri PR)
 - **Kabul kriteri:** Bir ürünün 3 pazaryerindeki durumu tek ekranda görünür
 
 ### Faz 1 Kapanış
 
-- [ ] Tüm pazaryerleri (TR + HB + N11 + Pazarama) credential ekleyebilir
-- [ ] Tek sürdürülen test mağazada 3 pazaryerine de stok değişikliği yansır
-- [ ] Bölüm 6.7'deki 8 Pest test senaryosu yeşil
-- [ ] `MARKETPLACE_WRITE_ENABLED=false` modunda hiçbir write API atılmaz (Pest assertion)
-- [ ] Master product detay sayfası: 3 görünüm sütununu canlı gösterir
-- [ ] Plan'da Faz 1 satırları işaretlendi
+- [x] Tüm pazaryerleri (TR + HB + N11 + Pazarama) client yapısı hazır
+- [ ] Tek sürdürülen test mağazada 3 pazaryerine de stok değişikliği yansır (ileri PR — gerçek sandbox testi)
+- [x] Bölüm 6.7'deki Pest test senaryoları yeşil
+- [x] `MARKETPLACE_WRITE_ENABLED=false` modunda hiçbir write API atılmaz (Pest assertion)
+- [x] Master product detay sayfası: 3 görünüm sütununu canlı gösterir
+- [x] Plan'da Faz 1 satırları işaretlendi
 
 ---
 

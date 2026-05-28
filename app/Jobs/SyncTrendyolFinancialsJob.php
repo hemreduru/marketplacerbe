@@ -5,7 +5,8 @@ namespace App\Jobs;
 use App\Jobs\Concerns\HasRetryPolicy;
 use App\Models\MarketplaceSyncLog;
 use App\Models\UserMarketplaceCredential;
-use App\Services\Trendyol\TrendyolFinanceService;
+use App\Services\Marketplaces\Trendyol\Client as TrendyolClient;
+use App\Services\Marketplaces\Trendyol\FinanceService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -43,12 +44,12 @@ class SyncTrendyolFinancialsJob implements ShouldQueue
 
             $log = MarketplaceSyncLog::start($credential->id, 'finance');
 
-            $service = new TrendyolFinanceService(
+            $service = new FinanceService(new TrendyolClient(
                 $credential->api_key,
                 $credential->api_secret,
                 $credential->additional_credentials['seller_id'] ?? '',
                 false
-            );
+            ));
 
             try {
                 $service->syncSmart($this->credentialId);

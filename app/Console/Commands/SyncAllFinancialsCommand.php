@@ -2,10 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\UserMarketplaceCredential;
 use App\Models\Marketplace;
-use App\Services\Trendyol\TrendyolFinanceService;
+use App\Models\UserMarketplaceCredential;
+use App\Services\Marketplaces\Trendyol\Client as TrendyolClient;
+use App\Services\Marketplaces\Trendyol\FinanceService;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
 class SyncAllFinancialsCommand extends Command
@@ -33,8 +34,9 @@ class SyncAllFinancialsCommand extends Command
 
         $trendyol = Marketplace::where('slug', 'trendyol')->first();
 
-        if (!$trendyol) {
+        if (! $trendyol) {
             $this->error('Trendyol marketplace not found!');
+
             return 1;
         }
 
@@ -44,6 +46,7 @@ class SyncAllFinancialsCommand extends Command
 
         if ($credentials->isEmpty()) {
             $this->warn('No active Trendyol credentials found.');
+
             return 0;
         }
 
@@ -70,14 +73,14 @@ class SyncAllFinancialsCommand extends Command
             $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s% %memory:6s%');
 
             try {
-                $service = new TrendyolFinanceService(
+                $service = new FinanceService(new TrendyolClient(
                     $credential->api_key,
                     $credential->api_secret,
                     $credential->additional_credentials['seller_id'] ?? '',
                     false
-                );
+                ));
 
-                $service->syncSmart($credential->id, null, function($current, $total, $msg = null, $stats = []) use ($bar) {
+                $service->syncSmart($credential->id, null, function ($current, $total, $msg = null, $stats = []) use ($bar) {
                     if ($bar->getMaxSteps() != $total) {
                         $bar->setMaxSteps($total);
                         $bar->start();
@@ -93,16 +96,16 @@ class SyncAllFinancialsCommand extends Command
                 $results[] = [
                     'User ID' => $credential->user_id,
                     'Status' => 'Success',
-                    'Message' => 'Synced 15 years of data'
+                    'Message' => 'Synced 15 years of data',
                 ];
             } catch (\Exception $e) {
                 $this->newLine();
-                $this->error("Sync failed for credential {$credential->id}: " . $e->getMessage());
-                Log::error("Sync failed for credential {$credential->id}: " . $e->getMessage());
+                $this->error("Sync failed for credential {$credential->id}: ".$e->getMessage());
+                Log::error("Sync failed for credential {$credential->id}: ".$e->getMessage());
                 $results[] = [
                     'User ID' => $credential->user_id,
                     'Status' => 'Failed',
-                    'Message' => substr($e->getMessage(), 0, 50) . '...'
+                    'Message' => substr($e->getMessage(), 0, 50).'...',
                 ];
             }
         }
@@ -114,6 +117,7 @@ class SyncAllFinancialsCommand extends Command
         );
 
         $this->info('Financial data sync completed.');
+
         return 0;
     }
 }

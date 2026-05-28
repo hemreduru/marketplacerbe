@@ -18,7 +18,8 @@ class UserMarketplaceCredentialFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'marketplace_id' => Marketplace::factory()->trendyol(),
+            'marketplace_id' => fn () => Marketplace::firstWhere('slug', 'trendyol')?->id
+                ?? Marketplace::factory()->trendyol()->create()->id,
             'api_key' => fake()->bothify('????########'),
             'api_secret' => fake()->bothify('????########'),
             'additional_credentials' => ['seller_id' => (string) fake()->numberBetween(100000, 999999)],

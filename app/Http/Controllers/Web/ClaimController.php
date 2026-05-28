@@ -123,8 +123,8 @@ class ClaimController extends Controller
             $result = $this->marketplace->claimService($credential)
                 ->approveClaimItems($validated['claim_id'], $validated['claim_item_ids']);
 
-            if (isset($result['error'])) {
-                return response()->json(['success' => false, 'message' => $result['message']], 500);
+            if (! $result->ok) {
+                return response()->json(['success' => false, 'message' => $result->errorMessage], 500);
             }
 
             return response()->json(['success' => true, 'message' => __('common.status_updated')]);

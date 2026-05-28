@@ -5,7 +5,8 @@ namespace App\Jobs;
 use App\Jobs\Concerns\HasRetryPolicy;
 use App\Models\MarketplaceSyncLog;
 use App\Models\UserMarketplaceCredential;
-use App\Services\Trendyol\TrendyolProductService;
+use App\Services\Marketplaces\Trendyol\Client as TrendyolClient;
+use App\Services\Marketplaces\Trendyol\ProductService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -42,12 +43,12 @@ class SyncTrendyolProductsJob implements ShouldQueue
         $stats = ['created' => 0, 'updated' => 0, 'failed' => 0];
 
         try {
-            $service = new TrendyolProductService(
+            $service = new ProductService(new TrendyolClient(
                 $credential->api_key,
                 $credential->api_secret,
                 $credential->additional_credentials['seller_id'] ?? '',
                 false
-            );
+            ));
 
             $service->syncProducts($credential->id, function ($processed, $total, $message, $progressStats) use (&$stats) {
                 $stats = $progressStats;
