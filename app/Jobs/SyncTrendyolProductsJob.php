@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\HasRetryPolicy;
 use App\Models\MarketplaceSyncLog;
 use App\Models\UserMarketplaceCredential;
 use App\Services\Trendyol\TrendyolProductService;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 
 class SyncTrendyolProductsJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, HasRetryPolicy, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $credentialId;
 

@@ -14,6 +14,7 @@ use App\Http\Controllers\Web\ProfileController;
 use App\Http\Controllers\Web\QuestionController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\Web\SubscriptionController;
+use App\Http\Controllers\Web\TwoFactorController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to dashboard or login
@@ -31,6 +32,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password', [ForgotPasswordController::class, 'sendLink'])->name('password.email');
     Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showForm'])->name('password.reset');
     Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+    Route::get('/two-factor-challenge', [TwoFactorController::class, 'showChallenge'])->name('two-factor.challenge');
+    Route::post('/two-factor-challenge', [TwoFactorController::class, 'verifyChallenge'])->name('two-factor.verify');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
@@ -60,6 +64,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/settings/profile', [ProfileController::class, 'update'])->name('settings.profile');
     Route::post('/settings/theme', [SettingsController::class, 'updateTheme'])->name('settings.theme');
     Route::post('/settings/language', [SettingsController::class, 'updateLanguage'])->name('settings.language');
+
+    // Two-Factor (TOTP)
+    Route::get('/settings/two-factor', [TwoFactorController::class, 'showSetup'])->name('two-factor.setup');
+    Route::post('/settings/two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('two-factor.confirm');
+    Route::delete('/settings/two-factor', [TwoFactorController::class, 'disable'])->name('two-factor.disable');
 
     // Products
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');

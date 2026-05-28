@@ -92,7 +92,7 @@
                             <div class="bullet w-8px h-3px rounded-2 bg-success me-3"></div>
                             <div class="text-gray-500 flex-grow-1 me-4">{{ __('common.avg_daily_sales') }}</div>
                             <div class="fw-bolder text-gray-700 text-xxl-end">
-                                {{ number_format($summaryStats['avg_daily_sales'], 2) }} ₺</div>
+                                @money($summaryStats['avg_daily_sales'])</div>
                         </div>
                     </div>
                 </div>

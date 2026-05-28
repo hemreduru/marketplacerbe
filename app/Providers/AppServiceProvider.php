@@ -25,5 +25,10 @@ class AppServiceProvider extends ServiceProvider
         Blade::if('feature', function (string $feature): bool {
             return auth()->check() && auth()->user()->canUseFeature($feature);
         });
+
+        // Türk Lirası para gösterimi: 1.234,56 ₺
+        Blade::directive('money', function (string $expression): string {
+            return "<?php echo number_format((float) ({$expression}), 2, ',', '.') . ' ₺'; ?>";
+        });
     }
 }

@@ -43,4 +43,27 @@ return [
     'reset_password_btn' => 'Şifremi Güncelle',
     'password_reset_success' => 'Şifreniz başarıyla güncellendi.',
     'error' => 'Hata',
+
+    // Two-factor authentication (TOTP)
+    'failed' => 'Giriş bilgileri hatalı.',
+    'two_factor' => [
+        'challenge_title' => 'İki Adımlı Doğrulama',
+        'challenge_subtitle' => 'Authenticator uygulamanızdaki 6 haneli kodu girin.',
+        'verify_button' => 'Doğrula',
+        'recovery_hint' => 'Telefonunuza erişiminiz yoksa kurtarma kodlarınızdan birini de girebilirsiniz.',
+        'setup_title' => 'İki Adımlı Doğrulama Kur',
+        'setup_intro' => 'QR kodu Google Authenticator, Authy veya 1Password gibi bir uygulama ile tarayın. Onaylamak için ürettiği 6 haneli kodu girin.',
+        'manage_title' => 'İki Adımlı Doğrulama',
+        'manual_code_label' => 'Manuel Kod',
+        'code_label' => 'Doğrulama Kodu',
+        'confirm_button' => 'Aktifleştir',
+        'invalid_code' => 'Doğrulama kodu hatalı veya süresi geçmiş.',
+        'enabled' => 'İki adımlı doğrulama etkinleştirildi.',
+        'disabled' => 'İki adımlı doğrulama devre dışı bırakıldı.',
+        'recovery_codes_title' => 'Kurtarma Kodları',
+        'recovery_codes_intro' => 'Her kod tek kullanımlıktır. Güvenli bir yerde saklayın.',
+        'disable_title' => 'Devre Dışı Bırak',
+        'disable_intro' => 'Devre dışı bırakmak için parolanızı tekrar girin.',
+        'disable_button' => 'İki Adımlı Doğrulamayı Kapat',
+    ],
 ];

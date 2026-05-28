@@ -1,0 +1,931 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Console/Commands/ProcessExpiredSubscriptions.php
+
+		-
+			message: '#^Parameter \#1 \$user of class App\\Mail\\TrialEndingMail constructor expects App\\Models\\User, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/ProcessExpiredSubscriptions.php
+
+		-
+			message: '#^Parameter \#1 \$user of class App\\Mail\\TrialExpiredMail constructor expects App\\Models\\User, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/ProcessExpiredSubscriptions.php
+
+		-
+			message: '#^Method App\\Console\\Commands\\SyncAllFinancialsCommand\:\:handle\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Console/Commands/SyncAllFinancialsCommand.php
+
+		-
+			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Console/Commands/SyncAllFinancialsCommand.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SyncMarketplaceBrandsCommand.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Console/Commands/SyncMarketplaceBrandsCommand.php
+
+		-
+			message: '#^Call to static method make\(\) on an unknown class App\\Services\\MarketplaceServiceFactory\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Console/Commands/SyncMarketplaceBrandsCommand.php
+
+		-
+			message: '#^Call to static method updateOrCreate\(\) on an unknown class App\\Models\\MarketplaceBrand\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Console/Commands/SyncMarketplaceBrandsCommand.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SyncMarketplaceCategoriesCommand.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Console/Commands/SyncMarketplaceCategoriesCommand.php
+
+		-
+			message: '#^Call to static method make\(\) on an unknown class App\\Services\\MarketplaceServiceFactory\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Console/Commands/SyncMarketplaceCategoriesCommand.php
+
+		-
+			message: '#^Call to static method updateOrCreate\(\) on an unknown class App\\Models\\MarketplaceCategory\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Console/Commands/SyncMarketplaceCategoriesCommand.php
+
+		-
+			message: '#^Method App\\Console\\Commands\\SyncUserMarketplaceDataCommand\:\:handle\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Console/Commands/SyncUserMarketplaceDataCommand.php
+
+		-
+			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 4
+			path: app/Console/Commands/SyncUserMarketplaceDataCommand.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Auth\\ForgotPasswordController\:\:sendLink\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Auth/ForgotPasswordController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Auth\\ForgotPasswordController\:\:showForm\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Auth/ForgotPasswordController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Auth\\ResetPasswordController\:\:reset\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Auth/ResetPasswordController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Auth\\ResetPasswordController\:\:showForm\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Auth/ResetPasswordController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\AuthController\:\:login\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/AuthController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\AuthController\:\:logout\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/AuthController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\AuthController\:\:register\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/AuthController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\AuthController\:\:showLogin\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/AuthController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\AuthController\:\:showRegister\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/AuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$claim_date\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Web/ClaimController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$item_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Web/ClaimController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ClaimController\:\:approve\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ClaimController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ClaimController\:\:getData\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ClaimController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ClaimController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ClaimController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ClaimController\:\:sync\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ClaimController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\DashboardController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/DashboardController.php
+
+		-
+			message: '#^Relation ''items'' is not found in App\\Models\\Order model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Web/DashboardController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\FinancialController\:\:emptyStats\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/FinancialController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\FinancialController\:\:emptyStats\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: app/Http/Controllers/Web/FinancialController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\FinancialController\:\:getStatsFromDb\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/FinancialController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\FinancialController\:\:getStatsFromDb\(\) has parameter \$credentialId with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Controllers/Web/FinancialController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\FinancialController\:\:getStatsFromDb\(\) has parameter \$endDate with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Controllers/Web/FinancialController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\FinancialController\:\:getStatsFromDb\(\) has parameter \$startDate with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Controllers/Web/FinancialController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\FinancialController\:\:getStatsFromDb\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: app/Http/Controllers/Web/FinancialController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\FinancialController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/FinancialController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\FinancialController\:\:sync\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/FinancialController.php
+
+		-
+			message: '#^Parameter \#1 \$num of function abs expects float\|int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Web/FinancialController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\MarketplaceSettingsController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/MarketplaceSettingsController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\MarketplaceSettingsController\:\:update\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/MarketplaceSettingsController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Order\:\:\$items\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Web/OrderController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Order\:\:\$marketplace\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Web/OrderController.php
+
+		-
+			message: '#^Call to an undefined method App\\Services\\Contracts\\OrderServiceContract\:\:createCommonLabel\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Web/OrderController.php
+
+		-
+			message: '#^Call to an undefined method App\\Services\\Contracts\\OrderServiceContract\:\:getCommonLabel\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Web/OrderController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\OrderController\:\:getData\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/OrderController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\OrderController\:\:getLabel\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/OrderController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\OrderController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/OrderController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\OrderController\:\:sync\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/OrderController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\OrderController\:\:updateStatus\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/OrderController.php
+
+		-
+			message: '#^Relation ''items'' is not found in App\\Models\\Order model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Web/OrderController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ProductController\:\:getData\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ProductController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ProductController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ProductController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ProductController\:\:sync\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ProductController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ProductController\:\:updatePriceStock\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ProductController.php
+
+		-
+			message: '#^Parameter \#1 \$num of function number_format expects float, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Web/ProductController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ProfileController\:\:show\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ProfileController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ProfileController\:\:update\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ProfileController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ProfileController\:\:updatePassword\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ProfileController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:toViewArray\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Web/QuestionController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\QuestionController\:\:answer\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/QuestionController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\QuestionController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/QuestionController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\QuestionController\:\:sync\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/QuestionController.php
+
+		-
+			message: '#^Unable to resolve the template type TMapValue in call to method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\)$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Http/Controllers/Web/QuestionController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\SettingsController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/SettingsController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\SettingsController\:\:update\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/SettingsController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\SettingsController\:\:updateLanguage\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/SettingsController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\SettingsController\:\:updateTheme\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/SettingsController.php
+
+		-
+			message: '#^Parameter \#1 \$params of method App\\Services\\IyzicoService\:\:createPayment\(\) expects array\{price\: float, currency\: string, buyer\: array, card\: array\}, array\{price\: float\|null, currency\: ''TRY'', buyer\: array\{name\: string, email\: string\}\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Web/SubscriptionController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\TwoFactorController\:\:confirm\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/TwoFactorController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\TwoFactorController\:\:disable\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/TwoFactorController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\TwoFactorController\:\:showChallenge\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/TwoFactorController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\TwoFactorController\:\:showSetup\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/TwoFactorController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\TwoFactorController\:\:verifyChallenge\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/TwoFactorController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$preferredLanguage\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Middleware/SetLocale.php
+
+		-
+			message: '#^Trait App\\Http\\Traits\\ApiResponseTrait is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: app/Http/Traits/ApiResponseTrait.php
+
+		-
+			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Jobs/SyncTrendyolClaimsJob.php
+
+		-
+			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Jobs/SyncTrendyolFinancialsJob.php
+
+		-
+			message: '#^Method App\\Jobs\\SyncTrendyolOrdersJob\:\:__construct\(\) has parameter \$credentialId with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Jobs/SyncTrendyolOrdersJob.php
+
+		-
+			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Jobs/SyncTrendyolOrdersJob.php
+
+		-
+			message: '#^Property App\\Jobs\\SyncTrendyolOrdersJob\:\:\$credentialId has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Jobs/SyncTrendyolOrdersJob.php
+
+		-
+			message: '#^Method App\\Jobs\\SyncTrendyolProductsJob\:\:__construct\(\) has parameter \$credentialId with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Jobs/SyncTrendyolProductsJob.php
+
+		-
+			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Jobs/SyncTrendyolProductsJob.php
+
+		-
+			message: '#^Property App\\Jobs\\SyncTrendyolProductsJob\:\:\$credentialId has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Jobs/SyncTrendyolProductsJob.php
+
+		-
+			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Jobs/SyncTrendyolQuestionsJob.php
+
+		-
+			message: '#^Class App\\Models\\Claim uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Claim.php
+
+		-
+			message: '#^Method App\\Models\\Claim\:\:credential\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Claim.php
+
+		-
+			message: '#^Class App\\Models\\FinancialDailySummary uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FinancialDailySummary.php
+
+		-
+			message: '#^Method App\\Models\\FinancialDailySummary\:\:credential\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FinancialDailySummary.php
+
+		-
+			message: '#^Class App\\Models\\FinancialTransaction uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FinancialTransaction.php
+
+		-
+			message: '#^Method App\\Models\\FinancialTransaction\:\:credential\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FinancialTransaction.php
+
+		-
+			message: '#^Class App\\Models\\Language uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Language.php
+
+		-
+			message: '#^Method App\\Models\\Language\:\:scopeActive\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Language.php
+
+		-
+			message: '#^Method App\\Models\\Language\:\:scopeActive\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/Language.php
+
+		-
+			message: '#^Method App\\Models\\Language\:\:scopeOrdered\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Language.php
+
+		-
+			message: '#^Method App\\Models\\Language\:\:scopeOrdered\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/Language.php
+
+		-
+			message: '#^Class App\\Models\\Marketplace uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Marketplace.php
+
+		-
+			message: '#^Method App\\Models\\Marketplace\:\:orders\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Marketplace.php
+
+		-
+			message: '#^Method App\\Models\\Marketplace\:\:syncLogs\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough does not specify its types\: TRelatedModel, TIntermediateModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Marketplace.php
+
+		-
+			message: '#^Method App\\Models\\Marketplace\:\:userCredentials\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Marketplace.php
+
+		-
+			message: '#^Class App\\Models\\MarketplaceSyncLog uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/MarketplaceSyncLog.php
+
+		-
+			message: '#^Method App\\Models\\MarketplaceSyncLog\:\:credential\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/MarketplaceSyncLog.php
+
+		-
+			message: '#^Class App\\Models\\Order uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Order.php
+
+		-
+			message: '#^Method App\\Models\\Order\:\:items\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Order.php
+
+		-
+			message: '#^Method App\\Models\\Order\:\:marketplace\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Order.php
+
+		-
+			message: '#^Method App\\Models\\Order\:\:user\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Order.php
+
+		-
+			message: '#^Class App\\Models\\OrderItem uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/OrderItem.php
+
+		-
+			message: '#^Method App\\Models\\OrderItem\:\:order\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/OrderItem.php
+
+		-
+			message: '#^Method App\\Models\\OrderItem\:\:product\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/OrderItem.php
+
+		-
+			message: '#^Method App\\Models\\Plan\:\:subscriptions\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Plan.php
+
+		-
+			message: '#^Offset string on string on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Models/Plan.php
+
+		-
+			message: '#^Class App\\Models\\Product uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Product.php
+
+		-
+			message: '#^Method App\\Models\\Product\:\:credential\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Product.php
+
+		-
+			message: '#^Cannot call method getTimestampMs\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Models/Question.php
+
+		-
+			message: '#^Class App\\Models\\Question uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Question.php
+
+		-
+			message: '#^Method App\\Models\\Question\:\:credential\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Question.php
+
+		-
+			message: '#^Offset ''answer'' on array\{\}\|string on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Models/Question.php
+
+		-
+			message: '#^Offset ''creationDate'' on array\{\}\|string on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Models/Question.php
+
+		-
+			message: '#^Offset ''imageUrl'' on array\{\}\|string on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Models/Question.php
+
+		-
+			message: '#^Offset ''productName'' on array\{\}\|string on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Models/Question.php
+
+		-
+			message: '#^Offset ''userName'' on array\{\}\|string on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Models/Question.php
+
+		-
+			message: '#^Offset ''webUrl'' on array\{\}\|string on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Models/Question.php
+
+		-
+			message: '#^Cannot call method addDays\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Subscription.php
+
+		-
+			message: '#^Method App\\Models\\Subscription\:\:plan\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Subscription.php
+
+		-
+			message: '#^Method App\\Models\\Subscription\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Subscription.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:hasFeature\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:activeSubscription\(\) should return App\\Models\\Subscription\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:marketplaceCredentials\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:orders\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:products\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough does not specify its types\: TRelatedModel, TIntermediateModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:settings\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasOne does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:subscriptions\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:syncLogs\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough does not specify its types\: TRelatedModel, TIntermediateModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:getLimit\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:first\(\) expects \(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: bool\)\|null, Closure\(App\\Models\\Subscription\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Class App\\Models\\UserMarketplaceCredential uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/UserMarketplaceCredential.php
+
+		-
+			message: '#^Method App\\Models\\UserMarketplaceCredential\:\:claims\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/UserMarketplaceCredential.php
+
+		-
+			message: '#^Method App\\Models\\UserMarketplaceCredential\:\:marketplace\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/UserMarketplaceCredential.php
+
+		-
+			message: '#^Method App\\Models\\UserMarketplaceCredential\:\:questions\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/UserMarketplaceCredential.php
+
+		-
+			message: '#^Method App\\Models\\UserMarketplaceCredential\:\:syncLogs\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/UserMarketplaceCredential.php
+
+		-
+			message: '#^Method App\\Models\\UserMarketplaceCredential\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/UserMarketplaceCredential.php
+
+		-
+			message: '#^Class App\\Models\\UserSetting uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/UserSetting.php
+
+		-
+			message: '#^Method App\\Models\\UserSetting\:\:preferredLanguage\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/UserSetting.php
+
+		-
+			message: '#^Method App\\Models\\UserSetting\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/UserSetting.php
+
+		-
+			message: '#^Class App\\Services\\MarketplaceServiceFactory not found\.$#'
+			identifier: class.notFound
+			count: 2
+			path: app/Providers/AppServiceProvider.php
+
+		-
+			message: '#^Class App\\Services\\MarketplaceServiceInterface not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Providers/AppServiceProvider.php
+
+		-
+			message: '#^Instantiated class App\\Services\\MarketplaceServiceFactory not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Providers/AppServiceProvider.php
+
+		-
+			message: '#^Parameter \#1 \$array \(array\{\}\) to function array_values is empty, call has no effect\.$#'
+			identifier: arrayValues.empty
+			count: 1
+			path: app/Services/Auth/TwoFactorAuthService.php
+
+		-
+			message: '#^Property App\\Models\\User\:\:\$two_factor_recovery_codes \(string\|null\) does not accept array\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Services/Auth/TwoFactorAuthService.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between \*NEVER\* and string will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: app/Services/Auth/TwoFactorAuthService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/MarketplaceManager.php
+
+		-
+			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/MarketplaceManager.php

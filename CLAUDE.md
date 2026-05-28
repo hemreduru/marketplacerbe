@@ -51,9 +51,6 @@ Services (`app/Services/Trendyol/`): `TrendyolProductService`, `TrendyolOrderSer
 
 **Profit model:** `net_profit = sale_price - (purchase_cost + commission + shipping_cost)`; toggles in `config/marketplace.php` `profit_calculation`.
 
-### Caveat: stale references
-`app/Models/User.php` and `routes/console.php` reference models/jobs that don't exist in the codebase (`MarketplaceProduct`, `MarketplaceSyncLog`, `MarketplaceOrder`, `SyncMarketplaceProductJob`). The real models are `Product`, `Order`, `OrderItem`, `FinancialTransaction`, `FinancialDailySummary`, `Marketplace`, `UserMarketplaceCredential`. Don't assume the User relationship methods or that scheduler block work as written.
-
 ## Project-specific skills
 
 `.agents/skills/laravel-best-practices/` and `.agents/skills/pest-testing/` contain detailed rules (eloquent, migrations, validation, testing, etc.). The Laravel Boost guidelines below are auto-managed by `php artisan boost:update` — do not hand-edit that block.

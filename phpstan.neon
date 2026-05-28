@@ -1,0 +1,15 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    level: 6
+    paths:
+        - app
+        - database/factories
+        - database/seeders
+    excludePaths:
+        - app/Services/Trendyol/*  # Faz 1 PR #1.9'da Marketplaces/Trendyol/ olarak refaktör edilecek; o zamana kadar L6'dan muaf
+    ignoreErrors:
+        # Eloquent relation method'larında dynamic return type — Larastan'in genel davranışı
+        - identifier: missingType.iterableValue

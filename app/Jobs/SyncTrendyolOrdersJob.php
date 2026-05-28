@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\HasRetryPolicy;
 use App\Models\MarketplaceSyncLog;
 use App\Models\UserMarketplaceCredential;
 use App\Services\Trendyol\TrendyolOrderService;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class SyncTrendyolOrdersJob implements ShouldQueue
 {
-    use Queueable;
+    use HasRetryPolicy, Queueable;
 
     protected $credentialId;
 

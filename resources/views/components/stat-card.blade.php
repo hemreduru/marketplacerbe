@@ -10,16 +10,16 @@
     'format' => 'currency',
 ])
 
-@php
-    $displayValue = $format === 'integer'
-        ? number_format($value, 0)
-        : number_format($value, 2) . ' ₺';
-@endphp
-
 <div class="card card-flush h-xl-100">
     <div class="card-header pt-5">
         <div class="card-title d-flex flex-column">
-            <span class="fs-2hx fw-bold text-gray-900 lh-1 ls-n2">{{ $displayValue }}</span>
+            <span class="fs-2hx fw-bold text-gray-900 lh-1 ls-n2">
+                @if($format === 'integer')
+                    {{ number_format($value, 0) }}
+                @else
+                    @money($value)
+                @endif
+            </span>
             <span class="text-gray-500 pt-1 fw-semibold fs-6">{{ $title }}</span>
         </div>
     </div>

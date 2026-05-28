@@ -50,15 +50,26 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+        $user = User::where('email', $credentials['email'])->first();
 
-            return redirect()->intended('dashboard');
+        if (! $user || ! Auth::validate($credentials)) {
+            return back()->withErrors([
+                'email' => __('auth.failed'),
+            ])->withInput();
         }
 
-        return back()->withErrors([
-            'email' => __('auth.failed'),
-        ])->withInput();
+        // 2FA aktifse: oturum henüz başlatılmaz; challenge sayfasına yönlendirilir.
+        if ($user->hasEnabledTwoFactor()) {
+            $request->session()->put('two_factor.user_id', $user->id);
+            $request->session()->put('two_factor.remember', $request->boolean('remember'));
+
+            return redirect()->route('two-factor.challenge');
+        }
+
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
+
+        return redirect()->intended('dashboard');
     }
 
     /**

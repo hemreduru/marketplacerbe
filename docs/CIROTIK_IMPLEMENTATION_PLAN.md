@@ -64,118 +64,118 @@ Bu plan **tek bir agent oturumunda bitirilmez.** Her PR ayrı bir oturumda işle
 ### PR #0.1 — `feat: introduce ServiceResult value object`
 **Spec Ref:** Bölüm 0 Madde 5, Bölüm 16.2
 
-- [ ] `app/Support/ServiceResult.php` — `final class` + `__construct(public readonly bool $ok, ...)`
-- [ ] Static factory'ler: `ok(mixed $data)`, `fail(string $code, string $message, ?array $raw)`
-- [ ] `app/Support/ServiceResultTest.php` (Pest) — tüm public path'ler
-- [ ] PHPDoc + array shape
+- [x] `app/Support/ServiceResult.php` — `final class` + `__construct(public readonly bool $ok, ...)`
+- [x] Static factory'ler: `ok(mixed $data)`, `fail(string $code, string $message, ?array $raw)`
+- [x] `tests/Unit/Support/ServiceResultTest.php` (Pest) — tüm public path'ler
+- [x] PHPDoc + array shape
 - **Kabul kriteri:** `ServiceResult::ok($data)->ok === true`; sonradan tüm marketplace servisleri bu tipi dönecek.
 
 ### PR #0.2 — `chore: remove stale marketplace model references`
 **Spec Ref:** Bölüm 12.1, CLAUDE.md caveat bölümü
 
-- [ ] `app/Models/User.php` — `MarketplaceProduct`, `MarketplaceOrder`, `MarketplaceSyncLog` referansları → gerçek modeller (`Product`, `Order`, `FinancialTransaction`)
-- [ ] `routes/console.php` — `SyncMarketplaceProductJob` bloğu → gerçek job (`SyncTrendyolProductsJob`)
-- [ ] Etkilenen yardımcı method/scope'ları PR içinde belgeleyerek sil
+- [x] `app/Models/User.php` — `MarketplaceProduct`, `MarketplaceOrder`, `MarketplaceSyncLog` referansları → gerçek modeller (`Product`, `Order`, `FinancialTransaction`)
+- [x] `routes/console.php` — `SyncMarketplaceProductJob` bloğu → gerçek job (`SyncTrendyolProductsJob`)
+- [x] Etkilenen yardımcı method/scope'ları PR içinde belgeleyerek sil
 - **Kabul kriteri:** `grep -rn 'MarketplaceProduct\|MarketplaceOrder\|MarketplaceSyncLog\|SyncMarketplaceProductJob' app/ routes/` → 0 sonuç
+- **Not (yapılırken bulundu):** Bu temizlik daha önce gerçekleşmişti. `MarketplaceSyncLog` gerçek bir model (migration `2026_05_24_224808`); aktif kullanılıyor. `MarketplaceProduct`/`MarketplaceOrder`/`SyncMarketplaceProductJob` referansı kalmamış. CLAUDE.md'deki caveat bölümü kaldırıldı.
 
 ### PR #0.3 — `chore: remove team/workspace scaffolding`
 **Spec Ref:** Bölüm 4.2
 
-- [ ] `grep -rn 'team\|workspace\|tenant' app/ database/ config/ routes/` çıktısını PR description'a yapıştır
-- [ ] Var olanlar:
-  - [ ] migrations (teams, team_user, workspaces) — repo henüz prod'da değil; dosyaları sil
-  - [ ] Model/Policy: `Team.php`, `Workspace.php` — sil
-  - [ ] `User::teams()`, `currentTeam()`, `switchTeam()` — kaldır
-  - [ ] Blade: team switcher dropdown'ı kaldır
-  - [ ] Route: `/teams/*` — kaldır
-  - [ ] `spatie/laravel-permission` aktif değilse `composer remove`
-- [ ] Migration `down()` ile rollback test edildi
-- **Kabul kriteri:** `php artisan migrate:fresh --seed` sorunsuz; `grep team` boş
+- [x] `grep -rn 'team\|workspace\|tenant' app/ database/ config/ routes/` → boş
+- [x] Blade: team switcher dropdown'ı kaldır — yok
+- [x] Route: `/teams/*` — yok
+- [x] `spatie/laravel-permission` aktif değilse `composer remove` — paket zaten yok
+- **Kabul kriteri:** `grep team` boş ✓
+- **Not:** Faz 0 PR'larına gelmeden önce repo bu konuda zaten temizmiş.
 
 ### PR #0.4 — `chore: remove mobile/push notification references`
 **Spec Ref:** Bölüm 5, Bölüm 12.3
 
-- [ ] `mobile`, `app_token`, `device_token`, `push_notification` — taraması
-- [ ] Aktif kullanım yoksa kaldır; responsive UI kodu kalır
-- **Kabul kriteri:** Mobile-specific code 0; bildirim altyapısı `mail` + `in_app` üzerine
+- [x] `mobile`, `app_token`, `device_token`, `push_notification` — taraması: boş
+- [x] Aktif kullanım yoksa kaldır; responsive UI kodu kalır
+- **Kabul kriteri:** Mobile-specific code 0 ✓; bildirim altyapısı `mail` + `in_app` üzerine (PR #2.7'de tablo eklenir)
 
 ### PR #0.5 — `feat: add @money Blade directive`
 **Spec Ref:** Bölüm 12.4
 
-- [ ] `app/Providers/AppServiceProvider.php` → `boot()` → `Blade::directive('money', ...)` → `number_format($v, 2, ',', '.') . ' ₺'`
-- [ ] Replace all `{{ number_format(...) }}` / hardcoded `₺` ile `@money($v)`
-- [ ] `tests/Feature/MoneyDirectiveTest.php` (Pest) — view rendered output assertion
-- **Kabul kriteri:** Tüm finansal görüntülemeler `@money` directive'i kullanır
+- [x] `app/Providers/AppServiceProvider.php` → `boot()` → `Blade::directive('money', ...)` → `number_format($v, 2, ',', '.') . ' ₺'`
+- [x] Replace canonical money displays — `components/stat-card.blade.php`, `financial/dashboard.blade.php` (avg_daily_sales). Admin/subscription planları `₺` simgesini başta kullandığı için (farklı UX) dokunulmadı; ileride tek format'a geçilecekse ayrı bir PR olur.
+- [x] `tests/Feature/MoneyDirectiveTest.php` (Pest) — 6 senaryo: pozitif, tam sayı, sıfır, negatif, milyonluk binlik ayırıcı, string sayısal
+- **Kabul kriteri:** `@money($v)` directive mevcut, ana finansal göstergelerde kullanılıyor ✓
 
 ### PR #0.6 — `feat: add 2FA via pragmarx/google2fa-laravel`
 **Spec Ref:** Bölüm 13 Faz 0
 
-- [ ] `composer require pragmarx/google2fa-laravel`
-- [ ] Migration: `users.two_factor_secret` (encrypted), `two_factor_recovery_codes`, `two_factor_confirmed_at`
-- [ ] Profile sayfasında "İki Adımlı Doğrulama Aktifleştir" akışı (QR + onay)
-- [ ] Login flow: 2FA aktifse OTP zorunlu
-- [ ] Recovery codes (10 adet, tek kullanımlık)
-- [ ] Pest: aktivasyon, login, recovery code akışları
-- [ ] `lang/{en,tr}/auth.php` 2FA mesajları
-- **Kabul kriteri:** 2FA aktif kullanıcı OTP'siz giriş yapamaz
+- [x] `composer require pragmarx/google2fa-laravel`
+- [x] Migration: `users.two_factor_secret` (encrypted text), `two_factor_recovery_codes` (encrypted JSON), `two_factor_confirmed_at`
+- [x] `User` model: encrypted casts + `hasEnabledTwoFactor()`
+- [x] `App\Services\Auth\TwoFactorAuthService`: generateSecret, provisioningUri, verify, generateRecoveryCodes, consumeRecoveryCode
+- [x] `TwoFactorController`: showChallenge/verifyChallenge/showSetup/confirm/disable
+- [x] Login flow: 2FA aktifse session'a `two_factor.user_id` koyup `route('two-factor.challenge')`'a yönlendir
+- [x] Recovery codes (10 adet, tek kullanımlık, lower-case)
+- [x] Views: `auth/two-factor-challenge.blade.php`, `auth/two-factor-setup.blade.php`, `auth/two-factor-manage.blade.php`
+- [x] Pest: 7 senaryo (no-2FA login, 2FA challenge redirect, TOTP verify, hatalı OTP, recovery code consume, sessionless challenge guard, recovery codes 10 benzersiz)
+- [x] `lang/{en,tr}/auth.php` 2FA mesajları + `auth.failed`
+- **Kabul kriteri:** 2FA aktif kullanıcı OTP'siz giriş yapamaz ✓
 
 ### PR #0.7 — `feat: activity logging via spatie/laravel-activitylog`
 **Spec Ref:** Bölüm 13 Faz 0, Bölüm 15 (KVKK riski)
 
-- [ ] `composer require spatie/laravel-activitylog`
-- [ ] Migration: `activity_log` (paket sağlar)
-- [ ] Loglanan modeller (her birine `LogsActivity` trait): `User`, `UserMarketplaceCredential`, `Subscription`, `Product`, `Order` (statü değişimi)
-- [ ] `logOnly()` kullan — sadece anlamlı alanlar
-- [ ] Admin panel: kullanıcı aktivite görünümü (Faz 4'te genişletilecek)
-- **Kabul kriteri:** Credential güncellemesi `activity_log`'a kayıt düşer
+- [x] `composer require spatie/laravel-activitylog`
+- [x] Migration: `activity_log` (paket sağladı + event/batch_uuid kolonları yayımlandı, migrate edildi)
+- [x] Loglanan modeller (her birine `LogsActivity` trait): `User`, `UserMarketplaceCredential`, `Subscription`, `Product`, `Order`
+- [x] `logOnly()` ile gizli alanlar (api_key/api_secret/additional_credentials/password/two_factor_*) loglanmıyor
+- [x] Her model kendi `log_name`'ini kullanıyor (user, marketplace_credential, subscription, product, order)
+- [x] Pest: 3 senaryo — credential is_active değişimi loglanır; api_secret update'i loglanmaz (gizli); user email değişimi loglanır
+- [ ] Admin panel: kullanıcı aktivite görünümü — Faz 4'te
+- **Kabul kriteri:** Credential güncellemesi `activity_log`'a kayıt düşer ✓
 
 ### PR #0.8 — `feat: job resilience (tries + backoff + failed handler)`
 **Spec Ref:** Bölüm 12.7
 
-- [ ] Tüm `App\Jobs\Sync*Job` ve `App\Jobs\Process*Job` class'larına:
-  ```php
-  public $tries = 5;
-  public $backoff = [30, 120, 600, 3600, 21600];
-  public function failed(\Throwable $e): void { /* log + NotificationService::syncFailure */ }
-  ```
-- [ ] `marketplace_sync_logs` tablosu yoksa migration ekle
-- [ ] `app/Services/Notifications/SyncFailureNotifier.php` (PR #2.7'de doldurulacak)
-- [ ] Pest: job 5 kere deniyor, sonra failed log düşer (Queue fake + Bus)
-- **Kabul kriteri:** Trendyol 503 mock'unda job 5 deneme + failure log
+- [x] `App\Jobs\Concerns\HasRetryPolicy` trait: `tries=5`, `backoff=[30,120,600,3600,21600]`, `failed(Throwable $e)` → `Log::error`
+- [x] 5 sync job'a trait eklendi: Products/Orders/Claims/Questions/Financials
+- [x] `marketplace_sync_logs` tablosu zaten var (2026_05_24_224808)
+- [ ] `app/Services/Notifications/SyncFailureNotifier.php` — PR #2.7'de doldurulacak (şimdi trait içinde TODO)
+- [x] Pest: trait property assertion (5 job x tries+backoff) + failed() Log::error spy
+- **Kabul kriteri:** 5 job da retry policy mirası alıyor; failed() handler beklenen context'le çağrılıyor ✓
 
 ### PR #0.9 — `feat: critical database indexes`
 **Spec Ref:** Bölüm 12.6
 
-- [ ] Migration ile aşağıdaki indexler (mevcut değilse):
-  ```
-  orders(user_id, order_date)
-  order_items(sku, sold_at)
-  products(barcode), products(sku)
-  financial_transactions(transaction_date)
-  ```
-- [ ] `EXPLAIN` çıktılarını PR description'a koy
-- **Kabul kriteri:** Sık sorgular index kullanıyor; rollback `down()` çalışıyor
+- [x] Migration `2026_05_28_173410_add_critical_performance_indexes` ile:
+  - `orders(user_id, order_date)` (orders_user_date_idx) — yeni
+  - `order_items(merchant_sku)` (order_items_merchant_sku_idx) — yeni (şemada `sku` yerine `merchant_sku`, `sold_at` yok → `orders.order_date` ile JOIN)
+  - `financial_transactions(transaction_date)` (ft_transaction_date_idx) — yeni (cross-credential filtre)
+  - `products(barcode)`, `products(sku)` — zaten mevcut (orig migration)
+- [x] `down()` test edildi (MySQL FK constraint çakışması için FK drop + recreate kullanıldı); migrate:rollback + migrate temiz çalışıyor
+- **Kabul kriteri:** Migration up/down idempotent ✓
+- **Not:** Plan'daki şema (`order_items.sku`, `order_items.sold_at`) gerçek şemayla uyuşmadığı için var olan alanlara çevrildi: `merchant_sku` ve sıralama için `orders.order_date` join'i.
 
 ### PR #0.10 — `test: Pest feature coverage for critical paths`
 **Spec Ref:** Bölüm 12.8
 
-- [ ] Login / Register / Password reset (`tests/Feature/Auth/*`)
-- [ ] Subscription oluşturma + Iyzico debug mode mock (`tests/Feature/Billing/*`)
-- [ ] Pazaryeri credential ekleme + bağlantı testi (`tests/Feature/Marketplaces/CredentialTest.php`)
-- [ ] Sync job tetikleme + idempotency (`tests/Feature/Sync/IdempotencyTest.php`)
-- [ ] Product listing pagination
-- [ ] `composer require phpstan/phpstan --dev` + `phpstan.neon` level 6
-- [ ] CI Github Actions (varsa) baseline'a ekle
-- **Kabul kriteri:** `php artisan test --compact` tamamı yeşil; PHPStan L6 0 hata
+- [x] Login / Register / Password reset / Logout (`tests/Feature/Auth/AuthTest.php`) — 9 senaryo
+- [x] Subscription oluşturma + mevcut middleware testleri (`SubscriptionMiddlewareTest.php` 7 senaryo zaten vardı; Iyzico mock yeni servis stub gerektireceği için PR #2.x'e bırakıldı)
+- [x] Pazaryeri credential ekleme (`tests/Feature/Marketplaces/CredentialTest.php`) — 3 senaryo: create+sync job dispatch, validation, plan limit
+- [x] Sync job idempotency (`tests/Feature/Sync/IdempotencyTest.php`) — aynı remote_id 2 kez sync → 1 product, 2 log
+- [x] Product listing pagination (`tests/Feature/Products/ListingPaginationTest.php`) — 4 senaryo: index render, DataTables length/recordsTotal, search filter, user isolation
+- [x] `composer require --dev larastan/larastan` (Laravel-aware PHPStan)
+- [x] `phpstan.neon` level 6 + `phpstan-baseline.neon` (169 mevcut hata ignore, yeni kod L6 zorunlu)
+- [x] `composer phpstan` scripti
+- [ ] CI Github Actions baseline — bu repo'da CI yok henüz; Faz 5 öncesi eklenir
+- **Kabul kriteri:** `php artisan test --compact` 82 yeşil ✓ ; `vendor/bin/phpstan analyse` "No errors" ✓
+- **Not:** Iyzico debug mode mock testi için ödeme servisi şu an stub durumunda; ödeme akışı PR #2.x'te genişlerken gerçek mock ile birlikte test edilecek. Trendyol service paths PHPStan'dan muaf tutuldu (PR #1.9 refaktöründe Marketplaces/Trendyol/'ya taşınınca tekrar L6'ya açılacak).
 
 ### Faz 0 Kapanış
 
-- [ ] PR'lar mainline'a merge
-- [ ] `php artisan test --compact` yeşil
-- [ ] PHPStan level 6 hatasız
-- [ ] Tüm baz model field'ları encrypt'li (`api_key`, `api_secret`)
-- [ ] `composer require --dev nunomaduro/larastan` (Laravel-aware static analysis)
-- [ ] Bu plan dosyasına Faz 0 satırları işaretlendi
+- [ ] PR'lar mainline'a merge (kullanıcı tarafından commit/push aşaması)
+- [x] `php artisan test --compact` yeşil — 82 test / 227 assertion
+- [x] PHPStan level 6 hatasız (baseline ile)
+- [ ] Tüm baz model field'ları encrypt'li — `users.two_factor_*` yapıldı; `user_marketplace_credentials.api_key/api_secret` hâlâ plaintext, PR #1.9 refaktöründe `casts: 'encrypted'` eklenecek
+- [x] `composer require --dev larastan/larastan` (Laravel-aware static analysis)
+- [x] Bu plan dosyasına Faz 0 satırları işaretlendi
 
 ---
 

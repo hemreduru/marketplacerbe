@@ -43,4 +43,27 @@ return [
     'reset_password_btn' => 'Update Password',
     'password_reset_success' => 'Your password has been updated successfully.',
     'error' => 'Error',
+
+    // Two-factor authentication (TOTP)
+    'failed' => 'These credentials do not match our records.',
+    'two_factor' => [
+        'challenge_title' => 'Two-Factor Authentication',
+        'challenge_subtitle' => 'Enter the 6-digit code from your authenticator app.',
+        'verify_button' => 'Verify',
+        'recovery_hint' => 'If you lost access to your device, you can enter one of your recovery codes.',
+        'setup_title' => 'Set Up Two-Factor Authentication',
+        'setup_intro' => 'Scan the QR code with Google Authenticator, Authy or 1Password. Enter the 6-digit code it generates to confirm.',
+        'manage_title' => 'Two-Factor Authentication',
+        'manual_code_label' => 'Manual Code',
+        'code_label' => 'Verification Code',
+        'confirm_button' => 'Enable',
+        'invalid_code' => 'Verification code is invalid or expired.',
+        'enabled' => 'Two-factor authentication is enabled.',
+        'disabled' => 'Two-factor authentication has been disabled.',
+        'recovery_codes_title' => 'Recovery Codes',
+        'recovery_codes_intro' => 'Each code can be used once. Store them in a safe place.',
+        'disable_title' => 'Disable',
+        'disable_intro' => 'Re-enter your password to disable two-factor authentication.',
+        'disable_button' => 'Disable Two-Factor',
+    ],
 ];
