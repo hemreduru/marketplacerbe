@@ -6,8 +6,9 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserMarketplaceCredential;
-use App\Services\Trendyol\TrendyolOrderService;
-use App\Services\Trendyol\TrendyolProductService;
+use App\Services\Marketplaces\Trendyol\Client as TrendyolClient;
+use App\Services\Marketplaces\Trendyol\OrderService;
+use App\Services\Marketplaces\Trendyol\ProductService;
 use Illuminate\Support\Facades\Http;
 
 test('starter plan restricts adding more than one marketplace connection', function () {
@@ -98,7 +99,7 @@ test('product sync service throws exception when limit is hit during loop', func
         ]),
     ]);
 
-    $service = new TrendyolProductService('key', 'secret', 'seller');
+    $service = new ProductService(new TrendyolClient('key', 'secret', 'seller'));
 
     $thrown = false;
     try {
@@ -120,7 +121,7 @@ test('order sync service throws exception when monthly order limit is reached', 
         'order_date' => now()->startOfMonth()->addDays(2),
     ]);
 
-    $service = new TrendyolOrderService('key', 'secret', 'seller');
+    $service = new OrderService(new TrendyolClient('key', 'secret', 'seller'));
 
     $thrown = false;
     try {

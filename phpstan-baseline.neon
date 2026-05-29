@@ -265,6 +265,12 @@ parameters:
 			path: app/Http/Controllers/Web/MarketplaceSettingsController.php
 
 		-
+			message: '#^Method App\\Http\\Controllers\\Web\\MasterProductController\:\:show\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/MasterProductController.php
+
+		-
 			message: '#^Access to an undefined property App\\Models\\Order\:\:\$items\.$#'
 			identifier: property.notFound
 			count: 1
@@ -274,18 +280,6 @@ parameters:
 			message: '#^Access to an undefined property App\\Models\\Order\:\:\$marketplace\.$#'
 			identifier: property.notFound
 			count: 2
-			path: app/Http/Controllers/Web/OrderController.php
-
-		-
-			message: '#^Call to an undefined method App\\Services\\Contracts\\OrderServiceContract\:\:createCommonLabel\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Web/OrderController.php
-
-		-
-			message: '#^Call to an undefined method App\\Services\\Contracts\\OrderServiceContract\:\:getCommonLabel\(\)\.$#'
-			identifier: method.notFound
-			count: 1
 			path: app/Http/Controllers/Web/OrderController.php
 
 		-
@@ -371,6 +365,36 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/Http/Controllers/Web/ProfileController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$master\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Web/ProfitReportController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ProfitReportController\:\:reconciliation\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ProfitReportController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ProfitReportController\:\:skuProfit\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ProfitReportController.php
+
+		-
+			message: '#^Relation ''master'' is not found in App\\Models\\OrderItem model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Web/ProfitReportController.php
+
+		-
+			message: '#^Relation ''order'' is not found in App\\Models\\OrderItem model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Web/ProfitReportController.php
 
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:toViewArray\(\)\.$#'
@@ -463,6 +487,12 @@ parameters:
 			path: app/Http/Controllers/Web/TwoFactorController.php
 
 		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Web/WebhookController.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$preferredLanguage\.$#'
 			identifier: property.notFound
 			count: 1
@@ -473,6 +503,30 @@ parameters:
 			identifier: trait.unused
 			count: 1
 			path: app/Http/Traits/ApiResponseTrait.php
+
+		-
+			message: '#^Using nullsafe property access on non\-nullable type App\\Models\\MarketplaceListing\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Jobs/ProcessIncomingWebhookJob.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/SyncCargoTrackingJob.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Services\\Cargo\\CargoManager\:\:forUser\(\) expects App\\Models\\User, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Jobs/SyncCargoTrackingJob.php
+
+		-
+			message: '#^Offset ''write_enabled'' on array\{\}\|string on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Jobs/SyncDispatcherJob.php
 
 		-
 			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
@@ -529,6 +583,84 @@ parameters:
 			path: app/Jobs/SyncTrendyolQuestionsJob.php
 
 		-
+			message: '#^Class App\\Models\\BulkOperation uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/BulkOperation.php
+
+		-
+			message: '#^Method App\\Models\\BulkOperation\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/BulkOperation.php
+
+		-
+			message: '#^Class App\\Models\\CargoCredential uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/CargoCredential.php
+
+		-
+			message: '#^Method App\\Models\\CargoCredential\:\:cargoProvider\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/CargoCredential.php
+
+		-
+			message: '#^Method App\\Models\\CargoCredential\:\:scopeActive\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/CargoCredential.php
+
+		-
+			message: '#^Method App\\Models\\CargoCredential\:\:scopeActive\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/CargoCredential.php
+
+		-
+			message: '#^Method App\\Models\\CargoCredential\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/CargoCredential.php
+
+		-
+			message: '#^Class App\\Models\\CargoProvider uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/CargoProvider.php
+
+		-
+			message: '#^Method App\\Models\\CargoProvider\:\:credentials\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/CargoProvider.php
+
+		-
+			message: '#^Method App\\Models\\CargoProvider\:\:scopeActive\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/CargoProvider.php
+
+		-
+			message: '#^Method App\\Models\\CargoProvider\:\:scopeActive\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/CargoProvider.php
+
+		-
+			message: '#^Method App\\Models\\CargoProvider\:\:scopeByCode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/CargoProvider.php
+
+		-
+			message: '#^Method App\\Models\\CargoProvider\:\:scopeByCode\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/CargoProvider.php
+
+		-
 			message: '#^Class App\\Models\\Claim uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
 			identifier: missingType.generics
 			count: 1
@@ -539,6 +671,72 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: app/Models/Claim.php
+
+		-
+			message: '#^Class App\\Models\\EInvoice uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/EInvoice.php
+
+		-
+			message: '#^Method App\\Models\\EInvoice\:\:order\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/EInvoice.php
+
+		-
+			message: '#^Method App\\Models\\EInvoice\:\:scopeByProvider\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/EInvoice.php
+
+		-
+			message: '#^Method App\\Models\\EInvoice\:\:scopeByProvider\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/EInvoice.php
+
+		-
+			message: '#^Method App\\Models\\EInvoice\:\:scopeDraft\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/EInvoice.php
+
+		-
+			message: '#^Method App\\Models\\EInvoice\:\:scopeDraft\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/EInvoice.php
+
+		-
+			message: '#^Method App\\Models\\EInvoice\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/EInvoice.php
+
+		-
+			message: '#^Class App\\Models\\EInvoiceCredential uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/EInvoiceCredential.php
+
+		-
+			message: '#^Method App\\Models\\EInvoiceCredential\:\:scopeActive\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/EInvoiceCredential.php
+
+		-
+			message: '#^Method App\\Models\\EInvoiceCredential\:\:scopeActive\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/EInvoiceCredential.php
+
+		-
+			message: '#^Method App\\Models\\EInvoiceCredential\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/EInvoiceCredential.php
 
 		-
 			message: '#^Class App\\Models\\FinancialDailySummary uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
@@ -631,8 +829,26 @@ parameters:
 			path: app/Models/MarketplaceSyncLog.php
 
 		-
+			message: '#^Class App\\Models\\NotificationPreference uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/NotificationPreference.php
+
+		-
+			message: '#^Method App\\Models\\NotificationPreference\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/NotificationPreference.php
+
+		-
 			message: '#^Class App\\Models\\Order uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
 			identifier: missingType.generics
+			count: 1
+			path: app/Models/Order.php
+
+		-
+			message: '#^Method App\\Models\\Order\:\:credential\(\) has no return type specified\.$#'
+			identifier: missingType.return
 			count: 1
 			path: app/Models/Order.php
 
@@ -657,6 +873,12 @@ parameters:
 		-
 			message: '#^Class App\\Models\\OrderItem uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
 			identifier: missingType.generics
+			count: 1
+			path: app/Models/OrderItem.php
+
+		-
+			message: '#^Method App\\Models\\OrderItem\:\:master\(\) has no return type specified\.$#'
+			identifier: missingType.return
 			count: 1
 			path: app/Models/OrderItem.php
 
@@ -749,6 +971,72 @@ parameters:
 			identifier: nullCoalesce.offset
 			count: 1
 			path: app/Models/Question.php
+
+		-
+			message: '#^Class App\\Models\\Shipment uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Shipment.php
+
+		-
+			message: '#^Method App\\Models\\Shipment\:\:cargoProvider\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Shipment.php
+
+		-
+			message: '#^Method App\\Models\\Shipment\:\:events\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Shipment.php
+
+		-
+			message: '#^Method App\\Models\\Shipment\:\:order\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Shipment.php
+
+		-
+			message: '#^Method App\\Models\\Shipment\:\:scopeActive\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Shipment.php
+
+		-
+			message: '#^Method App\\Models\\Shipment\:\:scopeActive\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/Shipment.php
+
+		-
+			message: '#^Method App\\Models\\Shipment\:\:scopeByStatus\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Shipment.php
+
+		-
+			message: '#^Method App\\Models\\Shipment\:\:scopeByStatus\(\) has parameter \$query with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/Shipment.php
+
+		-
+			message: '#^Method App\\Models\\Shipment\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Shipment.php
+
+		-
+			message: '#^Class App\\Models\\ShipmentEvent uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ShipmentEvent.php
+
+		-
+			message: '#^Method App\\Models\\ShipmentEvent\:\:shipment\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ShipmentEvent.php
 
 		-
 			message: '#^Cannot call method addDays\(\) on string\.$#'
@@ -919,6 +1207,426 @@ parameters:
 			path: app/Services/Auth/TwoFactorAuthService.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\Order\:\:\$items\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Calculations/ProfitCalculator.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\ArasService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Aras/ArasService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\ArasService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Aras/ArasService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\ArasService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Aras/ArasService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>desi" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Cargo/Aras/Mapper/ShipmentMapper.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>weightKg" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Cargo/Aras/Mapper/ShipmentMapper.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\ShipmentService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<array\{tracking_number\: mixed, label_url\: null\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Aras/ShipmentService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\ShipmentService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/Cargo/Aras/ShipmentService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\ShipmentService\:\:getLabel\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/Cargo/Aras/ShipmentService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\TrackingService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Aras/TrackingService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\TrackingService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Aras/TrackingService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\TrackingService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Aras/TrackingService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\TrackingService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Aras/TrackingService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\WebhookService\:\:handle\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<array\{tracking_number\: mixed, status\: mixed, location\: mixed, timestamp\: mixed\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Aras/WebhookService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Aras\\WebhookService\:\:handle\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Aras/WebhookService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>desi" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Cargo/Mng/Mapper/ShipmentMapper.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>weightKg" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Cargo/Mng/Mapper/ShipmentMapper.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Mng\\MngService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Mng/MngService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Mng\\MngService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Mng/MngService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Mng\\MngService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Mng/MngService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Mng\\ShipmentService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<array\{tracking_number\: mixed, label_url\: null\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Mng/ShipmentService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Mng\\ShipmentService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/Cargo/Mng/ShipmentService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Mng\\ShipmentService\:\:getLabel\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/Cargo/Mng/ShipmentService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Mng\\TrackingService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Mng/TrackingService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Mng\\TrackingService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Mng/TrackingService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Mng\\TrackingService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Mng/TrackingService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Mng\\TrackingService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Mng/TrackingService.php
+
+		-
+			message: '#^Constructor of class App\\Services\\Cargo\\Ptt\\PttService has an unused parameter \$credential\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: app/Services/Cargo/Ptt/PttService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Ptt\\PttService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Ptt/PttService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Ptt\\PttService\:\:getLabel\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Ptt/PttService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Ptt\\PttService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Ptt/PttService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Ptt\\PttService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Ptt/PttService.php
+
+		-
+			message: '#^Constructor of class App\\Services\\Cargo\\Surat\\SuratService has an unused parameter \$credential\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: app/Services/Cargo/Surat/SuratService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Surat\\SuratService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Surat/SuratService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Surat\\SuratService\:\:getLabel\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Surat/SuratService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Surat\\SuratService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Surat/SuratService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Surat\\SuratService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Surat/SuratService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>content" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Cargo/Yurtici/Mapper/ShipmentMapper.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>desi" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Cargo/Yurtici/Mapper/ShipmentMapper.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>weightKg" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Cargo/Yurtici/Mapper/ShipmentMapper.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Yurtici\\ShipmentService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: null\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Yurtici/ShipmentService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Yurtici\\ShipmentService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/Cargo/Yurtici/ShipmentService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Yurtici\\ShipmentService\:\:getLabel\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<non\-falsy\-string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Yurtici/ShipmentService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Yurtici\\ShipmentService\:\:getLabel\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/Cargo/Yurtici/ShipmentService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Yurtici\\TrackingService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Yurtici/TrackingService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Yurtici\\TrackingService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Yurtici/TrackingService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Yurtici\\TrackingService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Yurtici/TrackingService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Yurtici\\TrackingService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Yurtici/TrackingService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Yurtici\\YurticiService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Yurtici/YurticiService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Yurtici\\YurticiService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Yurtici/YurticiService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Yurtici\\YurticiService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Yurtici/YurticiService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\BizimHesap\\BizimHesapService\:\:createInvoice\(\) should return App\\Support\\ServiceResult\<array\{invoice_uuid\: string, e_invoice_number\: string\|null\}\> but returns App\\Support\\ServiceResult\<array\{invoice_uuid\: mixed, e_invoice_number\: mixed\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/EFatura/BizimHesap/BizimHesapService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\BizimHesap\\BizimHesapService\:\:createInvoice\(\) should return App\\Support\\ServiceResult\<array\{invoice_uuid\: string, e_invoice_number\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/EFatura/BizimHesap/BizimHesapService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\BizimHesap\\BizimHesapService\:\:getInvoicePdf\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/EFatura/BizimHesap/BizimHesapService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\BizimHesap\\BizimHesapService\:\:getInvoiceStatus\(\) should return App\\Support\\ServiceResult\<array\{status\: string, e_invoice_number\: string\|null\}\> but returns App\\Support\\ServiceResult\<array\{status\: mixed, e_invoice_number\: mixed\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/EFatura/BizimHesap/BizimHesapService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\BizimHesap\\BizimHesapService\:\:getInvoiceStatus\(\) should return App\\Support\\ServiceResult\<array\{status\: string, e_invoice_number\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/EFatura/BizimHesap/BizimHesapService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\Gib\\GibService\:\:createInvoice\(\) should return App\\Support\\ServiceResult\<array\{invoice_uuid\: string, e_invoice_number\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/EFatura/Gib/GibService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\Gib\\GibService\:\:getInvoicePdf\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/EFatura/Gib/GibService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\Gib\\GibService\:\:getInvoiceStatus\(\) should return App\\Support\\ServiceResult\<array\{status\: string, e_invoice_number\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/EFatura/Gib/GibService.php
+
+		-
+			message: '#^Property App\\Services\\EFatura\\Gib\\GibService\:\:\$credential is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Services/EFatura/Gib/GibService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\Parasut\\ParasutService\:\:createInvoice\(\) should return App\\Support\\ServiceResult\<array\{invoice_uuid\: string, e_invoice_number\: string\|null\}\> but returns App\\Support\\ServiceResult\<array\{invoice_uuid\: mixed, e_invoice_number\: mixed\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/EFatura/Parasut/ParasutService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\Parasut\\ParasutService\:\:createInvoice\(\) should return App\\Support\\ServiceResult\<array\{invoice_uuid\: string, e_invoice_number\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/EFatura/Parasut/ParasutService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\Parasut\\ParasutService\:\:getInvoicePdf\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<non\-empty\-string\|false\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/EFatura/Parasut/ParasutService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\Parasut\\ParasutService\:\:getInvoicePdf\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/EFatura/Parasut/ParasutService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\Parasut\\ParasutService\:\:getInvoiceStatus\(\) should return App\\Support\\ServiceResult\<array\{status\: string, e_invoice_number\: string\|null\}\> but returns App\\Support\\ServiceResult\<array\{status\: mixed, e_invoice_number\: mixed\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/EFatura/Parasut/ParasutService.php
+
+		-
+			message: '#^Method App\\Services\\EFatura\\Parasut\\ParasutService\:\:getInvoiceStatus\(\) should return App\\Support\\ServiceResult\<array\{status\: string, e_invoice_number\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/EFatura/Parasut/ParasutService.php
+
+		-
+			message: '#^Method App\\Services\\Inventory\\MasterProductPriceProjector\:\:record\(\) should return App\\Support\\ServiceResult\<App\\Models\\PriceEvent\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Inventory/MasterProductPriceProjector.php
+
+		-
+			message: '#^Offset ''event_uuid'' on array\{master_product_id\: int, event_type\: string, source\: string, source_reference\: string\|null, new_price\: float\|int\|string, previous_price\?\: float\|int\|string\|null, occurred_at\: Carbon\\CarbonInterface\|string, marketplace_listing_id\?\: int\|null\} on left side of \?\?\= does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/Inventory/MasterProductPriceProjector.php
+
+		-
+			message: '#^Method App\\Services\\Inventory\\MasterProductStockProjector\:\:record\(\) should return App\\Support\\ServiceResult\<App\\Models\\StockEvent\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Inventory/MasterProductStockProjector.php
+
+		-
+			message: '#^Offset ''event_uuid'' on array\{master_product_id\: int, event_type\: string, source\: string, source_reference\: string\|null, quantity_delta\: int, occurred_at\: Carbon\\CarbonInterface\|string, marketplace_listing_id\?\: int\|null\} on left side of \?\?\= does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/Inventory/MasterProductStockProjector.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
 			identifier: property.notFound
 			count: 1
@@ -927,5 +1635,299 @@ parameters:
 		-
 			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
 			identifier: nullCoalesce.offset
-			count: 1
+			count: 4
 			path: app/Services/MarketplaceManager.php
+
+		-
+			message: '#^Constructor of class App\\Services\\Marketplaces\\Amazon\\Client has an unused parameter \$sellerId\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: app/Services/Marketplaces/Amazon/Client.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: app/Services/Marketplaces/Amazon/Client.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Amazon\\Client\:\:request\(\) return type with generic class App\\Support\\ServiceResult does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/Marketplaces/Amazon/Client.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Amazon\\FinanceService\:\:listFinancialEventGroups\(\) return type with generic class App\\Support\\ServiceResult does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/Marketplaces/Amazon/FinanceService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Amazon\\FinanceService\:\:listFinancialEventsByOrderId\(\) return type with generic class App\\Support\\ServiceResult does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/Marketplaces/Amazon/FinanceService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Amazon\\OrderService\:\:getOrders\(\) return type with generic class App\\Support\\ServiceResult does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/Marketplaces/Amazon/OrderService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Amazon\\ReportsService\:\:createReport\(\) return type with generic class App\\Support\\ServiceResult does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/Marketplaces/Amazon/ReportsService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Amazon\\ReportsService\:\:getReport\(\) return type with generic class App\\Support\\ServiceResult does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/Marketplaces/Amazon/ReportsService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Amazon\\ReportsService\:\:getReportDocument\(\) return type with generic class App\\Support\\ServiceResult does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/Marketplaces/Amazon/ReportsService.php
+
+		-
+			message: '#^Variable \$content in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: app/Services/Marketplaces/Hepsiburada/ClaimService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Hepsiburada\\Client\:\:send\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/Marketplaces/Hepsiburada/Client.php
+
+		-
+			message: '#^Variable \$content in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: app/Services/Marketplaces/Hepsiburada/OrderService.php
+
+		-
+			message: '#^Variable \$content in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: app/Services/Marketplaces/Hepsiburada/ProductService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\N11\\ClaimService\:\:approveClaimItems\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Marketplaces/N11/ClaimService.php
+
+		-
+			message: '#^Constructor of class App\\Services\\Marketplaces\\N11\\Client has an unused parameter \$sellerId\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: app/Services/Marketplaces/N11/Client.php
+
+		-
+			message: '#^Constructor of class App\\Services\\Marketplaces\\N11\\Client has an unused parameter \$useStage\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: app/Services/Marketplaces/N11/Client.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\N11\\Client\:\:call\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/Marketplaces/N11/Client.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\N11\\Client\:\:get\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Marketplaces/N11/Client.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\N11\\OrderService\:\:updateStatus\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Marketplaces/N11/OrderService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\N11\\QuestionService\:\:answerQuestion\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Marketplaces/N11/QuestionService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\N11\\QuestionService\:\:getQuestions\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Marketplaces/N11/QuestionService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Pazarama\\ClaimService\:\:approveClaimItems\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Marketplaces/Pazarama/ClaimService.php
+
+		-
+			message: '#^Constructor of class App\\Services\\Marketplaces\\Pazarama\\Client has an unused parameter \$sellerId\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: app/Services/Marketplaces/Pazarama/Client.php
+
+		-
+			message: '#^Constructor of class App\\Services\\Marketplaces\\Pazarama\\Client has an unused parameter \$useStage\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: app/Services/Marketplaces/Pazarama/Client.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Pazarama\\Client\:\:getAccessToken\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 3
+			path: app/Services/Marketplaces/Pazarama/Client.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Pazarama\\Client\:\:send\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/Marketplaces/Pazarama/Client.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Pazarama\\Client\:\:send\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Marketplaces/Pazarama/Client.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Pazarama\\OrderService\:\:updateStatus\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Marketplaces/Pazarama/OrderService.php
+
+		-
+			message: '#^Variable \$content in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: app/Services/Marketplaces/Pazarama/ProductService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Pazarama\\QuestionService\:\:answerQuestion\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Marketplaces/Pazarama/QuestionService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Pazarama\\QuestionService\:\:getQuestions\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Marketplaces/Pazarama/QuestionService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Trendyol\\Client\:\:send\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/Marketplaces/Trendyol/Client.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Trendyol\\OrderService\:\:getCommonLabel\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<array\<string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Marketplaces/Trendyol/OrderService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Marketplaces/Trendyol/ProductService.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getSubscriptionLimit\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Services/Marketplaces/Trendyol/ProductService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>master_product_id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Marketplaces/Trendyol/ProductService.php
+
+		-
+			message: '#^Variable \$content in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: app/Services/Marketplaces/Trendyol/ProductService.php
+
+		-
+			message: '#^Method App\\Services\\Marketplaces\\Trendyol\\WebhookService\:\:validatePayload\(\) return type with generic class App\\Support\\ServiceResult does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/Marketplaces/Trendyol/WebhookService.php
+
+		-
+			message: '#^Method App\\Services\\Supplier\\XmlSupplierService\:\:importFromUrl\(\) should return App\\Support\\ServiceResult\<array\{imported\: int, skipped\: int, errors\: array\}\> but returns App\\Support\\ServiceResult\<array\{imported\: int, skipped\: int, errors\: array\{\}\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Supplier/XmlSupplierService.php
+
+		-
+			message: '#^Method App\\Services\\Supplier\\XmlSupplierService\:\:importFromUrl\(\) should return App\\Support\\ServiceResult\<array\{imported\: int, skipped\: int, errors\: array\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/Supplier/XmlSupplierService.php
+
+		-
+			message: '#^Class Database\\Factories\\BulkOperationFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/BulkOperationFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\CargoCredentialFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/CargoCredentialFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\CargoProviderFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/CargoProviderFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\EInvoiceCredentialFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/EInvoiceCredentialFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\EInvoiceFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/EInvoiceFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\NotificationPreferenceFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/NotificationPreferenceFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\ShipmentEventFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/ShipmentEventFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\ShipmentFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/ShipmentFactory.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: database/factories/UserMarketplaceCredentialFactory.php

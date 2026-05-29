@@ -46,7 +46,6 @@ class ProductMapper
             'listed_stock' => $item['quantity'] ?? $item['stockUnitQuantity'] ?? 0,
             'listing_url' => $item['productUrl'] ?? null,
             'category_path' => $item['categoryName'] ?? null,
-            'listing_url' => $item['productUrl'] ?? null,
             'attributes_json' => $item['attributes'] ?? [],
             'last_synced_at' => now(),
             'sync_status' => 'synced',

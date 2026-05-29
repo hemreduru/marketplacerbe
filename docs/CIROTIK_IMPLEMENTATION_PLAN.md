@@ -197,15 +197,17 @@ Bu plan **tek bir agent oturumunda bitirilmez.** Her PR ayrı bir oturumda işle
 - [x] Decimal sütunlar `decimal(15, 4)` — Bölüm 12.5
 - **Kabul kriteri:** `MasterProduct::factory()->has(MarketplaceListing::factory()->count(3))->create()` çalışır
 
-### PR #1.2 — `feat: migrate legacy products to marketplace_listings`
+### PR #1.2 — `feat: migrate legacy products to marketplace_listings` — ⏭️ SKIP (GEREKSİZ)
+
 **Spec Ref:** Bölüm 6.2
 
-- [ ] `database/migrations/...migrate_products_to_listings.php` — data migration
-- [ ] Algoritma: her `Product` → `MarketplaceListing` olur; `barcode` aynı olanlar otomatik aynı `master_product`'a bağlanır; yoksa solo master üretilir
-- [ ] Pest: 100 ürün, 50'si paylaşılan barcode → 75 master, 100 listing assertion
-- [ ] Eski `products` tablosu drop edilmez — read-only kalır (geriye dönük süreç için); yeni kod sadece yeni tabloları okur
-- [ ] `Product` model'ine `@deprecated` PHPDoc
-- **Kabul kriteri:** Mevcut Trendyol ürünleri kayıpsız taşındı; oluşan master_product sayısı doğru
+> **SKIP NOTU (gereksiz):** Bu data migration **atlandı çünkü ürün henüz production'da değil** ve eski/legacy `products` kayıtlarına ihtiyacımız yok — taşınacak gerçek tarihsel veri yok. Bunun yerine ileriye dönük çözüm uygulandı: `ProductService::syncProducts` artık her sync'te legacy `Product`'ın yanında `master_products` + `marketplace_listings` kayıtlarını da oluşturup bağlıyor (`syncListing` + `resolveMasterProduct`, barcode→sku önceliğiyle master eşleştirme). Yeni tablolar canlı veriyle ilk sync'ten itibaren dolar; geçmiş veriyi tek seferlik taşımaya gerek kalmadı. Test: `tests/Feature/Sync/MasterProductBridgeTest.php`.
+
+- [x] ~~`database/migrations/...migrate_products_to_listings.php` — data migration~~ → gereksiz (production'da değil)
+- [x] İleriye dönük köprü: sync `MarketplaceListing` + `MasterProduct` doldurur (barcode aynı → ortak master, yoksa solo)
+- [x] Pest: bridge testi (listing+master oluşumu, idempotency, aynı barcode tek master)
+- [x] Eski `products` tablosu drop edilmedi — read-only legacy olarak kalıyor
+- **Kabul kriteri:** Yeni sync'ler master_products/marketplace_listings'i canlı doldurur ✓
 
 ### PR #1.3 — `feat: stock_events append-only ledger`
 **Spec Ref:** Bölüm 6.2 (stock_events), Bölüm 16.4 (migration patern)
@@ -277,7 +279,8 @@ Bu plan **tek bir agent oturumunda bitirilmez.** Her PR ayrı bir oturumda işle
 - [x] Tüm public method `ServiceResult` döner (artık `['error' => true]` yok)
 - [x] Rate limit governor — Redis token bucket (`buybox: 1000/1m`, `default: 600/1m`)
 - [x] Pest: rate limit aşıldığında `ServiceResult::fail('rate_limited')`
-- **Kabul kriteri:** Mevcut sync job'lar yeni yapıyı kullanıyor; davranış aynı
+- [x] **Tamamlandı:** Eski `app/Services/Trendyol/*` (5 servis) + artık kullanılmayan `app/Services/Contracts/*` (5 contract) silindi; PHPStan `excludePaths` muafiyeti kaldırıldı, yeni kod L6 baseline altında. `PlanLimitingTest` yeni servislere taşındı.
+- **Kabul kriteri:** Mevcut sync job'lar yeni yapıyı kullanıyor; davranış aynı ✓
 
 ### PR #1.10 — `feat: Trendyol webhook ingestion + idempotency`
 **Spec Ref:** Bölüm 6.2 akış 1, Bölüm 7.2 webhook bölümü

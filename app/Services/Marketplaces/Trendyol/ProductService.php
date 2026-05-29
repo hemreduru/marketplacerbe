@@ -3,8 +3,11 @@
 namespace App\Services\Marketplaces\Trendyol;
 
 use App\Exceptions\SubscriptionLimitException;
+use App\Models\MarketplaceListing;
+use App\Models\MasterProduct;
 use App\Models\Product;
 use App\Models\UserMarketplaceCredential;
+use App\Services\Marketplaces\Trendyol\Mapper\ProductMapper;
 use App\Support\ServiceResult;
 
 /**
@@ -134,6 +137,12 @@ class ProductService
                         $stats['updated']++;
                     }
 
+                    // Cirotik master_products + marketplace_listings köprüsü:
+                    // legacy Product'a ek olarak yeni cross-marketplace şemasını doldur.
+                    if ($credential !== null) {
+                        $this->syncListing($credential, $item);
+                    }
+
                 } catch (\Exception $e) {
                     if ($e instanceof SubscriptionLimitException) {
                         throw $e;
@@ -154,6 +163,58 @@ class ProductService
             }
 
         } while (! empty($content));
+    }
+
+    /**
+     * Tek bir Trendyol ürününü marketplace_listings'e upsert eder ve
+     * uygun master_product'a bağlar. Aynı (credential, remote_product_id)
+     * tekrar sync edilince listing güncellenir, master yeniden oluşturulmaz.
+     *
+     * @param  array<string, mixed>  $item
+     */
+    protected function syncListing(UserMarketplaceCredential $credential, array $item): void
+    {
+        $mapper = new ProductMapper;
+        $listingAttributes = $mapper->toListingAttributes($item);
+
+        $existingListing = MarketplaceListing::where('user_marketplace_credential_id', $credential->id)
+            ->where('remote_product_id', $listingAttributes['remote_product_id'])
+            ->first();
+
+        $masterId = $existingListing?->master_product_id
+            ?? $this->resolveMasterProduct($credential->user_id, $item)->id;
+
+        MarketplaceListing::updateOrCreate(
+            [
+                'user_marketplace_credential_id' => $credential->id,
+                'remote_product_id' => $listingAttributes['remote_product_id'],
+            ],
+            array_merge($listingAttributes, ['master_product_id' => $masterId]),
+        );
+    }
+
+    /**
+     * Bir kullanıcının ürünleri için master_product bulur ya da oluşturur.
+     * Eşleşme önceliği: barcode → sku. İkisi de yoksa solo master üretilir.
+     *
+     * @param  array<string, mixed>  $item
+     */
+    protected function resolveMasterProduct(int $userId, array $item): MasterProduct
+    {
+        $mapper = new ProductMapper;
+        $barcode = $item['barcode'] ?? null;
+        $sku = $item['stockCode'] ?? null;
+
+        $existing = MasterProduct::where('user_id', $userId)
+            ->when($barcode, fn ($q) => $q->where('barcode', $barcode))
+            ->when(! $barcode && $sku, fn ($q) => $q->where('sku', $sku))
+            ->when(! $barcode && ! $sku, fn ($q) => $q->whereRaw('1 = 0'))
+            ->first();
+
+        return $existing ?? MasterProduct::create(array_merge(
+            $mapper->toMasterProductAttributes($item),
+            ['user_id' => $userId],
+        ));
     }
 
     /**
