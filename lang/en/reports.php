@@ -1,6 +1,7 @@
 <?php
 
 return [
+    // Existing
     'sku_profit' => 'SKU Profit Report',
     'reconciliation' => 'Reconciliation Report',
     'product' => 'Product',
@@ -16,4 +17,138 @@ return [
     'commission' => 'Commission',
     'reconciliation_note' => 'Monthly reconciliation compares your Cirotik estimate with the actual Trendyol settlement.',
     'reconciliation_detail' => 'Settlement data is fetched from the marketplace API on the 1st of every month. You can also trigger a manual check.',
+
+    // Navigation
+    'reports' => 'Reports',
+    'order_report' => 'Order Report',
+    'stock_report' => 'Stock Report',
+    'return_analysis' => 'Return Analysis',
+    'marketplace_comparison' => 'Marketplace Comparison',
+    'vat_report' => 'VAT & Tax Report',
+    'ad_performance' => 'Ad Performance',
+    'analytics_extra' => 'Geography & Trends',
+    'buybox_tracker' => 'Buybox Tracker',
+    'repricer' => 'Repricer',
+
+    // Period & shared filters
+    'period' => 'Period',
+    'period_today' => 'Today',
+    'period_yesterday' => 'Yesterday',
+    'period_this_week' => 'This Week',
+    'period_last_week' => 'Last Week',
+    'period_this_month' => 'This Month',
+    'period_last_month' => 'Last Month',
+    'period_this_year' => 'This Year',
+    'period_custom' => 'Custom',
+    'apply' => 'Apply',
+    'from' => 'From',
+    'to' => 'To',
+    'all' => 'All',
+    'status' => 'Status',
+    'search' => 'Search',
+    'export_csv' => 'Export CSV',
+    'export_excel' => 'Export Excel',
+    'previous_period' => 'vs previous period',
+
+    // Order report (4.1)
+    'order_no' => 'Order #',
+    'date' => 'Date',
+    'customer' => 'Customer',
+    'city' => 'City',
+    'items' => 'Items',
+    'amount' => 'Amount',
+    'order_or_customer' => 'Order # or customer',
+    'bulk_update_status' => 'Update status',
+    'bulk_invoice' => 'Create invoice',
+    'bulk_cargo' => 'Prepare cargo',
+    'new_status' => 'New status',
+    'apply_bulk' => 'Apply',
+    'bulk_status_done' => ':count orders updated.',
+    'bulk_write_disabled' => 'Marketplace write is disabled; no live action was performed.',
+    'bulk_queued' => ':count orders queued for processing.',
+
+    // Stock report (4.2)
+    'current_stock' => 'Current Stock',
+    'listed_stock' => 'Listed Stock',
+    'sales_velocity' => 'Sales/Day',
+    'days_to_depletion' => 'Days to Depletion',
+    'dead_stock' => 'Dead Stock',
+    'critical' => 'Critical',
+    'generate_po' => 'Generate Purchase Order',
+    'purchase_order' => 'Purchase Order',
+    'suggested_qty' => 'Suggested Qty',
+    'last_sale' => 'Last Sale',
+    'stock_filter_all' => 'All',
+    'stock_filter_critical' => 'Below critical',
+    'stock_filter_zero' => 'Zero stock',
+    'stock_filter_dead' => 'Dead stock (1y)',
+
+    // Return analysis (4.3)
+    'sales_qty' => 'Sales Qty',
+    'return_qty' => 'Return Qty',
+    'return_rate' => 'Return Rate',
+    'top_reasons' => 'Top Reasons',
+    'return_cost' => 'Return Cost',
+    'real_net' => 'Real Net Profit',
+
+    // Marketplace comparison (4.4)
+    'sales' => 'Sales',
+    'profit' => 'Profit',
+
+    // VAT report (4.5)
+    'month' => 'Month',
+    'sale_vat' => 'Sale VAT (payable)',
+    'purchase_vat' => 'Purchase VAT (refund)',
+    'commission_vat' => 'Commission VAT (refund)',
+    'shipping_vat' => 'Shipping VAT (refund)',
+    'net_vat' => 'Net VAT',
+    'vat_payable' => 'Payable',
+    'vat_refund' => 'Refund',
+
+    // Ad performance (4.6)
+    'campaign' => 'Campaign',
+    'spend' => 'Spend',
+    'attributed_revenue' => 'Attributed Revenue',
+    'roas' => 'ROAS',
+    'acos' => 'ACoS',
+    'profit_contribution' => 'Profit Contribution',
+    'sync_ads' => 'Sync Ad Data',
+    'profitable' => 'Profitable',
+    'unprofitable' => 'Unprofitable',
+    'ads_synced' => 'Ad sync complete; :count campaign(s) updated.',
+    'ads_not_configured' => 'Ad API endpoint is not configured for this marketplace yet.',
+
+    // Geography & trends (4.7)
+    'geography' => 'Sales Geography',
+    'top_cities' => 'Top Cities',
+    'hourly_heatmap' => 'Hour × Day Heatmap',
+    'cohort' => 'New Listing Cohort',
+    'ltm_trend' => 'Profit Trend (LTM)',
+    'orders_count' => 'Orders',
+
+    // Buybox (4.8)
+    'has_buybox' => 'Has Buybox',
+    'lost_buybox' => 'Lost Buybox',
+    'competitor_price' => 'Competitor Price',
+    'our_price' => 'Our Price',
+    'sync_buybox' => 'Sync Buybox',
+    'buybox_synced' => 'Buybox sync complete; :count listing(s) checked.',
+    'buybox_not_configured' => 'Buybox API endpoint is not configured for this marketplace yet.',
+    'lost_buybox_count' => 'Listings without buybox',
+
+    // Repricer (4.9)
+    'repricer_rules' => 'Repricer Rules',
+    'min_price' => 'Min Price',
+    'max_price' => 'Max Price',
+    'target_margin' => 'Target Margin %',
+    'competitor_based' => 'Competitor Based',
+    'rule_name' => 'Rule Name',
+    'create_rule' => 'Create Rule',
+    'run_repricer' => 'Run Repricer',
+    'active' => 'Active',
+    'no_rules' => 'No repricer rules defined yet.',
+    'rule_created' => 'Repricer rule created.',
+    'rule_deleted' => 'Repricer rule deleted.',
+    'rule_updated' => 'Repricer rule updated.',
+    'repricer_ran' => 'Repricer evaluated :count rule(s); :dispatched price change(s) queued.',
 ];

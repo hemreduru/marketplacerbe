@@ -186,6 +186,62 @@
                 </div>
                 <!--end:Menu item-->
 
+                <!--begin:Menu item - Reports (feature gated)-->
+                @feature('analytics')
+                <div data-kt-menu-trigger="click"
+                    class="menu-item menu-accordion {{ request()->routeIs('reports.*') ? 'here show' : '' }}">
+                    <span class="menu-link">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-chart-simple fs-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                                <span class="path4"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">{{ __('reports.reports') }}</span>
+                        <span class="menu-arrow"></span>
+                    </span>
+                    <div class="menu-sub menu-sub-accordion">
+                        @php($reportLinks = [
+                            'reports.order' => __('reports.order_report'),
+                            'reports.sku-profit' => __('reports.sku_profit'),
+                            'reports.stock' => __('reports.stock_report'),
+                            'reports.returns' => __('reports.return_analysis'),
+                            'reports.marketplace-comparison' => __('reports.marketplace_comparison'),
+                            'reports.vat' => __('reports.vat_report'),
+                            'reports.ads' => __('reports.ad_performance'),
+                            'reports.analytics' => __('reports.analytics_extra'),
+                            'reports.buybox' => __('reports.buybox_tracker'),
+                            'reports.reconciliation' => __('reports.reconciliation'),
+                        ])
+                        @foreach($reportLinks as $routeName => $label)
+                            <div class="menu-item">
+                                <a class="menu-link {{ request()->routeIs($routeName) ? 'active' : '' }}"
+                                    href="{{ route($routeName) }}">
+                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                    <span class="menu-title">{{ $label }}</span>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('repricer.*') ? 'active' : '' }}"
+                        href="{{ route('repricer.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-price-tag fs-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">{{ __('reports.repricer') }}</span>
+                    </a>
+                </div>
+                @endfeature
+                <!--end:Menu item - Reports-->
+
                 @auth
                     @if(auth()->user()->isAdmin())
                         <!--begin::Admin section-->

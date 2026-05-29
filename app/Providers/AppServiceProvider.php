@@ -6,6 +6,7 @@ use App\Services\Cargo\CargoManager;
 use App\Services\EFatura\EInvoiceManager;
 use App\Services\MarketplaceServiceFactory;
 use App\Services\MarketplaceServiceInterface;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
@@ -56,6 +57,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Metronic/Bootstrap teması için sayfalama görünümü
+        Paginator::useBootstrapFive();
+
         Blade::if('feature', function (string $feature): bool {
             return auth()->check() && auth()->user()->canUseFeature($feature);
         });

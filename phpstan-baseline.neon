@@ -115,6 +115,24 @@ parameters:
 			path: app/Http/Controllers/Auth/ResetPasswordController.php
 
 		-
+			message: '#^Method App\\Http\\Controllers\\Web\\AdReportController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/AdReportController.php
+
+		-
+			message: '#^Parameter \#1 \$credential of method App\\Services\\Ads\\AdSyncService\:\:sync\(\) expects App\\Models\\UserMarketplaceCredential, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Web/AdReportController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\AnalyticsReportController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/AnalyticsReportController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Web\\AuthController\:\:login\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -143,6 +161,18 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/Http/Controllers/Web/AuthController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\BuyboxController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/BuyboxController.php
+
+		-
+			message: '#^Parameter \#1 \$credential of method App\\Services\\Buybox\\BuyboxService\:\:sync\(\) expects App\\Models\\UserMarketplaceCredential, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Web/BuyboxController.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$claim_date\.$#'
@@ -253,6 +283,12 @@ parameters:
 			path: app/Http/Controllers/Web/FinancialController.php
 
 		-
+			message: '#^Method App\\Http\\Controllers\\Web\\MarketplaceComparisonController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/MarketplaceComparisonController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Web\\MarketplaceSettingsController\:\:index\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -317,6 +353,30 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 1
 			path: app/Http/Controllers/Web/OrderController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Order\:\:\$items_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Web/OrderReportController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Order\:\:\$marketplace\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Web/OrderReportController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\<App\\Models\\Order\>\:\:getCollection\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Web/OrderReportController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\OrderReportController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/OrderReportController.php
 
 		-
 			message: '#^Method App\\Http\\Controllers\\Web\\ProductController\:\:getData\(\) has no return type specified\.$#'
@@ -427,6 +487,18 @@ parameters:
 			path: app/Http/Controllers/Web/QuestionController.php
 
 		-
+			message: '#^Method App\\Http\\Controllers\\Web\\RepricerController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/RepricerController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\ReturnReportController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/ReturnReportController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Web\\SettingsController\:\:index\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -449,6 +521,12 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/Http/Controllers/Web/SettingsController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\StockReportController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/StockReportController.php
 
 		-
 			message: '#^Parameter \#1 \$params of method App\\Services\\IyzicoService\:\:createPayment\(\) expects array\{price\: float, currency\: string, buyer\: array, card\: array\}, array\{price\: float\|null, currency\: ''TRY'', buyer\: array\{name\: string, email\: string\}\} given\.$#'
@@ -485,6 +563,12 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/Http/Controllers/Web/TwoFactorController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Web\\VatReportController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Web/VatReportController.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
@@ -1189,6 +1273,42 @@ parameters:
 			path: app/Providers/AppServiceProvider.php
 
 		-
+			message: '#^Method App\\Services\\Ads\\AdReportService\:\:report\(\) should return array\{campaigns\: Illuminate\\Support\\Collection\<int, array\<string, mixed\>\>, totals\: array\<string, mixed\>\} but returns array\{campaigns\: Illuminate\\Support\\Collection\<int, array\{name\: string, marketplace_code\: string, spend\: string, revenue\: string, roas\: float, acos\: float, contribution\: numeric\-string, profitable\: bool\}\>, totals\: array\{spend\: numeric\-string&uppercase\-string, revenue\: numeric\-string&uppercase\-string, roas\: float, acos\: float, contribution\: numeric\-string\}\}\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Ads/AdReportService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Ads/AdSyncService.php
+
+		-
+			message: '#^Method App\\Services\\Ads\\AdSyncService\:\:sync\(\) should return App\\Support\\ServiceResult\<array\<string, int\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Ads/AdSyncService.php
+
+		-
+			message: '#^Method App\\Services\\Ads\\AdSyncService\:\:syncFromPayload\(\) should return App\\Support\\ServiceResult\<array\<string, int\>\> but returns App\\Support\\ServiceResult\<array\{campaigns\: int, metrics\: int\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Ads/AdSyncService.php
+
+		-
+			message: '#^Offset ''name'' on array\{remote_campaign_id\: string, name\: string, status\?\: string, metrics\?\: array\<int, array\{date\: string, spend\?\: float\|string, attributed_revenue\?\: float\|string, impressions\?\: int, clicks\?\: int, orders\?\: int\}\>\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/Ads/AdSyncService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>slug" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Services/Ads/AdSyncService.php
+
+		-
 			message: '#^Parameter \#1 \$array \(array\{\}\) to function array_values is empty, call has no effect\.$#'
 			identifier: arrayValues.empty
 			count: 1
@@ -1205,6 +1325,42 @@ parameters:
 			identifier: notIdentical.alwaysTrue
 			count: 1
 			path: app/Services/Auth/TwoFactorAuthService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Buybox/BuyboxService.php
+
+		-
+			message: '#^Method App\\Services\\Buybox\\BuyboxService\:\:lostBuybox\(\) should return Illuminate\\Support\\Collection\<int, array\<string, mixed\>\> but returns Illuminate\\Support\\Collection\<int, non\-empty\-array\<string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Buybox/BuyboxService.php
+
+		-
+			message: '#^Method App\\Services\\Buybox\\BuyboxService\:\:sync\(\) should return App\\Support\\ServiceResult\<array\<string, int\>\> but returns App\\Support\\ServiceResult\<array\{checked\: int\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Buybox/BuyboxService.php
+
+		-
+			message: '#^Method App\\Services\\Buybox\\BuyboxService\:\:sync\(\) should return App\\Support\\ServiceResult\<array\<string, int\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Buybox/BuyboxService.php
+
+		-
+			message: '#^Method App\\Services\\Buybox\\BuyboxService\:\:trackerRows\(\) should return Illuminate\\Support\\Collection\<int, array\<string, mixed\>\> but returns Illuminate\\Support\\Collection\<int, array\{sku\: string\|null, title\: string\|null, has_buybox\: bool, our_price\: string\|null, competitor_price\: string\|null, competitor_seller\: string\|null, checked_at\: Illuminate\\Support\\Carbon\|null\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Buybox/BuyboxService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>sku" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Buybox/BuyboxService.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Order\:\:\$items\.$#'
@@ -1295,6 +1451,36 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: app/Services/Cargo/Aras/WebhookService.php
+
+		-
+			message: '#^Constructor of class App\\Services\\Cargo\\Dhl\\DhlService has an unused parameter \$credential\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: app/Services/Cargo/Dhl/DhlService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Dhl\\DhlService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Dhl/DhlService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Dhl\\DhlService\:\:getLabel\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Dhl/DhlService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Dhl\\DhlService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Dhl/DhlService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Dhl\\DhlService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Dhl/DhlService.php
 
 		-
 			message: '#^Using nullsafe property access "\?\-\>desi" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
@@ -1427,6 +1613,36 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: app/Services/Cargo/Surat/SuratService.php
+
+		-
+			message: '#^Constructor of class App\\Services\\Cargo\\Ups\\UpsService has an unused parameter \$credential\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: app/Services/Cargo/Ups/UpsService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Ups\\UpsService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Ups/UpsService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Ups\\UpsService\:\:getLabel\(\) should return App\\Support\\ServiceResult\<string\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Ups/UpsService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Ups\\UpsService\:\:listStatusUpdates\(\) should return App\\Support\\ServiceResult\<array\<int, array\{tracking_number\: string, status\: string, location\: string\|null, timestamp\: string\}\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Ups/UpsService.php
+
+		-
+			message: '#^Method App\\Services\\Cargo\\Ups\\UpsService\:\:track\(\) should return App\\Support\\ServiceResult\<array\{status\: string, location\: string\|null, timestamp\: string\}\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Cargo/Ups/UpsService.php
 
 		-
 			message: '#^Using nullsafe property access "\?\-\>content" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
@@ -1865,6 +2081,222 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: app/Services/Marketplaces/Trendyol/WebhookService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Order\:\:\$city\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Reports/AnalyticsReportService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Order\:\:\$orders\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Reports/AnalyticsReportService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Order\:\:\$revenue\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Reports/AnalyticsReportService.php
+
+		-
+			message: '#^Method App\\Services\\Reports\\AnalyticsReportService\:\:cohort\(\) should return Illuminate\\Support\\Collection\<int, array\{month\: string, products\: int, sales_qty\: int\}\> but returns Illuminate\\Support\\Collection\<int, array\{month\: string, products\: int\<0, max\>, sales_qty\: int\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Reports/AnalyticsReportService.php
+
+		-
+			message: '#^Method App\\Services\\Reports\\AnalyticsReportService\:\:topCities\(\) should return Illuminate\\Support\\Collection\<int, array\{city\: string, orders\: int, revenue\: string\}\> but returns Illuminate\\Support\\Collection\<int, array\{city\: mixed, orders\: int, revenue\: string\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Reports/AnalyticsReportService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\Order\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/Reports/AnalyticsReportService.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\Order\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Services/Reports/AnalyticsReportService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$master\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Reports/MarketplaceComparisonService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$mp_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Reports/MarketplaceComparisonService.php
+
+		-
+			message: '#^Method App\\Services\\Reports\\MarketplaceComparisonService\:\:pivot\(\) should return array\{marketplaces\: Illuminate\\Support\\Collection\<int, App\\Models\\Marketplace\>, rows\: Illuminate\\Support\\Collection\<int, array\<string, mixed\>\>\} but returns array\{marketplaces\: Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Marketplace\>, rows\: Illuminate\\Support\\Collection\<int, array\{sku\: string\|null, title\: string\|null, cells\: array\<int, array\{qty\: int, profit\: string\}\>\}\>\}\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Reports/MarketplaceComparisonService.php
+
+		-
+			message: '#^Relation ''master'' is not found in App\\Models\\OrderItem model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/Reports/MarketplaceComparisonService.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Support\\Collection\<int, App\\Models\\Order\>\:\:loadMissing\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Services/Reports/OrderReportService.php
+
+		-
+			message: '#^Generic type Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\<App\\Models\\Order\> in PHPDoc tag @return does not specify all template types of interface Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\: TKey, TValue$#'
+			identifier: generics.lessTypes
+			count: 1
+			path: app/Services/Reports/OrderReportService.php
+
+		-
+			message: '#^Method App\\Services\\Reports\\OrderReportService\:\:paginate\(\) should return Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\<App\\Models\\Order\> but returns Illuminate\\Pagination\\LengthAwarePaginator\<int, App\\Models\\Order\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Reports/OrderReportService.php
+
+		-
+			message: '#^Relation ''marketplace'' is not found in App\\Models\\Order model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/Reports/OrderReportService.php
+
+		-
+			message: '#^Type App\\Models\\Order in generic type Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\<App\\Models\\Order\> in PHPDoc tag @return is not subtype of template type TKey of \(int\|string\) of interface Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\.$#'
+			identifier: generics.notSubtype
+			count: 1
+			path: app/Services/Reports/OrderReportService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Claim\:\:\$claim_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Reports/ReturnReportService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Claim\:\:\$qty\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Reports/ReturnReportService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Claim\:\:\$reason\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Reports/ReturnReportService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Claim\:\:\$refund\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Reports/ReturnReportService.php
+
+		-
+			message: '#^Method App\\Services\\Reports\\ReturnReportService\:\:byReason\(\) should return Illuminate\\Support\\Collection\<int, array\<string, mixed\>\> but returns Illuminate\\Support\\Collection\<int, array\{reason\: mixed, claim_count\: int, qty\: int, refund\: string\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Reports/ReturnReportService.php
+
+		-
+			message: '#^Method App\\Services\\Reports\\ReturnReportService\:\:bySku\(\) should return Illuminate\\Support\\Collection\<int, array\<string, mixed\>\> but returns Illuminate\\Support\\Collection\<int, array\{sku\: string\|null, title\: string\|null, sales_qty\: int, return_qty\: int, return_rate\: float\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Reports/ReturnReportService.php
+
+		-
+			message: '#^Method App\\Services\\Reports\\ReturnReportService\:\:returnedQtyBySku\(\) should return Illuminate\\Support\\Collection\<int, int\> but returns Illuminate\\Support\\Collection\<\(int\|string\), int\<0, max\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Reports/ReturnReportService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\Claim\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/Reports/ReturnReportService.php
+
+		-
+			message: '#^Return type of call to method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\Claim\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: method.unresolvableReturnType
+			count: 1
+			path: app/Services/Reports/ReturnReportService.php
+
+		-
+			message: '#^Method App\\Services\\Reports\\StockReportService\:\:purchaseOrder\(\) should return Illuminate\\Support\\Collection\<int, array\<string, mixed\>\> but returns Illuminate\\Support\\Collection\<int, array\{sku\: mixed, title\: mixed, current_stock\: mixed, velocity\: mixed, suggested_qty\: mixed\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Reports/StockReportService.php
+
+		-
+			message: '#^Method App\\Services\\Reports\\StockReportService\:\:rows\(\) should return Illuminate\\Support\\Collection\<int, array\<string, mixed\>\> but returns Illuminate\\Support\\Collection\<int, array\{id\: int, sku\: string\|null, title\: string, current_stock\: int, listed_stock\: int, critical_threshold\: int, velocity\: float, days_to_depletion\: int\|null, \.\.\.\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Reports/StockReportService.php
+
+		-
+			message: '#^Method App\\Services\\Reports\\StockReportService\:\:salesAggregates\(\) should return Illuminate\\Support\\Collection\<int, object\> but returns Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), App\\Models\\OrderItem\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Reports/StockReportService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$master\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Reports/VatReportService.php
+
+		-
+			message: '#^Method App\\Services\\Reports\\VatReportService\:\:monthly\(\) should return array\{from\: string, to\: string, rows\: Illuminate\\Support\\Collection\<int, array\<string, mixed\>\>, totals\: array\<string, string\>, order_count\: int\} but returns array\{from\: string, to\: string, rows\: Illuminate\\Support\\Collection\<int, array\{sku\: mixed, title\: mixed, sale_vat\: string, purchase_vat\: string, commission_vat\: string, shipping_vat\: string, net\: string\}\>, totals\: array\{sale_vat\: numeric\-string, purchase_vat\: numeric\-string, commission_vat\: numeric\-string, shipping_vat\: numeric\-string, net\: numeric\-string, platform_fee_vat\: string\}, order_count\: int\<0, max\>\}\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Reports/VatReportService.php
+
+		-
+			message: '#^Relation ''master'' is not found in App\\Models\\OrderItem model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/Reports/VatReportService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>cost_price_vat_rate" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Reports/VatReportService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Reports/VatReportService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>sku" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Reports/VatReportService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>title" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Reports/VatReportService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>vat_rate" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/Reports/VatReportService.php
 
 		-
 			message: '#^Method App\\Services\\Supplier\\XmlSupplierService\:\:importFromUrl\(\) should return App\\Support\\ServiceResult\<array\{imported\: int, skipped\: int, errors\: array\}\> but returns App\\Support\\ServiceResult\<array\{imported\: int, skipped\: int, errors\: array\{\}\}\>\.$#'

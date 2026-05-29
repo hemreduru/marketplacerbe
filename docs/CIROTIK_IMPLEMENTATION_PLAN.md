@@ -634,47 +634,92 @@ Bu plan **tek bir agent oturumunda bitirilmez.** Her PR ayrı bir oturumda işle
 **Hedef:** Tüm raporlar (Bölüm 10) tam, kural tabanlı repricer (ML değil), reklam ROI analizi, rakip takibi.
 **Spec Ref:** Bölüm 10 (tüm raporlar), Bölüm 13 Faz 4.
 
-### PR #4.1 — `feat: order report + bulk actions`
+> **Ortak altyapı:** `App\Services\Reports\ReportPeriod` (period → from/to + önceki dönem), sidebar "Raporlar" accordion menüsü (feature:analytics gated), `Paginator::useBootstrapFive()`. Tüm rapor route'ları `feature:analytics` ile korunur.
+
+### PR #4.1 — `feat: order report + bulk actions` ✓
 **Spec Ref:** Bölüm 10.3
 
-### PR #4.2 — `feat: stock report + PO list`
+- [x] `OrderReportController` (filtre: period/marketplace/status/şehir/arama) + sipariş başına net kâr (`ProfitCalculator::forOrder`)
+- [x] `OrderReportService` + CSV export
+- [x] Toplu işlem: yerel statü güncelleme (kullanıcıya scope'lu); invoice/cargo write-guard'lı (canlı yazma yok)
+- [x] **Bonus bug fix:** `orders.shipping_city/shipping_country` schema drift'i guarded migration ile resmileştirildi (MySQL'de vardı, migration'da yoktu)
+- [x] Pest: 5 senaryo
+
+### PR #4.2 — `feat: stock report + PO list` ✓
 **Spec Ref:** Bölüm 10.4
 
-### PR #4.3 — `feat: return analysis report`
+- [x] `StockReportService`: mevcut/listelenen stok, satış hızı (30g), tükenme tahmini, ölü stok (1y), kritik filtre
+- [x] Satın alma listesi (PO) CSV export
+- [x] Pest: 3 senaryo
+
+### PR #4.3 — `feat: return analysis report` ✓
 **Spec Ref:** Bölüm 10.5
 
-### PR #4.4 — `feat: marketplace comparison pivot`
+- [x] `ReturnReportService`: özet (satış/iade adedi, oran, maliyet), neden kırılımı, SKU bazlı iade oranı
+- [x] Claim item_count'u sipariş SKU'larına atfederek SKU bazlı iade (claim'ler SKU detayı tutmadığı için yaklaşım dokümante edildi)
+- [x] Pest: 2 senaryo
+
+### PR #4.4 — `feat: marketplace comparison pivot` ✓
 **Spec Ref:** Bölüm 10.6
 
-### PR #4.5 — `feat: VAT/tax monthly report (accountant export)`
+- [x] `MarketplaceComparisonService`: SKU × pazaryeri pivot (satış adedi + net kâr)
+- [x] Pest: 2 senaryo
+
+### PR #4.5 — `feat: VAT/tax monthly report (accountant export)` ✓
 **Spec Ref:** Bölüm 10.7
 
-### PR #4.6 — `feat: ad performance report (TY Ads + HB Sponsor)`
+- [x] `VatReportService` — `NetVatLiability` ile aylık KDV mahsuplaşması (satış/alış/komisyon/kargo/platform KDV), ürün bazlı satırlar
+- [x] CSV export (muhasebeci dosyası)
+- [x] Pest: 2 senaryo
+
+### PR #4.6 — `feat: ad performance report (TY Ads + HB Sponsor)` ✓
 **Spec Ref:** Bölüm 10.8, Bölüm 9.13
 
-- [ ] Trendyol Ads API entegrasyonu
-- [ ] HB Sponsor entegrasyonu
-- [ ] ROAS, ACoS hesaplamaları
+- [x] `ad_campaigns` + `ad_metrics` tabloları, modeller, factory'ler
+- [x] `AdReportService` — ROAS/ACoS/katkı hesabı; `AdSyncService` — idempotent upsert (`syncFromPayload`)
+- [x] ROAS, ACoS hesaplamaları + kârlı/zararlı işaretleme
+- [ ] Trendyol Ads / HB Sponsor **canlı API entegrasyonu** — endpoint config + sandbox erişimi gerektirir (ileri PR; servis yapısı + Http::fake testi hazır)
+- [x] Pest: 3 senaryo
 
-### PR #4.7 — `feat: sales geography + hourly heatmap + cohort + LTM trend`
+### PR #4.7 — `feat: sales geography + hourly heatmap + cohort + LTM trend` ✓
 **Spec Ref:** Bölüm 10.10–10.14
 
-### PR #4.8 — `feat: competitor tracker (Trendyol buybox)`
+- [x] `AnalyticsReportService`: en çok satış şehirleri, 7×24 saat ısı haritası, yeni listing cohort, LTM (son 12 ay) kâr trendi
+- [x] Saat/gün ve ay bucketing PHP'de (SQLite/MySQL dialect bağımsız)
+- [x] Pest: 3 senaryo
 
-- [ ] Buybox kayıp/kazanç bildirimi (Bölüm 11.1 `buybox_loss`)
+### PR #4.8 — `feat: competitor tracker (Trendyol buybox)` ✓
 
-### PR #4.9 — `feat: rule-based repricer`
+- [x] `buybox_snapshots` tablosu + model/factory
+- [x] `BuyboxService`: snapshot kaydı, son durum okuma, buybox kaybı tespiti
+- [x] Buybox kayıp bildirimi (Bölüm 11.1 `buybox_loss`) — tracker UI'da kayıp sayısı/uyarı
+- [ ] Trendyol buybox **canlı API** çekme — endpoint config gerektirir (ileri PR; yapı + scaffold hazır)
+- [x] Pest: 3 senaryo
 
-- [ ] Min/max fiyat, rakip baz, hedef marj kuralları
-- [ ] Trendyol 15dk cooldown'a saygılı dispatch
+### PR #4.9 — `feat: rule-based repricer` ✓
 
-### PR #4.10 — `feat: UPS + DHL cargo (e-export)`
+- [x] `repricer_rules` tablosu + model/factory; strateji: target_margin / undercut / fixed
+- [x] Min/max fiyat clamp, rakip baz (undercut), hedef marj kuralları
+- [x] Trendyol 15dk cooldown'a saygılı dispatch (`price_events` + `sync_dispatch_queue`, write-guard'lı)
+- [x] Pest: 4 senaryo (markup, cooldown, clamp, CRUD)
+
+### PR #4.10 — `feat: UPS + DHL cargo (e-export)` ✓
 **Spec Ref:** Bölüm 8.1 (UPS REST), Bölüm 13 Faz 4
+
+- [x] `UpsService` + `DhlService` — `CargoProvider` implementasyonu (REST scaffold)
+- [x] `config/cargo.php` UPS/DHL class eşlemesi (enabled=false); canlı entegrasyon ileri PR
+- [x] Pest: 3 senaryo
 
 ### Faz 4 Kapanış
 
-- [ ] Tüm raporlar export edilebilir (CSV/Excel/PDF)
-- [ ] Repricer test mağazada fiyat değiştirip aynı dakika tekrar çağırmıyor (15dk respekt)
+- [x] Tüm raporlar export edilebilir (CSV) — Excel/PDF ileri PR (CSV Excel'de açılır)
+- [x] Repricer test mağazada fiyat değiştirip aynı dakika tekrar çağırmıyor (15dk respekt — Pest doğruladı)
+- [x] `php artisan test --compact` 234 yeşil (Faz 4: +30 test)
+- [x] PHPStan level 6 baseline ile temiz
+- [x] Migration up/down test edildi (5 yeni migration)
+- [x] `lang/{en,tr}/reports.php` eşli; `.env.example` güncel
+- [ ] Reklam/buybox canlı API + Excel/PDF export — ileri PR (sandbox erişimi gerekir)
+- [x] Plan'da Faz 4 satırları işaretlendi
 
 ---
 

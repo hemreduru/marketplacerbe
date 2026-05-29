@@ -1,7 +1,9 @@
 <?php
 
 use App\Services\Cargo\Aras\ArasService;
+use App\Services\Cargo\Dhl\DhlService;
 use App\Services\Cargo\Mng\MngService;
+use App\Services\Cargo\Ups\UpsService;
 use App\Services\Cargo\Yurtici\YurticiService;
 
 return [
@@ -91,6 +93,7 @@ return [
         'ups' => [
             'name' => 'UPS Türkiye',
             'protocol' => 'rest',
+            'class' => UpsService::class,
             'rest_endpoint' => [
                 'test' => env('UPS_TEST_ENDPOINT', 'https://wwwcie.ups.com/api'),
                 'production' => env('UPS_PRODUCTION_ENDPOINT', 'https://onlinetools.ups.com/api'),
@@ -104,6 +107,7 @@ return [
         'dhl' => [
             'name' => 'DHL',
             'protocol' => 'rest',
+            'class' => DhlService::class,
             'rest_endpoint' => [
                 'test' => env('DHL_TEST_ENDPOINT', 'https://api-sandbox.dhl.com'),
                 'production' => env('DHL_PRODUCTION_ENDPOINT', 'https://api.dhl.com'),

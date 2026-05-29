@@ -3,21 +3,30 @@
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Web\AdminPlanController;
+use App\Http\Controllers\Web\AdReportController;
+use App\Http\Controllers\Web\AnalyticsReportController;
 use App\Http\Controllers\Web\AuthController;
+use App\Http\Controllers\Web\BuyboxController;
 use App\Http\Controllers\Web\ClaimController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\FinancialController;
 use App\Http\Controllers\Web\MailWebhookController;
+use App\Http\Controllers\Web\MarketplaceComparisonController;
 use App\Http\Controllers\Web\MarketplaceSettingsController;
 use App\Http\Controllers\Web\MasterProductController;
 use App\Http\Controllers\Web\OrderController;
+use App\Http\Controllers\Web\OrderReportController;
 use App\Http\Controllers\Web\ProductController;
 use App\Http\Controllers\Web\ProfileController;
 use App\Http\Controllers\Web\ProfitReportController;
 use App\Http\Controllers\Web\QuestionController;
+use App\Http\Controllers\Web\RepricerController;
+use App\Http\Controllers\Web\ReturnReportController;
 use App\Http\Controllers\Web\SettingsController;
+use App\Http\Controllers\Web\StockReportController;
 use App\Http\Controllers\Web\SubscriptionController;
 use App\Http\Controllers\Web\TwoFactorController;
+use App\Http\Controllers\Web\VatReportController;
 use App\Http\Controllers\Web\WebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -118,7 +127,46 @@ Route::middleware('auth')->group(function () {
         Route::post('/financial/sync', [FinancialController::class, 'sync'])->name('financial.sync');
     });
 
-    // Reports
-    Route::get('/reports/sku-profit', [ProfitReportController::class, 'skuProfit'])->name('reports.sku-profit');
-    Route::get('/reports/reconciliation', [ProfitReportController::class, 'reconciliation'])->name('reports.reconciliation');
+    // Reports (Faz 4 — Analitik 2.0) — analytics feature ile korunur
+    Route::middleware('feature:analytics')->group(function () {
+        Route::get('/reports/sku-profit', [ProfitReportController::class, 'skuProfit'])->name('reports.sku-profit');
+        Route::get('/reports/reconciliation', [ProfitReportController::class, 'reconciliation'])->name('reports.reconciliation');
+
+        // PR 4.1 — Sipariş raporu + toplu işlemler
+        Route::get('/reports/order', [OrderReportController::class, 'index'])->name('reports.order');
+        Route::get('/reports/order/export', [OrderReportController::class, 'export'])->name('reports.order.export');
+        Route::post('/reports/order/bulk', [OrderReportController::class, 'bulkAction'])->name('reports.order.bulk');
+
+        // PR 4.2 — Stok raporu + satın alma listesi
+        Route::get('/reports/stock', [StockReportController::class, 'index'])->name('reports.stock');
+        Route::get('/reports/stock/purchase-order', [StockReportController::class, 'purchaseOrder'])->name('reports.stock.po');
+
+        // PR 4.3 — İade analiz raporu
+        Route::get('/reports/returns', [ReturnReportController::class, 'index'])->name('reports.returns');
+
+        // PR 4.4 — Pazaryeri karşılaştırma pivotu
+        Route::get('/reports/marketplace-comparison', [MarketplaceComparisonController::class, 'index'])->name('reports.marketplace-comparison');
+
+        // PR 4.5 — KDV & vergi raporu + export
+        Route::get('/reports/vat', [VatReportController::class, 'index'])->name('reports.vat');
+        Route::get('/reports/vat/export', [VatReportController::class, 'export'])->name('reports.vat.export');
+
+        // PR 4.6 — Reklam performans raporu
+        Route::get('/reports/ads', [AdReportController::class, 'index'])->name('reports.ads');
+        Route::post('/reports/ads/sync', [AdReportController::class, 'sync'])->name('reports.ads.sync');
+
+        // PR 4.7 — Coğrafya + saat ısı haritası + cohort + LTM trend
+        Route::get('/reports/analytics', [AnalyticsReportController::class, 'index'])->name('reports.analytics');
+
+        // PR 4.8 — Rakip / buybox takip
+        Route::get('/reports/buybox', [BuyboxController::class, 'index'])->name('reports.buybox');
+        Route::post('/reports/buybox/sync', [BuyboxController::class, 'sync'])->name('reports.buybox.sync');
+
+        // PR 4.9 — Kural tabanlı repricer
+        Route::get('/repricer', [RepricerController::class, 'index'])->name('repricer.index');
+        Route::post('/repricer', [RepricerController::class, 'store'])->name('repricer.store');
+        Route::put('/repricer/{rule}', [RepricerController::class, 'update'])->name('repricer.update');
+        Route::delete('/repricer/{rule}', [RepricerController::class, 'destroy'])->name('repricer.destroy');
+        Route::post('/repricer/run', [RepricerController::class, 'run'])->name('repricer.run');
+    });
 });
