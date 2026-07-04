@@ -217,12 +217,6 @@ parameters:
 			path: app/Http/Controllers/Web/DashboardController.php
 
 		-
-			message: '#^Relation ''items'' is not found in App\\Models\\Order model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/Web/DashboardController.php
-
-		-
 			message: '#^Method App\\Http\\Controllers\\Web\\FinancialController\:\:emptyStats\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -307,18 +301,6 @@ parameters:
 			path: app/Http/Controllers/Web/MasterProductController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Order\:\:\$items\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Web/OrderController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Order\:\:\$marketplace\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/Web/OrderController.php
-
-		-
 			message: '#^Method App\\Http\\Controllers\\Web\\OrderController\:\:getData\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -347,24 +329,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/Http/Controllers/Web/OrderController.php
-
-		-
-			message: '#^Relation ''items'' is not found in App\\Models\\Order model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/Web/OrderController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Order\:\:\$items_count\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Web/OrderReportController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Order\:\:\$marketplace\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Web/OrderReportController.php
 
 		-
 			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\<App\\Models\\Order\>\:\:getCollection\(\)\.$#'
@@ -913,30 +877,6 @@ parameters:
 			path: app/Models/Order.php
 
 		-
-			message: '#^Method App\\Models\\Order\:\:credential\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Models/Order.php
-
-		-
-			message: '#^Method App\\Models\\Order\:\:items\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Models/Order.php
-
-		-
-			message: '#^Method App\\Models\\Order\:\:marketplace\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Models/Order.php
-
-		-
-			message: '#^Method App\\Models\\Order\:\:user\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Models/Order.php
-
-		-
 			message: '#^Class App\\Models\\OrderItem uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
 			identifier: missingType.generics
 			count: 1
@@ -1325,12 +1265,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Services/Buybox/BuyboxService.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Order\:\:\$items\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/Calculations/ProfitCalculator.php
 
 		-
 			message: '#^Method App\\Services\\Cargo\\Aras\\ArasService\:\:createShipment\(\) should return App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\> but returns App\\Support\\ServiceResult\<array\{tracking_number\: string, label_url\: string\|null\}\>\.$#'
@@ -2115,12 +2049,6 @@ parameters:
 		-
 			message: '#^Method App\\Services\\Reports\\OrderReportService\:\:paginate\(\) should return Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\<App\\Models\\Order\> but returns Illuminate\\Pagination\\LengthAwarePaginator\<int, App\\Models\\Order\>\.$#'
 			identifier: return.type
-			count: 1
-			path: app/Services/Reports/OrderReportService.php
-
-		-
-			message: '#^Relation ''marketplace'' is not found in App\\Models\\Order model\.$#'
-			identifier: larastan.relationExistence
 			count: 1
 			path: app/Services/Reports/OrderReportService.php
 

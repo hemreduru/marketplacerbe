@@ -36,4 +36,12 @@ class OrderItem extends Model
     {
         return $this->belongsTo(MasterProduct::class, 'master_product_id');
     }
+
+    /**
+     * @return HasOne<OrderItemFinancial, $this>
+     */
+    public function financial(): HasOne
+    {
+        return $this->hasOne(OrderItemFinancial::class);
+    }
 }

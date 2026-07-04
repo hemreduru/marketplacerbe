@@ -3,6 +3,7 @@
 namespace App\Services\Marketplaces\Trendyol;
 
 use App\Exceptions\SubscriptionLimitException;
+use App\Jobs\EstimateOrderProfitJob;
 use App\Models\Order;
 use App\Models\User;
 use App\Support\ServiceResult;
@@ -111,7 +112,9 @@ class OrderService
 
                 foreach ($orders as $orderData) {
                     try {
-                        DB::transaction(function () use ($orderData, $marketplaceId, $userId, $limit, &$chunkStats, &$totalStats) {
+                        $syncedOrderId = null;
+
+                        DB::transaction(function () use ($orderData, $marketplaceId, $userId, $limit, &$chunkStats, &$totalStats, &$syncedOrderId) {
                             $exists = Order::where('marketplace_id', $marketplaceId)
                                 ->where('user_id', $userId)
                                 ->where('order_number', $orderData['orderNumber'])
@@ -181,7 +184,14 @@ class OrderService
                                     ]);
                                 }
                             }
+
+                            $syncedOrderId = $order->id;
                         });
+
+                        // Kalem bazlı tahmini kâr — items yeniden yazıldığı için her sync'te tazelenir
+                        if ($syncedOrderId !== null) {
+                            EstimateOrderProfitJob::dispatch($syncedOrderId)->onQueue('sync');
+                        }
                     } catch (\Exception $e) {
                         if ($e instanceof SubscriptionLimitException) {
                             throw $e;
