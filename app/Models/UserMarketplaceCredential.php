@@ -83,6 +83,8 @@ class UserMarketplaceCredential extends Model
 
     /**
      * Get the user that owns this credential.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -91,6 +93,8 @@ class UserMarketplaceCredential extends Model
 
     /**
      * Get the marketplace that this credential belongs to.
+     *
+     * @return BelongsTo<Marketplace, $this>
      */
     public function marketplace(): BelongsTo
     {

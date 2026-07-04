@@ -31,18 +31,6 @@ parameters:
 			path: app/Console/Commands/SyncAllFinancialsCommand.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Console/Commands/SyncMarketplaceBrandsCommand.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 4
-			path: app/Console/Commands/SyncMarketplaceBrandsCommand.php
-
-		-
 			message: '#^Call to static method make\(\) on an unknown class App\\Services\\MarketplaceServiceFactory\.$#'
 			identifier: class.notFound
 			count: 1
@@ -53,18 +41,6 @@ parameters:
 			identifier: class.notFound
 			count: 1
 			path: app/Console/Commands/SyncMarketplaceBrandsCommand.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Console/Commands/SyncMarketplaceCategoriesCommand.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 4
-			path: app/Console/Commands/SyncMarketplaceCategoriesCommand.php
 
 		-
 			message: '#^Call to static method make\(\) on an unknown class App\\Services\\MarketplaceServiceFactory\.$#'
@@ -515,12 +491,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/Http/Controllers/Web/VatReportController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Web/WebhookController.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$preferredLanguage\.$#'
@@ -1117,12 +1087,6 @@ parameters:
 			path: app/Models/UserMarketplaceCredential.php
 
 		-
-			message: '#^Method App\\Models\\UserMarketplaceCredential\:\:marketplace\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Models/UserMarketplaceCredential.php
-
-		-
 			message: '#^Method App\\Models\\UserMarketplaceCredential\:\:questions\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
 			identifier: missingType.generics
 			count: 1
@@ -1130,12 +1094,6 @@ parameters:
 
 		-
 			message: '#^Method App\\Models\\UserMarketplaceCredential\:\:syncLogs\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Models/UserMarketplaceCredential.php
-
-		-
-			message: '#^Method App\\Models\\UserMarketplaceCredential\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
 			identifier: missingType.generics
 			count: 1
 			path: app/Models/UserMarketplaceCredential.php
@@ -1183,12 +1141,6 @@ parameters:
 			path: app/Services/Ads/AdReportService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/Ads/AdSyncService.php
-
-		-
 			message: '#^Method App\\Services\\Ads\\AdSyncService\:\:sync\(\) should return App\\Support\\ServiceResult\<array\<string, int\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
 			identifier: return.type
 			count: 1
@@ -1229,12 +1181,6 @@ parameters:
 			identifier: notIdentical.alwaysTrue
 			count: 1
 			path: app/Services/Auth/TwoFactorAuthService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/Buybox/BuyboxService.php
 
 		-
 			message: '#^Method App\\Services\\Buybox\\BuyboxService\:\:lostBuybox\(\) should return Illuminate\\Support\\Collection\<int, array\<string, mixed\>\> but returns Illuminate\\Support\\Collection\<int, non\-empty\-array\<string, mixed\>\>\.$#'
@@ -1741,12 +1687,6 @@ parameters:
 			path: app/Services/Inventory/MasterProductStockProjector.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/MarketplaceManager.php
-
-		-
 			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
 			identifier: nullCoalesce.offset
 			count: 4
@@ -1807,28 +1747,10 @@ parameters:
 			path: app/Services/Marketplaces/Amazon/ReportsService.php
 
 		-
-			message: '#^Variable \$content in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: app/Services/Marketplaces/Hepsiburada/ClaimService.php
-
-		-
 			message: '#^Method App\\Services\\Marketplaces\\Hepsiburada\\Client\:\:send\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
 			identifier: return.type
 			count: 2
 			path: app/Services/Marketplaces/Hepsiburada/Client.php
-
-		-
-			message: '#^Variable \$content in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: app/Services/Marketplaces/Hepsiburada/OrderService.php
-
-		-
-			message: '#^Variable \$content in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: app/Services/Marketplaces/Hepsiburada/ProductService.php
 
 		-
 			message: '#^Method App\\Services\\Marketplaces\\N11\\ClaimService\:\:approveClaimItems\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
@@ -1949,18 +1871,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: app/Services/Marketplaces/Trendyol/OrderService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/Marketplaces/Trendyol/ProductService.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getSubscriptionLimit\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Services/Marketplaces/Trendyol/ProductService.php
 
 		-
 			message: '#^Using nullsafe property access "\?\-\>master_product_id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'

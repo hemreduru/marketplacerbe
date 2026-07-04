@@ -38,4 +38,15 @@ class MarketplaceFactory extends Factory
             'is_active' => true,
         ]);
     }
+
+    public function hepsiburada(): static
+    {
+        return $this->state(fn () => [
+            'name' => 'Hepsiburada',
+            'slug' => 'hepsiburada',
+            'code' => 'HEPSIBURADA',
+            'api_base_url' => 'https://mpop-sit.hepsiburada.com',
+            'is_active' => true,
+        ]);
+    }
 }
