@@ -6,14 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FinancialDailySummary;
 use App\Models\MasterProduct;
 use App\Models\OrderItem;
-use App\Services\Calculations\AdAllocator;
-use App\Services\Calculations\CommissionCalculator;
-use App\Services\Calculations\PackagingCostCalculator;
 use App\Services\Calculations\ProfitCalculator;
-use App\Services\Calculations\ReturnCostEstimator;
-use App\Services\Calculations\ServiceFeeCalculator;
-use App\Services\Calculations\ShippingCostCalculator;
-use App\Services\Calculations\VatCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,24 +24,11 @@ class ProfitReportController extends Controller
 
         $items = OrderItem::whereIn('master_product_id', $masterIds)
             ->whereHas('order', fn ($q) => $q->whereBetween('order_date', [$from, $to]))
-            ->with('master', 'order')
+            ->with('master', 'order.marketplace')
             ->get()
             ->groupBy('master_product_id');
 
-        $vat = new VatCalculator;
-        $calculator = new ProfitCalculator(
-            vat: $vat,
-            commission: new CommissionCalculator($vat),
-            serviceFee: new ServiceFeeCalculator($vat),
-            shipping: new ShippingCostCalculator($vat),
-            returnCost: new ReturnCostEstimator,
-            packaging: new PackagingCostCalculator($vat),
-            ads: new AdAllocator,
-        );
-
-        $commissionRate = (float) config('marketplaces.trendyol.commission.default_rate', 15.0);
-        $commissionBaseType = config('marketplaces.trendyol.commission.base_type', 'vat_excluded');
-        $shippingTariff = config('marketplaces.trendyol.shipping.default_tariff', []);
+        $calculator = app(ProfitCalculator::class);
 
         $rows = [];
         foreach ($items as $masterId => $groupedItems) {
@@ -68,13 +48,8 @@ class ProfitReportController extends Controller
                 $qty += $item->quantity;
                 $revenue = bcadd($revenue, bcmul((string) $item->price, (string) $item->quantity, 4), 4);
 
-                $breakdown = $calculator->forOrderItem(
-                    $item,
-                    $master,
-                    commissionRate: $commissionRate,
-                    commissionBaseType: $commissionBaseType,
-                    shippingTariff: $shippingTariff,
-                );
+                // Context kalemin siparişinin pazaryerinden çözülür
+                $breakdown = $calculator->forOrderItem($item, $master);
 
                 $netRevenue = bcadd($netRevenue, $breakdown->netRevenue, 6);
                 $netProfit = bcadd($netProfit, $breakdown->netProfit, 6);

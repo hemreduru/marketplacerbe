@@ -28,16 +28,12 @@ class MarketplaceComparisonService
             ->where('orders.user_id', $user->id)
             ->whereBetween('orders.order_date', [$period->from, $period->to])
             ->whereNotNull('order_items.master_product_id')
-            ->with('master')
+            ->with('master', 'order.marketplace')
             ->select('order_items.*', 'orders.marketplace_id as mp_id')
             ->get();
 
         $marketplaceIds = $items->pluck('mp_id')->unique()->filter()->values();
         $marketplaces = Marketplace::whereIn('id', $marketplaceIds)->get();
-
-        $commissionRate = (float) config('marketplaces.trendyol.commission.default_rate', 15.0);
-        $commissionBaseType = config('marketplaces.trendyol.commission.base_type', 'vat_excluded');
-        $shippingTariff = config('marketplaces.trendyol.shipping.default_tariff', []);
 
         // [masterId][mpId] => ['qty' => int, 'profit' => string]
         $grid = [];
@@ -48,13 +44,8 @@ class MarketplaceComparisonService
             $mpId = $item->mp_id;
             $masters[$masterId] = $item->master;
 
-            $breakdown = $this->profit->forOrderItem(
-                $item,
-                $item->master,
-                commissionRate: $commissionRate,
-                commissionBaseType: $commissionBaseType,
-                shippingTariff: $shippingTariff,
-            );
+            // Context kalemin siparişinin pazaryerinden çözülür (pivot pazaryeri bazlı)
+            $breakdown = $this->profit->forOrderItem($item, $item->master);
 
             $grid[$masterId][$mpId]['qty'] = ($grid[$masterId][$mpId]['qty'] ?? 0) + $item->quantity;
             $grid[$masterId][$mpId]['profit'] = bcadd($grid[$masterId][$mpId]['profit'] ?? '0', $breakdown->netProfit, 4);

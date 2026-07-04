@@ -4,28 +4,12 @@ use App\Models\MasterProduct;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\User;
-use App\Services\Calculations\AdAllocator;
-use App\Services\Calculations\CommissionCalculator;
-use App\Services\Calculations\PackagingCostCalculator;
 use App\Services\Calculations\ProfitCalculator;
-use App\Services\Calculations\ReturnCostEstimator;
-use App\Services\Calculations\ServiceFeeCalculator;
-use App\Services\Calculations\ShippingCostCalculator;
-use App\Services\Calculations\VatCalculator;
+use App\Services\Finance\ProfitContextFactory;
 
 function makeCalculator(): ProfitCalculator
 {
-    $vat = new VatCalculator;
-
-    return new ProfitCalculator(
-        vat: $vat,
-        commission: new CommissionCalculator($vat),
-        serviceFee: new ServiceFeeCalculator($vat),
-        shipping: new ShippingCostCalculator($vat),
-        returnCost: new ReturnCostEstimator,
-        packaging: new PackagingCostCalculator($vat),
-        ads: new AdAllocator,
-    );
+    return app(ProfitCalculator::class);
 }
 
 test('tek kalem net kâr — 200 TL satış, düşük maliyet', function () {
@@ -53,9 +37,102 @@ test('tek kalem net kâr — 200 TL satış, düşük maliyet', function () {
     expect((float) $result->netProfit)->toBeGreaterThan(0);
     expect((float) $result->margin)->toBeGreaterThan(0);
     expect($result->deductions)->toHaveKeys([
-        'cost_of_goods', 'commission', 'shipping', 'return_cost', 'ad_cost', 'packaging',
+        'cost_of_goods', 'commission', 'shipping', 'stopaj', 'return_cost', 'ad_cost', 'packaging',
     ]);
     expect($result->deductions)->not->toHaveKey('service_fee');
+});
+
+test('stopaj KDV hariç matrah üzerinden yüzde 1 düşülür', function () {
+    $user = User::factory()->create();
+    $master = MasterProduct::factory()->create([
+        'user_id' => $user->id,
+        'cost_price' => 30.0,
+        'vat_rate' => 20.00,
+    ]);
+    $order = Order::factory()->create(['user_id' => $user->id]);
+    $item = OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'price' => 200.00,
+        'quantity' => 1,
+        'master_product_id' => $master->id,
+    ]);
+
+    $result = makeCalculator()->forOrderItem($item, $master);
+
+    // 200 / 1.2 = 166.6667 matrah → %1 = 1.6667
+    expect($result->deductions['stopaj'])->toBe('1.6667');
+});
+
+test('ürünün gerçek KDV oranı kullanılır — %10 KDV', function () {
+    $user = User::factory()->create();
+    $master = MasterProduct::factory()->create([
+        'user_id' => $user->id,
+        'cost_price' => 30.0,
+        'vat_rate' => 10.00,
+    ]);
+    $order = Order::factory()->create(['user_id' => $user->id]);
+    $item = OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'price' => 220.00,
+        'quantity' => 1,
+        'master_product_id' => $master->id,
+    ]);
+
+    $result = makeCalculator()->forOrderItem($item, $master);
+
+    // 220 / 1.10 = 200.0000 (hardcoded %20 olsaydı 183.3333 çıkardı)
+    expect($result->netRevenue)->toBe('200.0000');
+});
+
+test('hepsiburada bağlamında komisyon KDV dahil bazdan hesaplanır', function () {
+    $user = User::factory()->create();
+    $master = MasterProduct::factory()->create([
+        'user_id' => $user->id,
+        'cost_price' => 30.0,
+        'vat_rate' => 20.00,
+    ]);
+    $order = Order::factory()->create(['user_id' => $user->id]);
+    $item = OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'price' => 200.00,
+        'quantity' => 1,
+        'master_product_id' => $master->id,
+        'commission_rate' => 0,
+    ]);
+
+    $calculator = makeCalculator();
+    $factory = app(ProfitContextFactory::class);
+
+    $trendyol = $calculator->forOrderItem($item, $master, $factory->forMarketplace('trendyol'));
+    $hepsiburada = $calculator->forOrderItem($item, $master, $factory->forMarketplace('hepsiburada'));
+
+    // TY: KDV hariç 166.6667 × %15 = 25.0000 | HB: KDV dahil 200 × %15 = 30.0000
+    expect($trendyol->deductions['commission'])->toBe('25.0000')
+        ->and($hepsiburada->deductions['commission'])->toBe('30.0000')
+        ->and($hepsiburada->details['marketplace'])->toBe('hepsiburada');
+});
+
+test('kalemde settlement komisyon oranı varsa config yerine o kullanılır', function () {
+    $user = User::factory()->create();
+    $master = MasterProduct::factory()->create([
+        'user_id' => $user->id,
+        'cost_price' => 30.0,
+        'vat_rate' => 20.00,
+    ]);
+    $order = Order::factory()->create(['user_id' => $user->id]);
+    $item = OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'price' => 200.00,
+        'quantity' => 1,
+        'master_product_id' => $master->id,
+        'commission_rate' => 21.50,
+    ]);
+
+    $result = makeCalculator()->forOrderItem($item, $master);
+
+    // 166.6667 × %21.5 = 35.8333
+    expect($result->deductions['commission'])->toBe('35.8333')
+        ->and((float) $result->details['commission_rate'])->toBe(21.5);
 });
 
 test('multi-item order — platform fee sipariş başına 1 kez', function () {

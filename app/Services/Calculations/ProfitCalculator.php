@@ -5,21 +5,24 @@ namespace App\Services\Calculations;
 use App\Models\MasterProduct;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\Finance\ProfitContextFactory;
 use App\Support\ProfitBreakdown;
+use App\Support\ProfitContext;
 
 /**
  * Ana kârlılık hesaplama motoru.
  *
- * Tüm alt hesaplayıcıları (KDV, komisyon, hizmet bedeli, kargo, iade, paketleme, reklam)
- * birleştirerek net kâr hesaplar.
+ * Tüm alt hesaplayıcıları (KDV, komisyon, hizmet bedeli, kargo, stopaj,
+ * iade, paketleme, reklam) birleştirerek net kâr hesaplar. Pazaryeri
+ * parametreleri ProfitContext üzerinden gelir — hardcoded marketplace yok.
  *
  * Formül (tek kalem):
- *   net_profit = netRevenue - costOfGoods - commission - serviceFee - shipping
+ *   net_profit = netRevenue - costOfGoods - commission - shipping - stopaj
  *              - returnCost - adCost - packaging
  *
  * Formül (sipariş seviyesi — NOT: platform fee ve kargo sipariş başına 1 kez):
- *   net_profit = SUM(items_netRevenue) - SUM(items_costOfGoods, commission, return, ad, packaging)
- *              - shipping(order_level) - platform_fee(order_level)
+ *   net_profit = SUM(items_netRevenue) - SUM(items deductions)
+ *              - platform_fee(order_level)
  */
 class ProfitCalculator
 {
@@ -31,51 +34,60 @@ class ProfitCalculator
         private readonly ReturnCostEstimator $returnCost,
         private readonly PackagingCostCalculator $packaging,
         private readonly AdAllocator $ads,
+        private readonly StopajCalculator $stopaj,
+        private readonly ProfitContextFactory $contexts,
     ) {}
 
     /**
      * Tek sipariş kalemi için net kâr hesaplar.
+     *
+     * Context verilmezse kalemin siparişinin pazaryerinden çözülür.
      */
     public function forOrderItem(
         OrderItem $item,
         ?MasterProduct $master = null,
-        string $orderType = 'standard',
-        float $commissionRate = 15.0,
-        string $commissionBaseType = 'vat_excluded',
-        float $commissionVatRate = 20.0,
-        array $shippingTariff = [],
-        float $returnRate = 0.0,
+        ?ProfitContext $ctx = null,
     ): ProfitBreakdown {
-        $vatRate = 20.0;
+        $ctx ??= $this->contexts->forOrder($item->order);
+        $profile = $ctx->profile;
+
+        // Satış KDV oranı: ürünün gerçek oranı > pazaryeri varsayılanı
+        $vatRate = (string) ($master->vat_rate ?? $profile->saleVatRate);
         $qty = $item->quantity;
-        $unitPrice = (float) $item->price;
-        $totalIncVat = $unitPrice * $qty;
+        $unitPrice = (string) $item->price;
+        $totalIncVat = bcmul($unitPrice, (string) $qty, 4);
 
         $netRevenue = $this->vat->excludeVat($totalIncVat, $vatRate);
 
         $deductions = [];
-        $details = [];
 
         $costOfGoods = $master
-            ? $this->vat->excludeVat((float) $master->cost_price * $qty, (float) $master->cost_price_vat_rate)
+            ? $this->vat->excludeVat(bcmul((string) $master->cost_price, (string) $qty, 4), (string) $master->cost_price_vat_rate)
             : '0.0000';
         $deductions['cost_of_goods'] = bcround($costOfGoods, 4);
 
-        $commissionAmt = $this->commission->amount($totalIncVat, $vatRate, $commissionRate, $commissionBaseType);
+        // Komisyon: kalemde gerçek (settlement) oran varsa o, yoksa config fallback
+        $commissionRate = $item->commission_rate > 0
+            ? (string) $item->commission_rate
+            : $profile->commissionDefaultRate;
+        $commissionAmt = $this->commission->amount($totalIncVat, $vatRate, $commissionRate, $profile->commissionBaseType);
         $deductions['commission'] = bcround($commissionAmt, 4);
 
-        $shippingTariff = $shippingTariff ?: config('marketplaces.trendyol.shipping.default_tariff');
         $shippingResult = $this->shipping->compute(
-            $master ? (float) $master->desi : 1.0,
+            $master ? (string) $master->desi : '1',
             $master ? $master->weight_g : 500,
-            $shippingTariff
+            $profile->shippingTariff,
+            $profile->shippingVatRate,
         );
         $deductions['shipping'] = $shippingResult['excl_vat'];
 
-        $returnCost = $this->returnCost->expectedReturnCost($returnRate, (float) $shippingResult['total']);
+        // 7524 sayılı Kanun: KDV hariç matrah üzerinden %1 stopaj
+        $deductions['stopaj'] = $this->stopaj->amount($totalIncVat, $vatRate, $profile->stopajRate);
+
+        $returnCost = $this->returnCost->expectedReturnCost($ctx->returnRate, (float) $shippingResult['total']);
         $deductions['return_cost'] = bcround($returnCost, 4);
 
-        $adCost = $this->ads->perUnit($item->merchant_sku ?? '', 'trendyol', $qty);
+        $adCost = $this->ads->perUnit($item->merchant_sku ?? '', $profile->code, $qty);
         $deductions['ad_cost'] = bcround($adCost, 4);
 
         $packagingCost = $master
@@ -107,11 +119,14 @@ class ProfitCalculator
             deductions: $deductions,
             details: [
                 'item_id' => $item->id,
+                'marketplace' => $profile->code,
                 'unit_price' => $unitPrice,
                 'quantity' => $qty,
                 'vat_rate' => $vatRate,
                 'sale_inc_vat' => $totalIncVat,
                 'commission_rate' => $commissionRate,
+                'commission_base_type' => $profile->commissionBaseType,
+                'stopaj_rate' => $profile->stopajRate,
                 'shipping_result' => $shippingResult,
             ],
         );
@@ -121,15 +136,10 @@ class ProfitCalculator
      * Sipariş seviyesinde net kâr hesaplar.
      * Platform service fee sipariş başına 1 kez düşülür.
      */
-    public function forOrder(
-        Order $order,
-        string $orderType = 'standard',
-        float $defaultCommissionRate = 15.0,
-        string $commissionBaseType = 'vat_excluded',
-        float $commissionVatRate = 20.0,
-        array $shippingTariff = [],
-        float $returnRate = 0.0,
-    ): ProfitBreakdown {
+    public function forOrder(Order $order, ?ProfitContext $ctx = null): ProfitBreakdown
+    {
+        $ctx ??= $this->contexts->forOrder($order);
+
         $items = $order->items;
         $itemsNetRevenue = '0.0000';
         $itemsCost = '0.0000';
@@ -142,7 +152,7 @@ class ProfitCalculator
                 ? MasterProduct::find($item->master_product_id)
                 : null;
 
-            $breakdown = $this->forOrderItem($item, $master, $orderType, $defaultCommissionRate, $commissionBaseType, $commissionVatRate, $shippingTariff, $returnRate);
+            $breakdown = $this->forOrderItem($item, $master, $ctx);
 
             $itemsNetRevenue = bcadd($itemsNetRevenue, $breakdown->netRevenue, 6);
             $itemsCost = bcadd($itemsCost, bcsub($breakdown->netRevenue, $breakdown->netProfit, 6), 6);
@@ -152,7 +162,7 @@ class ProfitCalculator
             }
         }
 
-        $serviceFeeResult = $this->serviceFee->calculate('trendyol', $orderType, 1);
+        $serviceFeeResult = $this->serviceFee->calculate($ctx->profile->code, $ctx->orderType, 1);
         $aggregatedDeductions['service_fee'] = $serviceFeeResult['amount_excl_vat'];
 
         $itemsCost = bcadd($itemsCost, $serviceFeeResult['amount_excl_vat'], 6);
@@ -175,6 +185,7 @@ class ProfitCalculator
             deductions: $aggregatedDeductions,
             details: [
                 'order_id' => $order->id,
+                'marketplace' => $ctx->profile->code,
                 'item_count' => $items->count(),
                 'service_fee_once' => $serviceFeeResult['amount_excl_vat'],
             ],

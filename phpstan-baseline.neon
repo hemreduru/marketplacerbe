@@ -427,12 +427,6 @@ parameters:
 			path: app/Http/Controllers/Web/ProfileController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$master\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Web/ProfitReportController.php
-
-		-
 			message: '#^Method App\\Http\\Controllers\\Web\\ProfitReportController\:\:reconciliation\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -441,18 +435,6 @@ parameters:
 		-
 			message: '#^Method App\\Http\\Controllers\\Web\\ProfitReportController\:\:skuProfit\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: app/Http/Controllers/Web/ProfitReportController.php
-
-		-
-			message: '#^Relation ''master'' is not found in App\\Models\\OrderItem model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/Web/ProfitReportController.php
-
-		-
-			message: '#^Relation ''order'' is not found in App\\Models\\OrderItem model\.$#'
-			identifier: larastan.relationExistence
 			count: 1
 			path: app/Http/Controllers/Web/ProfitReportController.php
 
@@ -957,24 +939,6 @@ parameters:
 		-
 			message: '#^Class App\\Models\\OrderItem uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
 			identifier: missingType.generics
-			count: 1
-			path: app/Models/OrderItem.php
-
-		-
-			message: '#^Method App\\Models\\OrderItem\:\:master\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Models/OrderItem.php
-
-		-
-			message: '#^Method App\\Models\\OrderItem\:\:order\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Models/OrderItem.php
-
-		-
-			message: '#^Method App\\Models\\OrderItem\:\:product\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/Models/OrderItem.php
 
@@ -2125,12 +2089,6 @@ parameters:
 			path: app/Services/Reports/AnalyticsReportService.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$master\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/Reports/MarketplaceComparisonService.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$mp_id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -2139,12 +2097,6 @@ parameters:
 		-
 			message: '#^Method App\\Services\\Reports\\MarketplaceComparisonService\:\:pivot\(\) should return array\{marketplaces\: Illuminate\\Support\\Collection\<int, App\\Models\\Marketplace\>, rows\: Illuminate\\Support\\Collection\<int, array\<string, mixed\>\>\} but returns array\{marketplaces\: Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Marketplace\>, rows\: Illuminate\\Support\\Collection\<int, array\{sku\: string\|null, title\: string\|null, cells\: array\<int, array\{qty\: int, profit\: string\}\>\}\>\}\.$#'
 			identifier: return.type
-			count: 1
-			path: app/Services/Reports/MarketplaceComparisonService.php
-
-		-
-			message: '#^Relation ''master'' is not found in App\\Models\\OrderItem model\.$#'
-			identifier: larastan.relationExistence
 			count: 1
 			path: app/Services/Reports/MarketplaceComparisonService.php
 
@@ -2251,20 +2203,8 @@ parameters:
 			path: app/Services/Reports/StockReportService.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\OrderItem\:\:\$master\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/Reports/VatReportService.php
-
-		-
-			message: '#^Method App\\Services\\Reports\\VatReportService\:\:monthly\(\) should return array\{from\: string, to\: string, rows\: Illuminate\\Support\\Collection\<int, array\<string, mixed\>\>, totals\: array\<string, string\>, order_count\: int\} but returns array\{from\: string, to\: string, rows\: Illuminate\\Support\\Collection\<int, array\{sku\: mixed, title\: mixed, sale_vat\: string, purchase_vat\: string, commission_vat\: string, shipping_vat\: string, net\: string\}\>, totals\: array\{sale_vat\: numeric\-string, purchase_vat\: numeric\-string, commission_vat\: numeric\-string, shipping_vat\: numeric\-string, net\: numeric\-string, platform_fee_vat\: string\}, order_count\: int\<0, max\>\}\.$#'
+			message: '#^Method App\\Services\\Reports\\VatReportService\:\:monthly\(\) should return array\{from\: string, to\: string, rows\: Illuminate\\Support\\Collection\<int, array\<string, mixed\>\>, totals\: array\<string, string\>, order_count\: int\} but returns array\{from\: string, to\: string, rows\: Illuminate\\Support\\Collection\<int, array\{sku\: string\|null, title\: string, sale_vat\: string, purchase_vat\: string, commission_vat\: string, shipping_vat\: string, net\: string\}\>, totals\: array\{sale_vat\: numeric\-string, purchase_vat\: numeric\-string, commission_vat\: numeric\-string, shipping_vat\: numeric\-string, net\: numeric\-string, platform_fee_vat\: string\}, order_count\: int\<0, max\>\}\.$#'
 			identifier: return.type
-			count: 1
-			path: app/Services/Reports/VatReportService.php
-
-		-
-			message: '#^Relation ''master'' is not found in App\\Models\\OrderItem model\.$#'
-			identifier: larastan.relationExistence
 			count: 1
 			path: app/Services/Reports/VatReportService.php
 

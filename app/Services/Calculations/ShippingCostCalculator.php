@@ -22,10 +22,10 @@ class ShippingCostCalculator
     /**
      * Kargo ücretini hesaplar.
      *
-     * @param  array<string, string|int>  $tariff  ['base_desi' => 5, 'base_price' => '40.00', 'per_extra_desi_price' => '5.00']
+     * @param  array<string, string|int|float>  $tariff  ['base_desi' => 5, 'base_price' => '40.00', 'per_extra_desi_price' => '5.00']
      * @return array{excl_vat: string, vat: string, total: string}
      */
-    public function compute(float|string|int $desi, int $weightG, array $tariff): array
+    public function compute(float|string|int $desi, int $weightG, array $tariff, float|string|int $vatRate = 20.0): array
     {
         $weightDesi = bcdiv((string) $weightG, (string) self::GRAMS_PER_DESI, 4);
         $effectiveDesi = bcround(
@@ -45,7 +45,6 @@ class ShippingCostCalculator
             $exclVat = bcround(bcadd($basePrice, $extraCost, 4), 4);
         }
 
-        $vatRate = 20.0;
         $incVat = $this->vat->includeVat($exclVat, $vatRate);
         $vatAmount = $this->vat->vatAmount($incVat, $vatRate);
 

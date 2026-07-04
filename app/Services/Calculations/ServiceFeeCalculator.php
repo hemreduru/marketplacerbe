@@ -24,7 +24,7 @@ class ServiceFeeCalculator
         $amountExclVat = $config['amount_excl_vat'] ?? '8.49';
         $vatRate = $config['vat_rate'] ?? 20.0;
 
-        $unitExclVat = number_format((float) $amountExclVat, 4, '.', '');
+        $unitExclVat = bcround((string) $amountExclVat, 4);
         $totalExclVat = bcmul($unitExclVat, (string) $count, 4);
         $vatAmount = $this->vat->vatAmount(
             $this->vat->includeVat($totalExclVat, $vatRate),
