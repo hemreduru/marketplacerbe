@@ -2,18 +2,58 @@
 
 namespace App\Services\Calculations;
 
+use App\Services\Finance\AdSpendRepository;
+
 /**
  * SKU bazlı reklam maliyeti dağıtımı.
  *
- * Şu anda config'ten sabit yüzde veya 0 TL döner.
- * manual_ad_costs tablosu Faz 4'te reklam API entegrasyonuyla birlikte eklenecek.
+ * Gerçek harcama ad_metrics'ten okunur ve dönemdeki toplam satılan birime
+ * bölünerek blended (harmanlanmış) birim maliyet çıkarılır. Kampanya→SKU
+ * eşlemesi API'lerde olmadığı için v1 blended'dır; ileride ad_campaign_products
+ * pivot'u ile SKU hassasiyetine geçilecek.
  */
 class AdAllocator
 {
+    private const INTERNAL_SCALE = 6;
+
+    private const RESULT_SCALE = 4;
+
+    public function __construct(
+        private readonly AdSpendRepository $spend = new AdSpendRepository,
+    ) {}
+
     /**
-     * SKU başına birim reklam maliyetini hesaplar.
+     * Dönemdeki gerçek reklam harcamasını birim başına dağıtır.
      *
-     * Şimdilik config fallback; ileri PR'da manual_ad_costs tablosundan okur.
+     * Formül: (toplam spend / dönemdeki toplam satılan birim) × bu kalemin birimi
+     */
+    public function blendedPerUnit(
+        int $credentialId,
+        string $marketplaceCode,
+        string $periodStart,
+        string $periodEnd,
+        int $units,
+        int $totalUnitsInPeriod,
+    ): string {
+        if ($units <= 0 || $totalUnitsInPeriod <= 0) {
+            return '0.0000';
+        }
+
+        $totalSpend = $this->spend->totalSpend($credentialId, $marketplaceCode, $periodStart, $periodEnd);
+
+        if (bccomp($totalSpend, '0', self::RESULT_SCALE) === 0) {
+            return '0.0000';
+        }
+
+        $perUnit = bcdiv($totalSpend, (string) $totalUnitsInPeriod, self::INTERNAL_SCALE);
+
+        return bcround(bcmul($perUnit, (string) $units, self::INTERNAL_SCALE), self::RESULT_SCALE);
+    }
+
+    /**
+     * Config fallback ile SKU başına birim reklam maliyeti.
+     *
+     * @deprecated blendedPerUnit() kullanın — Stage 2'de ProfitCalculator geçince kaldırılacak.
      */
     public function perUnit(string $sku, string $marketplace, int $unitsSold, ?string $periodStart = null, ?string $periodEnd = null): string
     {

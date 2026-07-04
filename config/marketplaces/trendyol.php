@@ -40,6 +40,11 @@ return [
         'sale_default' => 20,
         'purchase_default' => 20,
         'commission' => 20,
+        'shipping' => 20,
+    ],
+    // 7524 sayılı Kanun: 01.01.2025'ten itibaren aracı platformlarda %1 stopaj (KDV hariç matrah)
+    'stopaj' => [
+        'rate' => env('STOPAJ_RATE', 1.0),
     ],
     'commission' => [
         'default_rate' => 15.0,
