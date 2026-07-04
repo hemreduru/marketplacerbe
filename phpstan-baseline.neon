@@ -25,12 +25,6 @@ parameters:
 			path: app/Console/Commands/SyncAllFinancialsCommand.php
 
 		-
-			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: app/Console/Commands/SyncAllFinancialsCommand.php
-
-		-
 			message: '#^Call to static method make\(\) on an unknown class App\\Services\\MarketplaceServiceFactory\.$#'
 			identifier: class.notFound
 			count: 1
@@ -58,12 +52,6 @@ parameters:
 			message: '#^Method App\\Console\\Commands\\SyncUserMarketplaceDataCommand\:\:handle\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
-			path: app/Console/Commands/SyncUserMarketplaceDataCommand.php
-
-		-
-			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
-			identifier: nullCoalesce.offset
-			count: 4
 			path: app/Console/Commands/SyncUserMarketplaceDataCommand.php
 
 		-
@@ -523,32 +511,8 @@ parameters:
 			path: app/Jobs/SyncCargoTrackingJob.php
 
 		-
-			message: '#^Offset ''write_enabled'' on array\{\}\|string on left side of \?\? does not exist\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: app/Jobs/SyncDispatcherJob.php
-
-		-
-			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: app/Jobs/SyncTrendyolClaimsJob.php
-
-		-
-			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: app/Jobs/SyncTrendyolFinancialsJob.php
-
-		-
 			message: '#^Method App\\Jobs\\SyncTrendyolOrdersJob\:\:__construct\(\) has parameter \$credentialId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/Jobs/SyncTrendyolOrdersJob.php
-
-		-
-			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
-			identifier: nullCoalesce.offset
 			count: 1
 			path: app/Jobs/SyncTrendyolOrdersJob.php
 
@@ -565,22 +529,10 @@ parameters:
 			path: app/Jobs/SyncTrendyolProductsJob.php
 
 		-
-			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: app/Jobs/SyncTrendyolProductsJob.php
-
-		-
 			message: '#^Property App\\Jobs\\SyncTrendyolProductsJob\:\:\$credentialId has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: app/Jobs/SyncTrendyolProductsJob.php
-
-		-
-			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: app/Jobs/SyncTrendyolQuestionsJob.php
 
 		-
 			message: '#^Class App\\Models\\BulkOperation uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
@@ -1685,12 +1637,6 @@ parameters:
 			identifier: nullCoalesce.offset
 			count: 1
 			path: app/Services/Inventory/MasterProductStockProjector.php
-
-		-
-			message: '#^Offset ''seller_id'' on string\|null on left side of \?\? does not exist\.$#'
-			identifier: nullCoalesce.offset
-			count: 4
-			path: app/Services/MarketplaceManager.php
 
 		-
 			message: '#^Constructor of class App\\Services\\Marketplaces\\Amazon\\Client has an unused parameter \$sellerId\.$#'

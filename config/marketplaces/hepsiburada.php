@@ -64,4 +64,8 @@ return [
         'product_title_max' => 100,
         'product_description_max' => 5000,
     ],
+    // Finansal mutabakat endpoint'i — {merchantId} client'taki seller id ile değiştirilir
+    'endpoints' => [
+        'settlements' => env('HB_SETTLEMENTS_PATH', '/finances/merchants/{merchantId}/transactions'),
+    ],
 ];

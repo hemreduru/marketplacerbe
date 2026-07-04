@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\BuyboxController;
 use App\Http\Controllers\Web\ClaimController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\FinancialController;
+use App\Http\Controllers\Web\HepsiburadaWebhookController;
 use App\Http\Controllers\Web\MailWebhookController;
 use App\Http\Controllers\Web\MarketplaceComparisonController;
 use App\Http\Controllers\Web\MarketplaceSettingsController;
@@ -32,6 +33,7 @@ use Illuminate\Support\Facades\Route;
 
 // Webhooks (public, marketplace'a özel endpoint'ler)
 Route::post('/webhooks/trendyol/{credentialUuid}', WebhookController::class)->name('webhooks.trendyol');
+Route::post('/webhooks/hepsiburada/{credentialUuid}', HepsiburadaWebhookController::class)->name('webhooks.hepsiburada');
 Route::post('/webhooks/ses/bounce', [MailWebhookController::class, 'bounce'])->name('webhooks.ses.bounce');
 Route::post('/webhooks/ses/complaint', [MailWebhookController::class, 'complaint'])->name('webhooks.ses.complaint');
 

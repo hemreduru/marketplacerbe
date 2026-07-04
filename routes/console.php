@@ -2,6 +2,11 @@
 
 use App\Jobs\SendDigestMail;
 use App\Jobs\SyncCargoTrackingJob;
+use App\Jobs\SyncHepsiburadaClaimsJob;
+use App\Jobs\SyncHepsiburadaFinancialsJob;
+use App\Jobs\SyncHepsiburadaOrdersJob;
+use App\Jobs\SyncHepsiburadaProductsJob;
+use App\Jobs\SyncHepsiburadaQuestionsJob;
 use App\Jobs\SyncTrendyolClaimsJob;
 use App\Jobs\SyncTrendyolFinancialsJob;
 use App\Jobs\SyncTrendyolOrdersJob;
@@ -59,6 +64,52 @@ Schedule::call(function () use ($activeTrendyolCredentials) {
         SyncTrendyolFinancialsJob::dispatch($credentialId)->onQueue('sync');
     }
 })->dailyAt('03:00')->name('sync-trendyol-financials')->withoutOverlapping();
+
+/*
+|--------------------------------------------------------------------------
+| Hepsiburada Sync Schedule
+|--------------------------------------------------------------------------
+|
+| Trendyol ile aynı kadans: ürünler 6 saatte bir, siparişler 30 dakikada
+| bir, sorular saatlik, iadeler 6 saatte bir, finansallar gecelik.
+| HB webhook'ları anlık akışı sağlar; polling güvenlik ağıdır.
+|
+*/
+
+$activeHepsiburadaCredentials = static fn () => UserMarketplaceCredential::query()
+    ->where('is_active', true)
+    ->whereHas('marketplace', fn ($q) => $q->where('slug', 'hepsiburada'))
+    ->pluck('id');
+
+Schedule::call(function () use ($activeHepsiburadaCredentials) {
+    foreach ($activeHepsiburadaCredentials() as $credentialId) {
+        SyncHepsiburadaProductsJob::dispatch($credentialId)->onQueue('sync');
+    }
+})->everySixHours()->name('sync-hepsiburada-products')->withoutOverlapping();
+
+Schedule::call(function () use ($activeHepsiburadaCredentials) {
+    foreach ($activeHepsiburadaCredentials() as $credentialId) {
+        SyncHepsiburadaOrdersJob::dispatch($credentialId)->onQueue('sync');
+    }
+})->everyThirtyMinutes()->name('sync-hepsiburada-orders')->withoutOverlapping();
+
+Schedule::call(function () use ($activeHepsiburadaCredentials) {
+    foreach ($activeHepsiburadaCredentials() as $credentialId) {
+        SyncHepsiburadaQuestionsJob::dispatch($credentialId)->onQueue('sync');
+    }
+})->hourly()->name('sync-hepsiburada-questions')->withoutOverlapping();
+
+Schedule::call(function () use ($activeHepsiburadaCredentials) {
+    foreach ($activeHepsiburadaCredentials() as $credentialId) {
+        SyncHepsiburadaClaimsJob::dispatch($credentialId)->onQueue('sync');
+    }
+})->everySixHours()->name('sync-hepsiburada-claims')->withoutOverlapping();
+
+Schedule::call(function () use ($activeHepsiburadaCredentials) {
+    foreach ($activeHepsiburadaCredentials() as $credentialId) {
+        SyncHepsiburadaFinancialsJob::dispatch($credentialId)->onQueue('sync');
+    }
+})->dailyAt('03:15')->name('sync-hepsiburada-financials')->withoutOverlapping();
 
 Schedule::command('subscriptions:process-expired')
     ->dailyAt('00:05')

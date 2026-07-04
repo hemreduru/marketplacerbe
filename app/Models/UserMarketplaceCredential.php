@@ -10,6 +10,10 @@ use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+/**
+ * @property array<string, mixed>|null $additional_credentials
+ * @property string|null $webhook_uuid
+ */
 class UserMarketplaceCredential extends Model
 {
     use HasFactory, LogsActivity;
