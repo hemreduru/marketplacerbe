@@ -4,6 +4,8 @@ namespace App\Services\Marketplaces\Hepsiburada;
 
 use App\Models\FinancialDailySummary;
 use App\Models\FinancialTransaction;
+use App\Services\Finance\DailyProfitAggregator;
+use App\Services\Finance\SettlementReconciler;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -130,6 +132,11 @@ class FinanceService
                 $s
             );
         }
+
+        // Hibrit kâr defteri: settlement komisyonlarını kalemlere işle
+        // (HB kargo faturası ayrı endpoint gerektirir — kargo şimdilik tahmin kalır)
+        app(SettlementReconciler::class)->reconcileCredential($credentialId, $startDateYmd, $endDateYmd);
+        app(DailyProfitAggregator::class)->rebuild($credentialId, $startDateYmd, $endDateYmd);
 
         return $stats;
     }

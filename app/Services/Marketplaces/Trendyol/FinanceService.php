@@ -4,6 +4,8 @@ namespace App\Services\Marketplaces\Trendyol;
 
 use App\Models\FinancialDailySummary;
 use App\Models\FinancialTransaction;
+use App\Services\Finance\DailyProfitAggregator;
+use App\Services\Finance\SettlementReconciler;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -295,11 +297,17 @@ class FinanceService
             FinancialDailySummary::updateOrCreate(
                 [
                     'user_marketplace_credential_id' => $credentialId,
-                    'date' => $day,
+                    'date' => Carbon::parse($day)->startOfDay(),
                 ],
                 $s
             );
         }
+
+        // Hibrit kâr defteri: settlement gerçeklerini kalemlere işle, günlük
+        // özete COGS dahil gerçek net kârı yaz.
+        $cargoMap = $this->fetchCargoInvoiceMap($deductions);
+        app(SettlementReconciler::class)->reconcileCredential($credentialId, $startDateYmd, $endDateYmd, $cargoMap);
+        app(DailyProfitAggregator::class)->rebuild($credentialId, $startDateYmd, $endDateYmd);
 
         return $stats;
     }
