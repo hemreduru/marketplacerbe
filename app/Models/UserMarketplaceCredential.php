@@ -79,7 +79,10 @@ class UserMarketplaceCredential extends Model
     protected function casts(): array
     {
         return [
-            'additional_credentials' => 'array',
+            // Sırlar rest'te şifreli saklanır (launch gate v1).
+            'api_key' => 'encrypted',
+            'api_secret' => 'encrypted',
+            'additional_credentials' => 'encrypted:array',
             'is_active' => 'boolean',
             'last_sync_at' => 'datetime',
         ];
