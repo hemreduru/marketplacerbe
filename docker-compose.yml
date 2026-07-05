@@ -1,0 +1,104 @@
+# Cirotik — production topolojisi (Dokploy Compose uyumlu).
+#   web (nginx) → app (php-fpm) · queue worker · scheduler · redis · mysql (izole cirotik DB)
+#
+# NOT (kod-dışı, flag): gerçek deploy insan kararıdır. MARKETPLACE_WRITE_ENABLED
+# ve IYZICO_DEBUG=false yalnız bilinçli olarak canlıda açılır. Dokploy'da MySQL/Redis
+# managed servis olarak da bağlanabilir (o durumda mysql/redis servisleri kaldırılır).
+
+services:
+  web:
+    build:
+      context: .
+      target: web
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "${WEB_PORT:-8080}:80"
+
+  app:
+    build:
+      context: .
+      target: app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: mysql
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: redis
+      CACHE_STORE: redis
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - storage:/var/www/html/storage
+
+  queue:
+    build:
+      context: .
+      target: app
+    restart: unless-stopped
+    command: php artisan queue:work --queue=sync,default --tries=3 --backoff=30 --timeout=120 --sleep=3
+    env_file: .env
+    environment:
+      DB_HOST: mysql
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: redis
+      CACHE_STORE: redis
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - storage:/var/www/html/storage
+
+  scheduler:
+    build:
+      context: .
+      target: app
+    restart: unless-stopped
+    command: php artisan schedule:work
+    env_file: .env
+    environment:
+      DB_HOST: mysql
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: redis
+      CACHE_STORE: redis
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - storage:/var/www/html/storage
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE:-cirotik}"
+      MYSQL_USER: "${DB_USERNAME:-cirotik}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-secret}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-root}"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  storage:
+  redis_data:
+  mysql_data:
