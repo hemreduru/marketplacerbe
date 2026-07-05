@@ -252,6 +252,20 @@
                             </div>
                         </div>
                         <div class="menu-item">
+                            <a class="menu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+                                href="{{ route('admin.dashboard') }}">
+                                <span class="menu-icon"><i class="ki-duotone ki-element-11 fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></span>
+                                <span class="menu-title">{{ __('admin.dashboard') }}</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a class="menu-link {{ request()->routeIs('admin.users') ? 'active' : '' }}"
+                                href="{{ route('admin.users') }}">
+                                <span class="menu-icon"><i class="ki-duotone ki-people fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i></span>
+                                <span class="menu-title">{{ __('admin.users') }}</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
                             <a class="menu-link {{ request()->routeIs('admin.plans.*') ? 'active' : '' }}"
                                 href="{{ route('admin.plans.index') }}">
                                 <span class="menu-icon">

@@ -43,6 +43,15 @@
                         <div id="kt_app_content" class="app-content flex-column-fluid">
                             <!--begin::Content container-->
                             <div id="kt_app_content_container" class="app-container container-fluid px-2 py-4">
+                                @if(session('impersonator_id'))
+                                <div class="alert alert-warning d-flex flex-stack flex-wrap gap-2 mb-4">
+                                    <span class="fw-semibold">{{ __('admin.impersonation_active', ['name' => auth()->user()->name ?? '']) }}</span>
+                                    <form action="{{ route('stop-impersonating') }}" method="POST" class="m-0">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-warning">{{ __('admin.stop_impersonating') }}</button>
+                                    </form>
+                                </div>
+                                @endif
                                 @yield('content')
                             </div>
                             <!--end::Content container-->

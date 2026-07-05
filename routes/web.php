@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Web\AdminController;
 use App\Http\Controllers\Web\AdminPlanController;
 use App\Http\Controllers\Web\AdReportController;
 use App\Http\Controllers\Web\AnalyticsReportController;
@@ -80,6 +81,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/plans', [AdminPlanController::class, 'index'])->name('admin.plans.index');
         Route::get('/plans/{plan}/edit', [AdminPlanController::class, 'edit'])->name('admin.plans.edit');
         Route::put('/plans/{plan}', [AdminPlanController::class, 'update'])->name('admin.plans.update');
+
+        Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+        Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+        Route::post('/users/{user}/impersonate', [AdminController::class, 'impersonate'])->name('admin.impersonate');
     });
 
     // Dashboard
@@ -87,6 +92,9 @@ Route::middleware('auth')->group(function () {
 
     // Onboarding wizard (self-serve kurulum rehberi)
     Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding');
+
+    // Impersonation sonlandırma (admin-dışı bürünülen kullanıcı da erişebilir)
+    Route::post('/stop-impersonating', [AdminController::class, 'stopImpersonating'])->name('stop-impersonating');
 
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
