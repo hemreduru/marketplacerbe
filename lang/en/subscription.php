@@ -50,6 +50,7 @@ return [
     'cancel_subscription' => 'Cancel subscription',
     'cancel_confirm' => 'Are you sure you want to cancel your subscription?',
     'payment_error' => 'A payment error occurred. Please try again.',
+    'payment_failed' => 'Payment could not be verified. Please try again or use another card.',
 
     // Trial card
     'trial_card_title' => '3-Day Free Trial',

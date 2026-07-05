@@ -35,6 +35,13 @@ return Application::configure(basePath: dirname(__DIR__))
             EnsureSubscribed::class,
             EnsureMarketplaceConfigured::class,
         ]);
+
+        // Public POST endpoint'leri (dış servis çağrıları) CSRF'ten muaf:
+        // pazaryeri webhook'ları + iyzico 3DS ödeme callback'i.
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/*',
+            'subscription/payment/callback',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (SubscriptionLimitException $e, $request) {

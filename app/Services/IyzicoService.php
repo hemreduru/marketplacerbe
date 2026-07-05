@@ -2,9 +2,20 @@
 
 namespace App\Services;
 
+use App\Support\ServiceResult;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * iyzico 3DS ödeme servisi.
+ *
+ * Spec Bölüm 0: tüm dönüşler ServiceResult. Debug modda gerçek API'ye gidilmez
+ * (yerel geliştirme/test), otomatik "success" ile akış test edilebilir.
+ *
+ * NOT (kod-dışı, flag): gerçek 3DS uçtan uca doğrulama CANLI iyzico sandbox
+ * hesabı (procurement) + tarayıcı gerektirir. İmza/PKI algoritması yayına
+ * almadan önce canlı sandbox ile doğrulanmalı; kart verisi ASLA saklanmaz (PCI).
+ */
 class IyzicoService
 {
     private string $apiKey;
@@ -17,65 +28,93 @@ class IyzicoService
 
     public function __construct()
     {
-        $this->apiKey = config('services.iyzico.api_key', '');
-        $this->secretKey = config('services.iyzico.secret_key', '');
-        $this->baseUrl = config('services.iyzico.base_url', 'https://sandbox.iyzipay.com');
+        $this->apiKey = (string) config('services.iyzico.api_key', '');
+        $this->secretKey = (string) config('services.iyzico.secret_key', '');
+        $this->baseUrl = (string) config('services.iyzico.base_url', 'https://sandbox.iyzipay.com');
         $this->debugMode = (bool) config('services.iyzico.debug', true);
     }
 
     /**
-     * Process a payment.
+     * 3DS ödeme başlatır — banka doğrulama formu (threeDSHtmlContent) döner.
      *
-     * In debug mode returns a fake success immediately without hitting the API.
-     *
-     * @param  array{price: float, currency: string, buyer: array, card: array}  $params
-     * @return array{success: bool, reference: string|null, message: string}
+     * @param  array<string, mixed>  $params
+     * @return ServiceResult<array<string, mixed>>
      */
-    public function createPayment(array $params): array
+    public function initializeThreeDSPayment(array $params): ServiceResult
     {
         if ($this->debugMode) {
-            return [
-                'success' => true,
-                'reference' => 'debug_'.uniqid(),
-                'message' => 'Debug mode: payment accepted.',
-            ];
+            /** @var array<string, mixed> $data */
+            $data = ['threeDSHtmlContent' => '', 'paymentId' => 'debug_'.uniqid(), 'status' => 'success'];
+
+            return ServiceResult::ok($data);
         }
 
+        return $this->post('/payment/3dsecure/initialize', $params, fn (array $body): array => [
+            'threeDSHtmlContent' => base64_decode((string) ($body['threeDSHtmlContent'] ?? ''), true) ?: '',
+            'paymentId' => $body['paymentId'] ?? null,
+            'status' => $body['status'] ?? 'failure',
+        ]);
+    }
+
+    /**
+     * 3DS callback sonrası ödemeyi tamamlar/doğrular.
+     *
+     * @param  array<string, mixed>  $params
+     * @return ServiceResult<array<string, mixed>>
+     */
+    public function completeThreeDSPayment(array $params): ServiceResult
+    {
+        if ($this->debugMode) {
+            /** @var array<string, mixed> $data */
+            $data = ['paymentId' => (string) ($params['paymentId'] ?? 'debug_'.uniqid()), 'status' => 'success'];
+
+            return ServiceResult::ok($data);
+        }
+
+        return $this->post('/payment/3dsecure/auth', $params, fn (array $body): array => [
+            'paymentId' => $body['paymentId'] ?? null,
+            'status' => $body['status'] ?? 'failure',
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $params
+     * @param  callable(array<string, mixed>): array<string, mixed>  $mapSuccess
+     * @return ServiceResult<array<string, mixed>>
+     */
+    private function post(string $path, array $params, callable $mapSuccess): ServiceResult
+    {
         try {
             $response = Http::withHeaders($this->buildHeaders($params))
-                ->post("{$this->baseUrl}/payment/auth", $params);
+                ->post($this->baseUrl.$path, $params);
 
-            $body = $response->json();
+            /** @var array<string, mixed> $body */
+            $body = $response->json() ?? [];
 
             if ($response->successful() && ($body['status'] ?? '') === 'success') {
-                return [
-                    'success' => true,
-                    'reference' => $body['paymentId'] ?? null,
-                    'message' => 'Payment successful.',
-                ];
+                return ServiceResult::ok($mapSuccess($body));
             }
 
-            return [
-                'success' => false,
-                'reference' => null,
-                'message' => $body['errorMessage'] ?? 'Payment failed.',
-            ];
+            return ServiceResult::fail(
+                'iyzico_'.((string) ($body['errorCode'] ?? 'error')),
+                (string) ($body['errorMessage'] ?? __('subscription.payment_error')),
+                $body,
+            );
         } catch (\Throwable $e) {
-            Log::error('iyzico payment error', ['exception' => $e->getMessage()]);
+            Log::error('iyzico request error', ['path' => $path, 'exception' => $e->getMessage()]);
 
-            return [
-                'success' => false,
-                'reference' => null,
-                'message' => __('subscription.payment_error'),
-            ];
+            return ServiceResult::fail('iyzico_exception', (string) __('subscription.payment_error'));
         }
     }
 
-    /** @param  array<string, mixed>  $params */
+    /**
+     * @param  array<string, mixed>  $params
+     * @return array<string, string>
+     */
     private function buildHeaders(array $params): array
     {
         $randomKey = uniqid();
-        $requestBody = json_encode($params);
+        $requestBody = (string) json_encode($params);
         $hashStr = $this->apiKey.$randomKey.$this->secretKey.$requestBody;
         $signature = base64_encode(hash('sha256', $hashStr, true));
 

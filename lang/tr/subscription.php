@@ -50,6 +50,7 @@ return [
     'cancel_subscription' => 'Aboneliği iptal et',
     'cancel_confirm' => 'Aboneliğinizi iptal etmek istediğinize emin misiniz?',
     'payment_error' => 'Ödeme işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.',
+    'payment_failed' => 'Ödeme doğrulanamadı. Lütfen tekrar deneyin veya başka bir kart kullanın.',
 
     // Trial card
     'trial_card_title' => '3 Günlük Ücretsiz Deneme',

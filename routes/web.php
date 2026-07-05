@@ -46,6 +46,9 @@ Route::get('/', function () {
 // Yasal sayfalar (KVKK/aydınlatma, ToS, mesafeli satış) — public
 Route::get('/legal/{page}', [LegalController::class, 'show'])->name('legal.show');
 
+// iyzico 3DS ödeme callback'i (public — iyzico session'suz POST eder)
+Route::post('/subscription/payment/callback', [SubscriptionController::class, 'paymentCallback'])->name('subscription.payment.callback');
+
 // Authentication routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

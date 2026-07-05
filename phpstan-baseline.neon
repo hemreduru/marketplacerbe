@@ -439,12 +439,6 @@ parameters:
 			path: app/Http/Controllers/Web/StockReportController.php
 
 		-
-			message: '#^Parameter \#1 \$params of method App\\Services\\IyzicoService\:\:createPayment\(\) expects array\{price\: float, currency\: string, buyer\: array, card\: array\}, array\{price\: float\|null, currency\: ''TRY'', buyer\: array\{name\: string, email\: string\}\} given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Http/Controllers/Web/SubscriptionController.php
-
-		-
 			message: '#^Method App\\Http\\Controllers\\Web\\TwoFactorController\:\:confirm\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -1637,6 +1631,12 @@ parameters:
 			identifier: nullCoalesce.offset
 			count: 1
 			path: app/Services/Inventory/MasterProductStockProjector.php
+
+		-
+			message: '#^Method App\\Services\\IyzicoService\:\:post\(\) should return App\\Support\\ServiceResult\<array\<string, mixed\>\> but returns App\\Support\\ServiceResult\<null\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/IyzicoService.php
 
 		-
 			message: '#^Constructor of class App\\Services\\Marketplaces\\Amazon\\Client has an unused parameter \$sellerId\.$#'
