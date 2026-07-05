@@ -5,6 +5,7 @@ use App\Models\MarketplaceListing;
 use App\Models\MasterProduct;
 use App\Models\SyncDispatchEntry;
 use App\Models\UserMarketplaceCredential;
+use Illuminate\Support\Facades\Http;
 
 it('write disabled iken status=skipped olur', function () {
     config()->set('marketplace.write_enabled', false);
@@ -41,6 +42,7 @@ it('env write açık ama credential.write_enabled false ise skipped', function (
 
 it('iki katmanlı sigorta açıkken status=sent olur', function () {
     config()->set('marketplace.write_enabled', true);
+    Http::fake(['*price-and-inventory*' => Http::response(['batchRequestId' => 'x'], 200)]);
 
     $credential = UserMarketplaceCredential::factory()->create([
         'additional_credentials' => ['seller_id' => '12345', 'write_enabled' => true],

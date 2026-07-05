@@ -7,6 +7,7 @@ use App\Models\MarketplaceListing;
 use App\Models\MasterProduct;
 use App\Models\Product;
 use App\Models\UserMarketplaceCredential;
+use App\Services\Marketplaces\Contracts\InventoryWriter;
 use App\Services\Marketplaces\Hepsiburada\Mapper\ProductMapper;
 use App\Support\ServiceResult;
 
@@ -16,7 +17,7 @@ use App\Support\ServiceResult;
  * Trendyol ProductService ile aynı persistence paterni: legacy Product +
  * cross-marketplace köprüsü (MasterProduct + MarketplaceListing).
  */
-class ProductService
+class ProductService implements InventoryWriter
 {
     public function __construct(protected Client $client) {}
 

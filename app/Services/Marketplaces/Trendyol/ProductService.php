@@ -7,6 +7,7 @@ use App\Models\MarketplaceListing;
 use App\Models\MasterProduct;
 use App\Models\Product;
 use App\Models\UserMarketplaceCredential;
+use App\Services\Marketplaces\Contracts\InventoryWriter;
 use App\Services\Marketplaces\Trendyol\Mapper\ProductMapper;
 use App\Support\ServiceResult;
 
@@ -15,7 +16,7 @@ use App\Support\ServiceResult;
  *
  * Tüm HTTP çağrıları {@see Client} üzerinden yapılır, ServiceResult döner.
  */
-class ProductService
+class ProductService implements InventoryWriter
 {
     public function __construct(protected Client $client) {}
 

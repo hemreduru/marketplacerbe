@@ -3,8 +3,11 @@
 namespace App\Jobs;
 
 use App\Jobs\Concerns\HasRetryPolicy;
+use App\Models\MarketplaceListing;
 use App\Models\SyncDispatchEntry;
 use App\Models\UserMarketplaceCredential;
+use App\Services\MarketplaceManager;
+use App\Services\Marketplaces\Contracts\InventoryWriter;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -34,17 +37,17 @@ class SyncDispatcherJob implements ShouldQueue
             return;
         }
 
-        $listing = $entry->listing()->with('credential')->first();
+        $listing = $entry->listing()->with('credential.marketplace')->first();
         $credential = $listing?->credential;
 
-        if (! $this->isWriteAllowed($credential)) {
+        if ($listing === null || $credential === null || ! $this->isWriteAllowed($credential)) {
             $entry->update([
                 'status' => 'skipped',
                 'last_error' => 'write_disabled',
                 'last_attempt_at' => now(),
             ]);
 
-            Log::info('sync dispatch skipped (write disabled)', [
+            Log::info('sync dispatch skipped (write disabled or no listing)', [
                 'entry_id' => $entry->id,
                 'credential_id' => $credential?->id,
             ]);
@@ -56,9 +59,28 @@ class SyncDispatcherJob implements ShouldQueue
         $entry->update(['last_attempt_at' => now()]);
 
         try {
-            // Gerçek pazaryeri push burada — PR #1.11/1.12/1.13'te marketplace bazında
-            // ayrı write service çağırılacak. Şimdilik no-op + success işaretle.
-            $entry->update(['status' => 'sent']);
+            $service = app(MarketplaceManager::class)->productService($credential);
+
+            if (! $service instanceof InventoryWriter) {
+                $entry->update(['status' => 'skipped', 'last_error' => 'no_inventory_writer']);
+
+                return;
+            }
+
+            $result = $service->updatePriceAndInventory([$this->buildItem($entry, $listing, $credential->marketplace->slug)]);
+
+            if ($result->ok) {
+                $entry->update(['status' => 'sent', 'last_error' => null]);
+
+                return;
+            }
+
+            // API iş hatası (network değil) — backoff ile yeniden dene.
+            $entry->update([
+                'last_error' => trim(($result->errorCode ?? '').' '.($result->errorMessage ?? '')),
+                'next_attempt_at' => now()->addSeconds($this->backoffSecondsForAttempt($entry->attempt_count)),
+                'status' => $entry->attempt_count >= 5 ? 'failed' : 'pending',
+            ]);
         } catch (Throwable $e) {
             $entry->update([
                 'last_error' => $e->getMessage(),
@@ -68,6 +90,39 @@ class SyncDispatcherJob implements ShouldQueue
 
             throw $e;
         }
+    }
+
+    /**
+     * Kanonik payload'ı (new_stock/listed_price) pazaryeri-özel item'a çevirir;
+     * null alanlar çıkarılır (stok-yalnız / fiyat-yalnız güncellemeler).
+     *
+     * NOT (kod-dışı, flag): Hepsiburada item anahtar isimleri canlı HB API ile
+     * doğrulanmalı (procurement — HB SIT erişimi). Trendyol formatı doğru.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildItem(SyncDispatchEntry $entry, MarketplaceListing $listing, string $slug): array
+    {
+        $payload = $entry->payload_json;
+        $stock = $payload['new_stock'] ?? null;
+        $price = $payload['listed_price'] ?? null;
+
+        $item = match ($slug) {
+            'hepsiburada' => [
+                'hepsiburadaSku' => $listing->remote_product_id,
+                'merchantSku' => $listing->remote_sku,
+                'availableStock' => $stock,
+                'price' => $price,
+            ],
+            default => [
+                'barcode' => $listing->remote_barcode ?? $listing->remote_sku,
+                'quantity' => $stock,
+                'salePrice' => $price,
+                'listPrice' => $price,
+            ],
+        };
+
+        return array_filter($item, fn ($v) => $v !== null);
     }
 
     private function isWriteAllowed(?UserMarketplaceCredential $credential): bool
