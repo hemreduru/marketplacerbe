@@ -108,7 +108,7 @@ class AnalyticsReportService
 
         $summaries = FinancialDailySummary::whereIn('user_marketplace_credential_id', $credentialIds)
             ->where('date', '>=', $since->toDateString())
-            ->get(['date', 'gross_sales', 'net_profit']);
+            ->get(['date', 'gross_sales', 'net_profit', 'true_net_profit']);
 
         $buckets = $summaries->groupBy(fn ($s) => Carbon::parse($s->date)->format('Y-m'));
 
@@ -119,7 +119,7 @@ class AnalyticsReportService
             $rows->push([
                 'month' => $month,
                 'gross' => (string) $group->sum(fn ($s) => (float) $s->gross_sales),
-                'net' => (string) $group->sum(fn ($s) => (float) $s->net_profit),
+                'net' => (string) $group->sum(fn ($s) => (float) $s->true_net_profit ?: (float) $s->net_profit),
             ]);
         }
 

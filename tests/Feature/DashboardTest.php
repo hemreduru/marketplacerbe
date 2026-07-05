@@ -39,3 +39,38 @@ test('a user with a credential sees KPI figures', function () {
         ->assertSee(__('dashboard.revenue'))
         ->assertSee(__('dashboard.sales_net_trend'));
 });
+
+test('dashboard COGS dahil gerçek net kârı gösterir (true_net_profit)', function () {
+    [$user, $credential] = userWithTrendyol();
+
+    FinancialDailySummary::factory()->create([
+        'user_marketplace_credential_id' => $credential->id,
+        'date' => now()->toDateString(),
+        'gross_sales' => 1000,
+        'net_profit' => 777,        // legacy (COGS düşülmemiş) — GÖSTERİLMEMELİ
+        'true_net_profit' => 333,   // gerçek (COGS düşülmüş) — GÖSTERİLMELİ
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('333')
+        ->assertDontSee('777');
+});
+
+test('dashboard true_net_profit yoksa legacy net_profit\'e düşer', function () {
+    [$user, $credential] = userWithTrendyol();
+
+    FinancialDailySummary::factory()->create([
+        'user_marketplace_credential_id' => $credential->id,
+        'date' => now()->toDateString(),
+        'gross_sales' => 1000,
+        'net_profit' => 250,
+        // true_net_profit set edilmedi → DB default 0 → fallback devrede
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('250');
+});

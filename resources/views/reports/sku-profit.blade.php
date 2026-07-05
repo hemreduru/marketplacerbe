@@ -25,7 +25,6 @@
                                     <th>SKU</th>
                                     <th>{{ __('reports.product') }}</th>
                                     <th>{{ __('reports.quantity') }}</th>
-                                    <th>{{ __('reports.revenue') }}</th>
                                     <th>{{ __('reports.net_revenue') }}</th>
                                     <th>{{ __('reports.cost') }}</th>
                                     <th>{{ __('reports.net_profit') }}</th>
@@ -37,12 +36,11 @@
                                 <tr>
                                     <td class="fw-bold">{{ $row['sku'] }}</td>
                                     <td>{{ $row['title'] }}</td>
-                                    <td>{{ $row['qty'] }}</td>
-                                    <td>{{ number_format($row['revenue'], 2) }} TL</td>
-                                    <td>{{ number_format($row['net_revenue'], 2) }} TL</td>
-                                    <td>{{ number_format($row['cost'], 2) }} TL</td>
-                                    <td class="fw-bold {{ $row['net_profit'] >= 0 ? 'text-success' : 'text-danger' }}">
-                                        {{ number_format($row['net_profit'], 2) }} TL
+                                    <td>{{ $row['items'] }}</td>
+                                    <td>{{ number_format((float) $row['net_revenue'], 2) }} TL</td>
+                                    <td>{{ number_format((float) $row['cogs'], 2) }} TL</td>
+                                    <td class="fw-bold {{ (float) $row['net_profit'] >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {{ number_format((float) $row['net_profit'], 2) }} TL
                                     </td>
                                     <td>%{{ $row['margin'] }}</td>
                                 </tr>

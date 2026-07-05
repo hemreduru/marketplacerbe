@@ -38,7 +38,7 @@ class FinancialController extends Controller
         // Calculate Totals for Summary Cards (Current Period)
         $currentStats = [
             'gross_sales' => $dailySummaries->sum('gross_sales'),
-            'net_profit' => $dailySummaries->sum('net_profit'),
+            'net_profit' => $dailySummaries->sum(fn ($s) => (float) $s->true_net_profit ?: (float) $s->net_profit),
             'commission' => $dailySummaries->sum('commission'),
             'total_expense' => $dailySummaries->sum('commission') + $dailySummaries->sum('shipping_cost') + $dailySummaries->sum('platform_expense') + $dailySummaries->sum('other_expense'),
         ];
@@ -55,7 +55,7 @@ class FinancialController extends Controller
 
         $prevStats = [
             'gross_sales' => $prevSummaries->sum('gross_sales'),
-            'net_profit' => $prevSummaries->sum('net_profit'),
+            'net_profit' => $prevSummaries->sum(fn ($s) => (float) $s->true_net_profit ?: (float) $s->net_profit),
             'commission' => $prevSummaries->sum('commission'),
             'total_expense' => $prevSummaries->sum('commission') + $prevSummaries->sum('shipping_cost') + $prevSummaries->sum('platform_expense') + $prevSummaries->sum('other_expense'),
         ];
@@ -124,7 +124,7 @@ class FinancialController extends Controller
         $chartData = [
             'dates' => $dailySummaries->pluck('date')->map(fn ($d) => date('d M', strtotime($d)))->toArray(),
             'sales' => $dailySummaries->pluck('gross_sales')->toArray(),
-            'net' => $dailySummaries->pluck('net_profit')->toArray(),
+            'net' => $dailySummaries->map(fn ($s) => (float) $s->true_net_profit ?: (float) $s->net_profit)->toArray(),
             'expenses' => $expenseBreakdown,
         ];
 
@@ -185,7 +185,7 @@ class FinancialController extends Controller
             $stats['shipping'] += $s->shipping_cost;
             $stats['platform'] += $s->platform_expense;
             $stats['penalty_other'] += $s->other_expense;
-            $stats['net'] += $s->net_profit;
+            $stats['net'] += (float) $s->true_net_profit ?: (float) $s->net_profit;
             $stats['orders'] += $s->order_count;
             $stats['qty'] += $s->item_count;
         }

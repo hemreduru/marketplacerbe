@@ -66,7 +66,7 @@ class DashboardController extends Controller
         $chartData = [
             'dates' => $trend->map(fn ($s) => Carbon::parse($s->date)->translatedFormat('d M'))->toArray(),
             'sales' => $trend->map(fn ($s) => (float) $s->gross_sales)->toArray(),
-            'net' => $trend->map(fn ($s) => (float) $s->net_profit)->toArray(),
+            'net' => $trend->map(fn ($s) => (float) $s->true_net_profit ?: (float) $s->net_profit)->toArray(),
         ];
 
         $listingsSummary = MarketplaceListing::whereHas('credential', fn ($q) => $q->where('user_id', $user->id))
@@ -125,7 +125,7 @@ class DashboardController extends Controller
     {
         $rows = FinancialDailySummary::where('user_marketplace_credential_id', $credentialId)
             ->whereBetween('date', [$from, $to])
-            ->selectRaw('COALESCE(SUM(gross_sales), 0) as gross, COALESCE(SUM(net_profit), 0) as net')
+            ->selectRaw('COALESCE(SUM(gross_sales), 0) as gross, COALESCE(SUM(COALESCE(NULLIF(true_net_profit, 0), net_profit)), 0) as net')
             ->first();
 
         return [
