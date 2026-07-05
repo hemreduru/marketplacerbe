@@ -57,6 +57,7 @@ class UserMarketplaceCredential extends Model
         'api_secret',
         'additional_credentials',
         'is_active',
+        'is_demo',
         'last_sync_at',
     ];
 
@@ -84,6 +85,7 @@ class UserMarketplaceCredential extends Model
             'api_secret' => 'encrypted',
             'additional_credentials' => 'encrypted:array',
             'is_active' => 'boolean',
+            'is_demo' => 'boolean',
             'last_sync_at' => 'datetime',
         ];
     }

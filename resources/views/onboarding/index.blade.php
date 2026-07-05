@@ -58,6 +58,18 @@
                         <a href="{{ route('dashboard') }}" class="btn btn-success">{{ __('onboarding.go_dashboard') }}</a>
                     </div>
                     @endif
+
+                    <div class="separator my-6"></div>
+                    <div class="d-flex flex-stack flex-wrap gap-3">
+                        <div>
+                            <div class="fw-bold text-gray-900">{{ __('demo.explore_title') }}</div>
+                            <div class="text-muted fs-7">{{ __('demo.explore_desc') }}</div>
+                        </div>
+                        <form action="{{ route('demo.load') }}" method="POST" class="m-0">
+                            @csrf
+                            <button type="submit" class="btn btn-light-primary">{{ __('demo.load_button') }}</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

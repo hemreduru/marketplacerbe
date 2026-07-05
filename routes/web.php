@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\BuyboxController;
 use App\Http\Controllers\Web\ClaimController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\DemoController;
 use App\Http\Controllers\Web\FinancialController;
 use App\Http\Controllers\Web\HepsiburadaWebhookController;
 use App\Http\Controllers\Web\LegalController;
@@ -95,6 +96,10 @@ Route::middleware('auth')->group(function () {
 
     // Impersonation sonlandırma (admin-dışı bürünülen kullanıcı da erişebilir)
     Route::post('/stop-impersonating', [AdminController::class, 'stopImpersonating'])->name('stop-impersonating');
+
+    // Demo/sandbox mod — gerçek anahtar girmeden keşif
+    Route::post('/demo/load', [DemoController::class, 'load'])->name('demo.load');
+    Route::post('/demo/clear', [DemoController::class, 'clear'])->name('demo.clear');
 
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');

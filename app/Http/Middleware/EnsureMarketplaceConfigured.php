@@ -26,6 +26,7 @@ class EnsureMarketplaceConfigured
                 if ($request->is('marketplace-settings*') ||
                     $request->is('subscription*') ||
                     $request->is('onboarding*') ||
+                    $request->is('demo/*') ||
                     $request->is('stop-impersonating') ||
                     $request->is('logout') ||
                     $request->is('settings*')) {
