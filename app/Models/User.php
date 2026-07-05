@@ -36,6 +36,7 @@ class User extends Authenticatable
         'password',
         'settings_id',
         'is_admin',
+        'onboarding_completed_steps',
     ];
 
     protected $hidden = [
@@ -54,7 +55,31 @@ class User extends Authenticatable
             'two_factor_secret' => 'encrypted',
             'two_factor_recovery_codes' => 'encrypted:array',
             'two_factor_confirmed_at' => 'datetime',
+            'onboarding_completed_steps' => 'array',
         ];
+    }
+
+    /**
+     * Onboarding adımları ve tamamlanma durumu (gerçek veriden türetilir).
+     *
+     * @return array<string, bool>
+     */
+    public function onboardingSteps(): array
+    {
+        return [
+            'account' => true,
+            'subscription' => $this->hasActiveSubscription(),
+            'marketplace' => $this->marketplaceCredentials()->where('is_active', true)->exists(),
+            'first_sync' => $this->products()->exists(),
+        ];
+    }
+
+    /**
+     * Tüm onboarding adımları tamam mı?
+     */
+    public function isOnboardingComplete(): bool
+    {
+        return ! in_array(false, $this->onboardingSteps(), true);
     }
 
     /**

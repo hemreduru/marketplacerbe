@@ -20,7 +20,7 @@ class EnsureSubscribed
             $user = Auth::user();
 
             // Allow access to subscription selection, mock subscribe endpoint, and logout
-            if ($request->is('subscription*') || $request->is('logout')) {
+            if ($request->is('subscription*') || $request->is('onboarding*') || $request->is('logout')) {
                 return $next($request);
             }
 

@@ -25,6 +25,7 @@ class EnsureMarketplaceConfigured
                 // Allow marketplace-settings, subscriptions, password profile updates, and logout
                 if ($request->is('marketplace-settings*') ||
                     $request->is('subscription*') ||
+                    $request->is('onboarding*') ||
                     $request->is('logout') ||
                     $request->is('settings*')) {
                     return $next($request);

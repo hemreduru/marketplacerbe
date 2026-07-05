@@ -16,6 +16,7 @@ use App\Http\Controllers\Web\MailWebhookController;
 use App\Http\Controllers\Web\MarketplaceComparisonController;
 use App\Http\Controllers\Web\MarketplaceSettingsController;
 use App\Http\Controllers\Web\MasterProductController;
+use App\Http\Controllers\Web\OnboardingController;
 use App\Http\Controllers\Web\OrderController;
 use App\Http\Controllers\Web\OrderReportController;
 use App\Http\Controllers\Web\ProductController;
@@ -83,6 +84,9 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Onboarding wizard (self-serve kurulum rehberi)
+    Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding');
 
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');

@@ -3,6 +3,13 @@
 @section('title', __('common.dashboard'))
 
 @section('content')
+    @if(! auth()->user()->isOnboardingComplete())
+        <div class="alert alert-primary d-flex flex-stack flex-wrap gap-3 mb-6">
+            <span class="fw-semibold">{{ __('onboarding.banner_title') }}</span>
+            <a href="{{ route('onboarding') }}" class="btn btn-sm btn-primary">{{ __('onboarding.banner_cta') }}</a>
+        </div>
+    @endif
+
     @unless ($hasCredential)
         <!--begin::Welcome / Connect Card-->
         <div class="card">
