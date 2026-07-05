@@ -10,7 +10,7 @@
 
 arch('hesaplama servisleri float fonksiyonları kullanmaz')
     ->expect('App\Services\Calculations')
-    ->not->toUse(['round', 'number_format', 'floatval', 'fdiv', 'fmod', 'intdiv']);
+    ->not->toUse(['round', 'number_format', 'floatval', 'fdiv', 'fmod', 'intdiv', 'abs', 'floor', 'ceil']);
 
 arch('finance servisleri float fonksiyonları kullanmaz')
     ->expect('App\Services\Finance')
