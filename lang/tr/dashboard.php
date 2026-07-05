@@ -36,6 +36,7 @@ return [
     'margin' => 'Marj',
     'return_rate' => 'İade Oranı',
     'critical_stock' => 'Kritik Stok',
+    'tacos' => 'TACoS (reklam/ciro)',
     'this_month_sales' => 'Bu Ay Satış',
     'this_month_net' => 'Bu Ay Net Kâr',
     'pending_orders_short' => 'Bekleyen',

@@ -36,6 +36,7 @@ return [
     'margin' => 'Margin',
     'return_rate' => 'Return Rate',
     'critical_stock' => 'Critical Stock',
+    'tacos' => 'TACoS (ad/sales)',
     'this_month_sales' => 'Sales This Month',
     'this_month_net' => 'Net Profit This Month',
     'pending_orders_short' => 'Pending',

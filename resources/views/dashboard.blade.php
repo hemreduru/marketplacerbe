@@ -93,6 +93,15 @@
                     :link="route('products.index')"
                 />
             </div>
+            <div class="col-md-4 col-xl-2">
+                <x-stat-card
+                    :value="$kpis['tacos']"
+                    :title="__('dashboard.tacos')"
+                    icon="ki-rocket"
+                    color="dark"
+                    format="pct"
+                />
+            </div>
         </div>
         <!--end::KPI Row-->
 

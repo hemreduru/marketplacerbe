@@ -74,3 +74,22 @@ test('dashboard true_net_profit yoksa legacy net_profit\'e düşer', function ()
         ->assertOk()
         ->assertSee('250');
 });
+
+test('dashboard TACoS kartı reklam/ciro oranını gösterir', function () {
+    [$user, $credential] = userWithTrendyol();
+
+    FinancialDailySummary::factory()->create([
+        'user_marketplace_credential_id' => $credential->id,
+        'date' => now()->toDateString(),
+        'gross_sales' => 1000,
+        'ad_cost' => 125,          // TACoS = 125/1000 = %12.5
+        'net_profit' => 300,
+        'true_net_profit' => 300,
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee(__('dashboard.tacos'))
+        ->assertSee('12.5');
+});

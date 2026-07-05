@@ -51,6 +51,12 @@ class DashboardController extends Controller
                 ? round(($currentSummary['net_profit'] / $currentSummary['gross_sales']) * 100, 1)
                 : 0,
             'return_rate' => 0,
+            // TACoS = reklam harcaması / ciro. net_profit zaten reklam-dahil
+            // (true_net_profit); bu kart reklamın ciroya oranını görünür kılar.
+            'ad_spend' => $currentSummary['ad_spend'],
+            'tacos' => $currentSummary['gross_sales'] > 0
+                ? round(($currentSummary['ad_spend'] / $currentSummary['gross_sales']) * 100, 1)
+                : 0,
             'critical_stock' => $criticalStock,
             'waiting_questions' => $credential->questions()->where('status', 'WAITING_FOR_ANSWER')->count(),
             'low_stock' => MasterProduct::where('user_id', $user->id)->whereBetween('current_stock', [1, 5])->count(),
@@ -119,18 +125,19 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return array{gross_sales: float, net_profit: float}
+     * @return array{gross_sales: float, net_profit: float, ad_spend: float}
      */
     private function aggregateSummary(int $credentialId, string $from, string $to): array
     {
         $rows = FinancialDailySummary::where('user_marketplace_credential_id', $credentialId)
-            ->whereBetween('date', [$from, $to])
-            ->selectRaw('COALESCE(SUM(gross_sales), 0) as gross, COALESCE(SUM(COALESCE(NULLIF(true_net_profit, 0), net_profit)), 0) as net')
+            ->whereBetween('date', [$from.' 00:00:00', $to.' 23:59:59'])
+            ->selectRaw('COALESCE(SUM(gross_sales), 0) as gross, COALESCE(SUM(COALESCE(NULLIF(true_net_profit, 0), net_profit)), 0) as net, COALESCE(SUM(ad_cost), 0) as ad_spend')
             ->first();
 
         return [
             'gross_sales' => (float) ($rows->gross ?? 0),
             'net_profit' => (float) ($rows->net ?? 0),
+            'ad_spend' => (float) ($rows->ad_spend ?? 0),
         ];
     }
 
