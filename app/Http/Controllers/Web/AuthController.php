@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -48,15 +50,28 @@ class AuthController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
+        // Brute-force koruması: email+IP başına 5 deneme / dk, sonra kilit.
+        $throttleKey = Str::lower((string) $request->input('email')).'|'.(string) $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            return back()->withErrors([
+                'email' => __('auth.throttle', ['seconds' => RateLimiter::availableIn($throttleKey)]),
+            ])->withInput();
+        }
+
         $credentials = $request->only('email', 'password');
 
         $user = User::where('email', $credentials['email'])->first();
 
         if (! $user || ! Auth::validate($credentials)) {
+            RateLimiter::hit($throttleKey, 60);
+
             return back()->withErrors([
                 'email' => __('auth.failed'),
             ])->withInput();
         }
+
+        RateLimiter::clear($throttleKey);
 
         // 2FA aktifse: oturum henüz başlatılmaz; challenge sayfasına yönlendirilir.
         if ($user->hasEnabledTwoFactor()) {

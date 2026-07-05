@@ -11,6 +11,7 @@ use App\Http\Controllers\Web\ClaimController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\FinancialController;
 use App\Http\Controllers\Web\HepsiburadaWebhookController;
+use App\Http\Controllers\Web\LegalController;
 use App\Http\Controllers\Web\MailWebhookController;
 use App\Http\Controllers\Web\MarketplaceComparisonController;
 use App\Http\Controllers\Web\MarketplaceSettingsController;
@@ -41,6 +42,9 @@ Route::post('/webhooks/ses/complaint', [MailWebhookController::class, 'complaint
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
+
+// Yasal sayfalar (KVKK/aydınlatma, ToS, mesafeli satış) — public
+Route::get('/legal/{page}', [LegalController::class, 'show'])->name('legal.show');
 
 // Authentication routes
 Route::middleware('guest')->group(function () {

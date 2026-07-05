@@ -12,10 +12,13 @@
         <!--begin::Menu-->
         <ul class="menu menu-gray-600 menu-hover-primary fw-semibold order-1">
             <li class="menu-item">
-                <a href="#" target="_blank" class="menu-link px-2">About</a>
+                <a href="{{ route('legal.show', 'privacy') }}" class="menu-link px-2">{{ __('legal.privacy_title') }}</a>
             </li>
             <li class="menu-item">
-                <a href="#" target="_blank" class="menu-link px-2">Support</a>
+                <a href="{{ route('legal.show', 'terms') }}" class="menu-link px-2">{{ __('legal.terms_title') }}</a>
+            </li>
+            <li class="menu-item">
+                <a href="{{ route('legal.show', 'distance-sales') }}" class="menu-link px-2">{{ __('legal.distance_sales_title') }}</a>
             </li>
         </ul>
         <!--end::Menu-->

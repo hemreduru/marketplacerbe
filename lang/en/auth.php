@@ -46,6 +46,7 @@ return [
 
     // Two-factor authentication (TOTP)
     'failed' => 'These credentials do not match our records.',
+    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'two_factor' => [
         'challenge_title' => 'Two-Factor Authentication',
         'challenge_subtitle' => 'Enter the 6-digit code from your authenticator app.',

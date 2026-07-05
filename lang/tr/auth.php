@@ -46,6 +46,7 @@ return [
 
     // Two-factor authentication (TOTP)
     'failed' => 'Giriş bilgileri hatalı.',
+    'throttle' => 'Çok fazla giriş denemesi. Lütfen :seconds saniye sonra tekrar deneyin.',
     'two_factor' => [
         'challenge_title' => 'İki Adımlı Doğrulama',
         'challenge_subtitle' => 'Authenticator uygulamanızdaki 6 haneli kodu girin.',
