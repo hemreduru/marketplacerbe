@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Claim;
 use App\Models\MarketplaceSyncLog;
+use App\Models\User;
 use App\Services\MarketplaceManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 
 class ClaimController extends Controller
 {
@@ -16,6 +19,21 @@ class ClaimController extends Controller
     public function index()
     {
         return view('claims.index');
+    }
+
+    /**
+     * İade detayı — zenginleştirilmiş alanlar (neden, kargo, iade tutarı,
+     * stoğa iade). Kullanıcının kendi credential'ına scope'lu.
+     */
+    public function show(int $id): View
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $claim = Claim::whereHas('credential', fn ($q) => $q->where('user_id', $user->id))
+            ->findOrFail($id);
+
+        return view('claims.detail', ['claim' => $claim]);
     }
 
     public function getData(Request $request)
@@ -60,7 +78,7 @@ class ClaimController extends Controller
             $statusBadge = '<span class="badge badge-light-info">'.e($claim->status ?? '-').'</span>';
 
             return [
-                '<span class="fw-bold text-gray-800">'.e($claim->order_number ?? '-').'</span>',
+                '<a href="'.route('claims.show', $claim->getKey()).'" class="fw-bold text-gray-800 text-hover-primary">'.e($claim->order_number ?? '-').'</a>',
                 e($claim->customer_name ?? '-'),
                 '<span class="fw-bold">'.$claim->item_count.'</span>',
                 $statusBadge,

@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'sku' => 'SKU',
+    'barcode' => 'Barkod',
+    'brand' => 'Marka',
+    'category' => 'Kategori',
+    'price' => 'Fiyat',
+    'cost_price' => 'Maliyet',
+    'stock' => 'Stok',
+    'status' => 'Durum',
+    'weight' => 'Ağırlık',
+    'vat_rate' => 'KDV oranı',
+    'packaging_cost' => 'Paketleme maliyeti',
+    'pricing_strategy' => 'Fiyat stratejisi',
+    'stock_buffer' => 'Stok tamponu',
+    'listings' => 'listeleme',
+    'marketplace_listings' => 'Pazaryeri Listelemeleri',
+    'no_listings' => 'Henüz pazaryeri listelemesi yok.',
+    'stock_views' => 'Stok Görünümleri',
+    'live' => 'Canlı',
+    'listed' => 'Listelenen',
+    'last_synced' => 'Son senkron',
+    'click_refresh' => 'Yenilemek için tıklayın',
+];

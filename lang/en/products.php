@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'sku' => 'SKU',
+    'barcode' => 'Barcode',
+    'brand' => 'Brand',
+    'category' => 'Category',
+    'price' => 'Price',
+    'cost_price' => 'Cost price',
+    'stock' => 'Stock',
+    'status' => 'Status',
+    'weight' => 'Weight',
+    'vat_rate' => 'VAT rate',
+    'packaging_cost' => 'Packaging cost',
+    'pricing_strategy' => 'Pricing strategy',
+    'stock_buffer' => 'Stock buffer',
+    'listings' => 'listings',
+    'marketplace_listings' => 'Marketplace listings',
+    'no_listings' => 'No marketplace listings yet.',
+    'stock_views' => 'Stock views',
+    'live' => 'Live',
+    'listed' => 'Listed',
+    'last_synced' => 'Last synced',
+    'click_refresh' => 'Click to refresh',
+];

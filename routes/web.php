@@ -129,6 +129,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/claims/data', [ClaimController::class, 'getData'])->name('claims.data');
         Route::post('/claims/sync', [ClaimController::class, 'sync'])->name('claims.sync');
         Route::post('/claims/approve', [ClaimController::class, 'approve'])->name('claims.approve');
+        Route::get('/claims/{id}', [ClaimController::class, 'show'])->whereNumber('id')->name('claims.show');
     });
 
     // Questions
