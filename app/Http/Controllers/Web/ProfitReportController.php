@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Exports\ArrayExport;
 use App\Http\Controllers\Controller;
 use App\Services\Finance\ProfitAggregator;
 use App\Services\Finance\ReconciliationService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProfitReportController extends Controller
 {
@@ -29,6 +34,48 @@ class ProfitReportController extends Controller
             'from' => $from,
             'to' => $to,
         ]);
+    }
+
+    /**
+     * SKU kâr raporunu Excel (xlsx) veya PDF olarak indirir.
+     */
+    public function skuProfitExport(Request $request, string $format, ProfitAggregator $aggregator): BinaryFileResponse|Response
+    {
+        $user = Auth::user();
+        $period = $request->get('period', 'this_month');
+        [$from, $to] = $this->resolvePeriod($period);
+
+        $headings = [
+            'SKU', __('reports.product'), __('reports.quantity'),
+            __('reports.net_revenue'), __('reports.cost'),
+            __('reports.net_profit'), __('reports.margin'),
+        ];
+
+        $rows = $aggregator->skuTable($user, $from, $to)
+            ->map(fn (array $row): array => [
+                $row['sku'],
+                $row['title'],
+                $row['items'],
+                $row['net_revenue'],
+                $row['cogs'],
+                $row['net_profit'],
+                $row['margin'].'%',
+            ])
+            ->values()
+            ->all();
+
+        $filename = 'sku-profit-'.$from.'_'.$to;
+
+        if ($format === 'pdf') {
+            return Pdf::loadView('exports.table', [
+                'title' => __('reports.sku_profit'),
+                'period' => $from.' — '.$to,
+                'headings' => $headings,
+                'rows' => $rows,
+            ])->download($filename.'.pdf');
+        }
+
+        return Excel::download(new ArrayExport($headings, $rows), $filename.'.xlsx');
     }
 
     /**

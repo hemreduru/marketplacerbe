@@ -10,6 +10,10 @@
                 {{ __('reports.sku_profit') }}
                 <span class="text-gray-500 fw-semibold fs-7 mt-1">{{ $from }} — {{ $to }}</span>
             </h1>
+            <div class="d-flex gap-2">
+                <a href="{{ route('reports.sku-profit.export', ['format' => 'xlsx', 'period' => $period]) }}" class="btn btn-sm btn-light-success">{{ __('reports.export_excel') }}</a>
+                <a href="{{ route('reports.sku-profit.export', ['format' => 'pdf', 'period' => $period]) }}" class="btn btn-sm btn-light-danger">{{ __('reports.export_pdf') }}</a>
+            </div>
         </div>
     </div>
 

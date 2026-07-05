@@ -157,6 +157,7 @@ Route::middleware('auth')->group(function () {
     // Reports (Faz 4 — Analitik 2.0) — analytics feature ile korunur
     Route::middleware('feature:analytics')->group(function () {
         Route::get('/reports/sku-profit', [ProfitReportController::class, 'skuProfit'])->name('reports.sku-profit');
+        Route::get('/reports/sku-profit/export/{format}', [ProfitReportController::class, 'skuProfitExport'])->whereIn('format', ['xlsx', 'pdf'])->name('reports.sku-profit.export');
         Route::get('/reports/reconciliation', [ProfitReportController::class, 'reconciliation'])->name('reports.reconciliation');
         Route::get('/reports/refund-recovery', [ProfitReportController::class, 'refundRecovery'])->name('reports.refund-recovery');
 

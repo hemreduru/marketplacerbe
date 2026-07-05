@@ -11,6 +11,8 @@ return [
     'cost' => 'Cost',
     'net_profit' => 'Net Profit',
     'margin' => 'Margin',
+    'export_excel' => 'Excel',
+    'export_pdf' => 'PDF',
     'no_data' => 'No data found for this period.',
     'cirotik_estimated' => 'Cirotik Estimated (Net)',
     'actual_net_profit' => 'Actual Net Profit',

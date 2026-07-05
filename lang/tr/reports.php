@@ -11,6 +11,8 @@ return [
     'cost' => 'Maliyet',
     'net_profit' => 'Net Kâr',
     'margin' => 'Marj',
+    'export_excel' => 'Excel',
+    'export_pdf' => 'PDF',
     'no_data' => 'Bu dönem için veri bulunamadı.',
     'cirotik_estimated' => 'Cirotik Tahmini (Net)',
     'actual_net_profit' => 'Gerçek Net Kâr',
