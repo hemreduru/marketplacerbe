@@ -144,6 +144,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('feature:analytics')->group(function () {
         Route::get('/reports/sku-profit', [ProfitReportController::class, 'skuProfit'])->name('reports.sku-profit');
         Route::get('/reports/reconciliation', [ProfitReportController::class, 'reconciliation'])->name('reports.reconciliation');
+        Route::get('/reports/refund-recovery', [ProfitReportController::class, 'refundRecovery'])->name('reports.refund-recovery');
 
         // PR 4.1 — Sipariş raporu + toplu işlemler
         Route::get('/reports/order', [OrderReportController::class, 'index'])->name('reports.order');

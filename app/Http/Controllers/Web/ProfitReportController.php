@@ -7,6 +7,7 @@ use App\Services\Finance\ProfitAggregator;
 use App\Services\Finance\ReconciliationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class ProfitReportController extends Controller
 {
@@ -42,6 +43,24 @@ class ProfitReportController extends Controller
         return view('reports.reconciliation', [
             'portfolio' => $reconciliation->portfolioDeviation($user, $from, $to),
             'bySku' => $reconciliation->bySku($user, $from, $to),
+            'period' => $period,
+            'from' => $from,
+            'to' => $to,
+        ]);
+    }
+
+    /**
+     * "Para iade" ekranı — geri alınabilir fee anomalileri (fazla komisyon,
+     * yanlış desi kargo, ceza satırları) kanıt referanslı listelenir.
+     */
+    public function refundRecovery(Request $request, ReconciliationService $reconciliation): View
+    {
+        $user = Auth::user();
+        $period = $request->get('period', 'this_month');
+        [$from, $to] = $this->resolvePeriod($period);
+
+        return view('reports.refund-recovery', [
+            'anomalies' => $reconciliation->anomalies($user, $from, $to),
             'period' => $period,
             'from' => $from,
             'to' => $to,

@@ -214,6 +214,7 @@
                             'reports.analytics' => __('reports.analytics_extra'),
                             'reports.buybox' => __('reports.buybox_tracker'),
                             'reports.reconciliation' => __('reports.reconciliation'),
+                            'reports.refund-recovery' => __('reports.refund_recovery'),
                         ])
                         @foreach($reportLinks as $routeName => $label)
                             <div class="menu-item">
