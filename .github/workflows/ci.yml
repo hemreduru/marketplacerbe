@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    name: Lint · Analyse · Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # PHP 8.3 zorunlu — php8.4 pdo_sqlite/phpstan baseline'ı kırar.
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, bcmath, pdo_sqlite, intl, fileinfo, dom, curl, gd, zip
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      # Vite manifest — feature testleri master layout (@vite) render eder.
+      - name: Build front-end assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Code style (Pint)
+        run: vendor/bin/pint --test
+
+      - name: Static analysis (PHPStan L6)
+        run: composer phpstan
+
+      - name: Tests (Pest)
+        run: php artisan test
+
+      # Migration up gate (file DB — prod'a yakın). Tam-zincir rollback burada
+      # yapılmaz: eski bir migration'ın down()'ı SQLite'ta kolon+unique-index
+      # drop sırasını bozuyor (MySQL'de sorunsuz). Per-migration down() her PR
+      # ritüelinde lokal doğrulanır.
+      - name: Migration up
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ${{ github.workspace }}/database/ci.sqlite
+        run: |
+          touch "$DB_DATABASE"
+          php artisan migrate --force
