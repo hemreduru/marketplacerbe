@@ -109,6 +109,8 @@ return [
     'return_rate' => 'Return Rate',
     'top_reasons' => 'Top Reasons',
     'return_cost' => 'Return Cost',
+    'vat_passthrough_note' => 'Net profit excludes VAT — VAT is a pass-through (sale VAT owed to the state, input VAT on purchases/commission offset). See your net VAT liability in the VAT report.',
+    'vat_report_cta' => 'VAT Report',
     'real_net' => 'Real Net Profit',
 
     // Marketplace comparison (4.4)

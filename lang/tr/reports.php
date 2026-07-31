@@ -122,6 +122,8 @@ return [
     'commission_vat' => 'Komisyon KDV (alacak)',
     'shipping_vat' => 'Kargo KDV (alacak)',
     'net_vat' => 'Net KDV',
+    'vat_passthrough_note' => 'Net kâr KDV hariçtir — KDV bir pass-through kalemdir (satış KDV\'si devlete borç, alış/komisyon KDV\'si mahsup). Net KDV yükümlülüğünüzü KDV raporundan görün.',
+    'vat_report_cta' => 'KDV Raporu',
     'vat_payable' => 'Borç',
     'vat_refund' => 'Alacak',
 

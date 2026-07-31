@@ -46,6 +46,12 @@
     </div>
     <!--end::Toolbar-->
 
+    {{-- K.8: net kâr KDV hariçtir (pass-through); net KDV yükümlülüğü ayrı VAT raporunda --}}
+    <div class="alert alert-info d-flex flex-stack flex-wrap gap-3 mb-6">
+        <span class="fw-semibold text-gray-700">{{ __('reports.vat_passthrough_note') }}</span>
+        <a href="{{ route('reports.vat') }}" class="btn btn-sm btn-light-info">{{ __('reports.vat_report_cta') }}</a>
+    </div>
+
     <!--begin::Row-->
     <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
         <!--begin::Col-->
