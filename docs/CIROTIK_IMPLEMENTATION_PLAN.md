@@ -55,6 +55,46 @@ Bu plan **tek bir agent oturumunda bitirilmez.** Her PR ayrı bir oturumda işle
 
 ---
 
+## FAZ K — KÂR DOĞRULUĞU ACİL DÜZELTMELERİ (EN ÖNCELİKLİ)
+
+> **Eklendi: 2026-07-31, kod-doğrulamalı analiz sonrası.** Vaat "gerçek net kâr"; ama gösterilen net kâr şu an **sistematik olarak yüksek** (fazla iyimser). Aşağıdaki 3 hata koddan bizzat doğrulandı. Her PR mevcut kod üzerinde **küçük diff** — yeni soyutlama YOK (ponytail). Sıralama = para doğruluğu önce. Bu faz bitmeden FAZ 5/6'ya geçme.
+
+**Başarı Kriteri:** Bir örnek siparişte tahmini net kâr ile Trendyol settlement gerçeği arasındaki fark ≤ %2; `ad_cost`, `return_cost`, `cogs` artık gerçek değerleri yansıtıyor; dashboard günlük kârı = SKU raporu kârı.
+
+### PR #K.1 — `fix: wire real ad spend into ProfitCalculator (ad_cost daima 0 bug)` 💰
+- [ ] **Kök neden (doğrulandı):** `ProfitCalculator` deprecated `AdAllocator::perUnit()` çağırıyor; o da `config("marketplaces.trendyol.advertising.default_cost_per_unit", 0)` okuyor ama `config/marketplaces/trendyol.php`'de `advertising` anahtarı **yok** → `ad_cost` HER ZAMAN 0 → net kâr reklam harcaması kadar şişik.
+- [ ] **Dosya:** `app/Services/Calculations/ProfitCalculator.php` (`$this->ads->perUnit(...)` → `blendedPerUnit(...)`; `blendedPerUnit()` zaten yazılı). Dönem toplam adet EstimateOrderProfitJob'ın bildiği değerden geçilir.
+- [ ] **Kabul:** gerçek `ad_metrics` spend'i olan SKU'da `ad_cost > 0` (Pest assert). SKU-hassas dağıtımı EKLEME — blended doğru seviye (YAGNI).
+
+### PR #K.2 — `fix: populate Claim refund_amount + approved_at (iade zinciri ölü)` 💰
+- [ ] **Kök neden (doğrulandı):** `ClaimService` sadece `raw_data` yazıyor; `refund_amount`/`approved_at` boş → `ReturnCostResolver` `whereNotNull('approved_at')` ile HİÇBİR iade bulamıyor → `return_cost` hem tahminde hem gerçekte 0.
+- [ ] **Dosya:** `app/Services/Marketplaces/Trendyol/ClaimService.php` (`updateOrCreate`'e claims payload'undan `refund_amount` ve claim item Accepted ise `approved_at`).
+- [ ] **Kabul:** onaylı bir claim'in `return_cost`'a düştüğünü doğrula (Pest). İade-yönü kargo+ceza ayrı modellemesi ŞİMDİLİK yok (settlement Return satırı kısmen yakalıyor).
+
+### PR #K.3 — `feat: COGS eksik-maliyet uyarısı + toplu/inline cost_price girişi` 💰
+- [ ] **Kök neden (doğrulandı):** `ProductMapper.php:26 'cost_price' => 0` hardcoded; user girene kadar tüm net kâr yalan-yüksek, hiçbir uyarı yok.
+- [ ] **Dosya:** dashboard/sku-profit'e `cost_price=0` SKU sayısı için uyarı banner'ı (var olan sorgu) + master-products index'te inline `cost_price` düzenleme VEYA basit CSV import.
+- [ ] **Kabul:** cost_price=0 SKU varken uyarı görünür; inline/CSV ile maliyet girilebilir. FIFO/parti maliyet muhasebesi EKLEME (Sellerboard seviyesi — YAGNI).
+
+### PR #K.4 — `fix: unify net-profit (DailyProfitAggregator ≠ SKU raporu)` 💰
+- [ ] **Kök neden (doğrulandı):** `DailyProfitAggregator.true_net_profit` packaging+service_fee düşmüyor ve komisyon/kargo'yu keyword-summary kolonlarından alıyor → dashboard kârı ≠ `order_item_financials.net_profit`.
+- [ ] **Dosya:** `app/Services/Finance/DailyProfitAggregator.php` → `true_net_profit`'i `order_item_financials.net_profit` günlük SUM'ından türet (tek doğruluk kaynağı = kalem defteri).
+- [ ] **Kabul:** dashboard günlük kâr = aynı dönem SKU raporu kâr toplamı (cross-check Pest testi).
+
+### PR #K.5 — `feat: capture real line commissionRate + discounted amount` 💰
+- [ ] **Kök neden (doğrulandı):** `OrderService` (~satır 176-184) `lines[].commissionRate` ve `amount`/`discount` almıyor → tahmin config %15'e çakılı, `net_revenue` indirimsiz `price`'tan → kampanyalı siparişte gelir+kâr şişik.
+- [ ] **Dosya:** `app/Services/Marketplaces/Trendyol/OrderService.php` (`commission_rate = line['commissionRate']`; tutar `line['amount'] ?? price`). `commission_rate` kolonunu ProfitCalculator zaten okuyor.
+- [ ] **Kabul:** indirimli bir kalemde `net_revenue` indirimli tutarı yansıtır (Pest).
+
+### PR #K.6 — `feat: per-order/SKU kesinti dökümü ekranı (şeffaflık)`
+- [ ] **Neden:** Motor 8 kalem kesintiyi `order_item_financials`'ta kolon kolon saklıyor ama hiçbir view göstermiyor; user net kâra körlemesine güveniyor. "200 TL − komisyon − KDV − kargo − stopaj − reklam = net" tek satır dökümü yok.
+- [ ] **Dosya:** `sku-profit.blade.php`'ye `ProfitAggregator::skuTable`'ın zaten döndürdüğü commission/shipping/stopaj/ad/return kolonları (veri hazır, view eksik).
+- [ ] **Kabul:** kullanıcı bir SKU/siparişin kesinti kırılımını görebilir. Yeni endpoint/JS drill-down gerekmez.
+
+**FAZ K sonrası (P2, para doğruluğu bitince):** dashboard tahmin/gerçek kaynak rozeti (ProfitSource enum var); Net KDV mahsubunu (komisyon KDV'si) dönem-sonu P&L'e bağla; orderType düzelt (service_fee 8.49 vs bugün-teslim 5.49). **En son (P3):** kampanya kâr simülatörü (motor hazır, tek form).
+
+---
+
 ## FAZ 0 — SAĞLAMLAŞTIRMA & TEMİZLİK
 
 **Hedef:** Mevcut kod tabanını markaya hazır temele oturt. Ölü referansları temizle, finansal mevzuat (`@money`, decimal precision), güvenlik (2FA, audit), test altyapısı (Pest), job dayanıklılığı.
