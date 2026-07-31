@@ -23,30 +23,41 @@
                 <div class="card-body p-0">
                     @if(count($rows) > 0)
                     <div class="table-responsive">
-                        <table class="table table-row-dashed align-middle gs-0 gy-2">
+                        {{-- K.6: net gelirden tüm kesintiler ayrı kolonlarda → "ciro − komisyon − kargo − stopaj − reklam − iade = net kâr" şeffaf --}}
+                        <table class="table table-row-dashed align-middle gs-0 gy-2" style="font-variant-numeric: tabular-nums;">
                             <thead>
-                                <tr class="fw-bold text-muted bg-light">
+                                <tr class="fw-bold text-muted bg-light text-nowrap">
                                     <th>SKU</th>
                                     <th>{{ __('reports.product') }}</th>
-                                    <th>{{ __('reports.quantity') }}</th>
-                                    <th>{{ __('reports.net_revenue') }}</th>
-                                    <th>{{ __('reports.cost') }}</th>
-                                    <th>{{ __('reports.net_profit') }}</th>
-                                    <th>{{ __('reports.margin') }}</th>
+                                    <th class="text-end">{{ __('reports.quantity') }}</th>
+                                    <th class="text-end">{{ __('reports.net_revenue') }}</th>
+                                    <th class="text-end">{{ __('reports.cost') }}</th>
+                                    <th class="text-end">{{ __('reports.commission') }}</th>
+                                    <th class="text-end">{{ __('reports.shipping') }}</th>
+                                    <th class="text-end">{{ __('reports.stopaj') }}</th>
+                                    <th class="text-end">{{ __('reports.ad_cost') }}</th>
+                                    <th class="text-end">{{ __('reports.return_cost') }}</th>
+                                    <th class="text-end">{{ __('reports.net_profit') }}</th>
+                                    <th class="text-end">{{ __('reports.margin') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($rows as $row)
-                                <tr>
+                                <tr class="text-nowrap">
                                     <td class="fw-bold">{{ $row['sku'] }}</td>
                                     <td>{{ $row['title'] }}</td>
-                                    <td>{{ $row['items'] }}</td>
-                                    <td>{{ number_format((float) $row['net_revenue'], 2) }} TL</td>
-                                    <td>{{ number_format((float) $row['cogs'], 2) }} TL</td>
-                                    <td class="fw-bold {{ (float) $row['net_profit'] >= 0 ? 'text-success' : 'text-danger' }}">
-                                        {{ number_format((float) $row['net_profit'], 2) }} TL
+                                    <td class="text-end">{{ $row['items'] }}</td>
+                                    <td class="text-end">{{ number_format((float) $row['net_revenue'], 2) }}</td>
+                                    <td class="text-end text-gray-600">{{ number_format((float) $row['cogs'], 2) }}</td>
+                                    <td class="text-end text-gray-600">{{ number_format((float) $row['commission'], 2) }}</td>
+                                    <td class="text-end text-gray-600">{{ number_format((float) $row['shipping'], 2) }}</td>
+                                    <td class="text-end text-gray-600">{{ number_format((float) $row['stopaj'], 2) }}</td>
+                                    <td class="text-end text-gray-600">{{ number_format((float) $row['ad_cost'], 2) }}</td>
+                                    <td class="text-end text-gray-600">{{ number_format((float) $row['return_cost'], 2) }}</td>
+                                    <td class="text-end fw-bold {{ (float) $row['net_profit'] >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {{ number_format((float) $row['net_profit'], 2) }}
                                     </td>
-                                    <td>%{{ $row['margin'] }}</td>
+                                    <td class="text-end">%{{ $row['margin'] }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

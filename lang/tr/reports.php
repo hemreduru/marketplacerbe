@@ -32,6 +32,9 @@ return [
     'anomaly_penalty' => 'Ceza',
     'gross_sales' => 'Brüt Satış',
     'commission' => 'Komisyon',
+    'shipping' => 'Kargo',
+    'stopaj' => 'Stopaj',
+    'ad_cost' => 'Reklam',
     'reconciliation_note' => 'Aylık mutabakat, Cirotik tahmininizi gerçek Trendyol settlement ile karşılaştırır.',
     'reconciliation_detail' => 'Settlement verisi her ayın 1\'inde pazaryeri API\'sinden çekilir. Manuel kontrol de tetikleyebilirsiniz.',
 

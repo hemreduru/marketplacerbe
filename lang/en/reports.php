@@ -32,6 +32,9 @@ return [
     'anomaly_penalty' => 'Penalty',
     'gross_sales' => 'Gross Sales',
     'commission' => 'Commission',
+    'shipping' => 'Shipping',
+    'stopaj' => 'Withholding',
+    'ad_cost' => 'Ad Cost',
     'reconciliation_note' => 'Monthly reconciliation compares your Cirotik estimate with the actual Trendyol settlement.',
     'reconciliation_detail' => 'Settlement data is fetched from the marketplace API on the 1st of every month. You can also trigger a manual check.',
 
