@@ -178,7 +178,13 @@ class OrderService
                                         'merchant_sku' => $line['merchantSku'] ?? null,
                                         'barcode' => $line['barcode'] ?? null,
                                         'quantity' => $line['quantity'] ?? 1,
-                                        'price' => $line['price'] ?? 0,
+                                        // İndirimli birim tutar (kampanya) gelire yansısın; yoksa liste fiyatı.
+                                        // ponytail: Trendyol 'amount' birim indirimli fiyattır; canlı sipariş
+                                        // verisiyle price-vs-amount semantiği doğrulanınca sadeleştirilebilir.
+                                        'price' => $line['amount'] ?? $line['price'] ?? 0,
+                                        // Kalem bazında gerçek komisyon oranı → ProfitCalculator config %15
+                                        // fallback yerine bu oranı kullanır (K.5).
+                                        'commission_rate' => $line['commissionRate'] ?? 0,
                                         'currency_code' => $line['currencyCode'] ?? 'TRY',
                                         'line_item_status' => $line['orderLineItemStatusName'] ?? null,
                                     ]);
