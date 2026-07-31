@@ -1,133 +1,138 @@
-# What this project is
+# AGENTS.md
 
-**Resbe** — a Laravel 12 Blade web app for Turkish e-commerce sellers to manage products, orders, claims, questions, and finances across multiple marketplaces from a single panel. Uses the Metronic 8 admin theme. Only Trendyol integration is live; Hepsiburada, n11, and Amazon are scaffolded in `config/marketplace.php`.
+Bu depoda çalışan tüm AI ajanları için rehber. **Ayrıntılı kodlama kuralları aşağıdaki Boost guideline bloğundadır** (kaynağı `.ai/guidelines/cirotik.blade.php`; `php artisan boost:update` ile üretilir — bloğu elle düzenleme). CLAUDE.md de aynı bloğu paylaşır.
 
-This is a **server-rendered Blade app**, NOT an API-only backend. The `.github/copilot-instructions.md` describes an earlier API-only design that no longer matches the code — trust `routes/web.php` and `app/Http/Controllers/Web/` over it. Sanctum is installed but `routes/api.php` has only a stub `/user` route.
+## Proje
 
-## Commands
+**Cirotik** (eski adı "Resbe") — çok pazaryerli Türk e-ticaret satıcıları için **SKU bazlı gerçek net kâr** paneli. Laravel 12 / PHP 8.3, server-rendered Blade (Metronic 8), **1 kullanıcı = 1 hesap** (Team/Workspace/RBAC yok). Trendyol canlı; Hepsiburada/N11/Pazarama `MarketplaceManager`'da kayıtlı; Amazon scaffold-only.
+
+- **Ürün hedefi:** GitHub issue #1 — https://github.com/hemreduru/marketplacerbe/issues/1
+- **Bağlayıcı spec:** `/home/emre/Documents/CIROTIK_AGENT_SPEC.md` (Bölüm 0, 6, 16)
+- **Operasyonel plan / PR sırası:** `docs/CIROTIK_IMPLEMENTATION_PLAN.md` (sıradaki iş = ilk `[ ]` PR)
+
+## Komutlar
 
 ```bash
-composer dev       # Run server + queue listener + pail logs + vite concurrently
-composer test      # Clears config cache then runs Pest/PHPUnit
-composer setup     # First-time: install, env, key, migrate, npm install + build
-php artisan test --compact                     # Run tests
-php artisan test --compact --filter=Name       # Single test
+composer dev                              # server + queue listener + pail + vite (birincil dev döngüsü)
+composer test                             # config cache temizler, sonra Pest/PHPUnit
+php artisan test --compact                # testler
+php artisan test --compact --filter=Name  # tek test
 php artisan migrate
-npm run build / npm run dev                    # Rebuild front-end assets
-vendor/bin/pint --dirty --format agent         # REQUIRED after editing PHP
+vendor/bin/pint --dirty --format agent    # PHP düzenledikten SONRA zorunlu
+vendor/bin/phpstan analyse                # level 6 temiz olmalı
+php artisan boost:update                  # boost guideline bloğunu tazele
 ```
 
-Tests use in-memory SQLite (phpunit.xml sets `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`). The app itself uses MySQL.
+## Ortam
 
-## Architecture
-
-**Request flow:** `routes/web.php` → `App\Http\Controllers\Web\*` → `App\Services\Trendyol\*` / `App\Services\MarketplaceManager` → Eloquent models. All web routes are under `auth` or `guest` middleware groups.
-
-**Marketplace integration:** `config/marketplace.php` is the single source of truth for API URLs, rate limits, endpoints, commission rates, status/sync/entity enums, and profit calculation toggles. Read it before hardcoding any marketplace constant.
-
-Services (`app/Services/Trendyol/`): `TrendyolProductService`, `TrendyolOrderService`, `TrendyolFinanceService`, `TrendyolQuestionService`, `TrendyolClaimService`. They use Laravel's `Http` facade with basic auth. Failure pattern: return `['error' => true, ...]` rather than throwing. `MarketplaceManager` is injected via container; individual services are instantiated manually with per-user credentials.
-
-**Credentials:** `user_marketplace_credentials` has per-user `api_key`/`api_secret` (hidden from serialization) and an `additional_credentials` JSON column (e.g., `seller_id`). Look up via `Marketplace::where('slug', 'trendyol')` then the user's credential row.
-
-**Product ownership:** Products belong to a credential (`Product::credential()`), not directly to a user. Scope user queries with `whereHas('credential', fn($q) => $q->where('user_id', $id))`. `User` model provides `products()` via `HasManyThrough`.
-
-**Sync:** Triggered by (1) manual button → controller `sync()`, (2) queued `App\Jobs\SyncTrendyol*Job` on the `sync` queue, (3) `routes/console.php` scheduler (every 6h / 30min intervals with `withoutOverlapping()`).
-
-**DataTables:** List pages use server-side DataTables. Controller `getData()` methods read `start`, `length`, `order.0.column`, `search.value` and return `{draw, recordsTotal, recordsFiltered, data}` where `data` rows are pre-rendered HTML strings.
-
-**Localization:** Turkish + English. `SetLocale` middleware on API, `SetLocaleFromSession` on web (registered in `bootstrap/app.php`). Translation files in `lang/{en,tr}/*.php`. All user-facing strings must use `__('key')`.
-
-**JSON responses:** `App\Http\Traits\ApiResponseTrait` provides `successResponse`/`errorResponse`/`paginatedResponse`/etc. returning `{success, message, data}`. Some controller Ajax endpoints build responses inline — match the surrounding method.
-
-**Profit model:** `net_profit = sale_price - (purchase_cost + commission + shipping_cost)`. Toggles in `config/marketplace.php` under `profit_calculation`.
-
-## Project-specific skills
-
-`.agents/skills/laravel-best-practices/` and `.agents/skills/pest-testing/` contain detailed domain rules. Load them when working in those areas.
-
-The Laravel Boost guidelines below are auto-managed by `php artisan boost:update` — do not hand-edit.
+- **App DB (lokal `.env`):** MySQL `marketplace` @ 127.0.0.1 (`emre`). Testler **in-memory sqlite** (`phpunit.xml`).
+- Frontend değişikliği görünmüyorsa: `npm run build` / `npm run dev` / `composer dev`.
 
 <laravel-boost-guidelines>
 === .ai/cirotik rules ===
 
-## Cirotik — Çalışan Implementasyon Planı
+# Cirotik — Kodlama Kuralları (Laravel Boost)
 
-> **Marka adı:** Cirotik (Ciro + ✓ tik). Vaat: *"Cironuzu görmek değil, gerçekten ne kazandığınızı bilmek."*
+Cirotik: çok pazaryerli satıcının **SKU bazlı gerçek net kârını** doğrulanmış şekilde gösteren karlılık platformu. Laravel 12 / PHP 8.3. **1 kullanıcı = 1 hesap**, tüm sahiplik `user_id` üzerinden.
 
-Bu proje, Trendyol/Hepsiburada/N11/Pazarama/Amazon TR pazaryerlerine bağlı satıcılar için **gerçek SKU bazlı net kâr** veren bir Laravel 12 Blade panelidir. Kod tabanı şu an "Resbe" adıyla Trendyol-only çalışıyor; Cirotik rebrand + yeniden mimarileme aktif olarak yürürlükte.
+> Tam bağlayıcı spec: `/home/emre/Documents/CIROTIK_AGENT_SPEC.md` (Bölüm 0, 6, 16).
 
-### Bağlayıcı kaynaklar (sırasıyla bu sıra ile oku)
+## Mimari (koda uygun — güncel)
 
-1. `/home/emre/Documents/CIROTIK_AGENT_SPEC.md` — **TEK truth source.** 18 bölüm, ~2000 satır design spec.
-2. `docs/CIROTIK_IMPLEMENTATION_PLAN.md` — bu projede `docs/` altında. Spec'i 7 faz (0-6), ~79 PR'a böler. **Her PR için: hedef, dokunulan dosyalar, kabul kriteri, Pest gereksinimi.**
-3. `CLAUDE.md` — proje teknik özet (auto-managed `<laravel-boost-guidelines>` blokunu elle düzenleme).
-
-### Mutlak Kurallar (her oturumda hatırla)
-
-- ✅ **`ServiceResult` döner**, exception fırlatma (programming bug hariç). Spec Bölüm 0 Madde 5.
-- ✅ **Write API çağrısı iki katmanlı sigorta:** `MARKETPLACE_WRITE_ENABLED=true` env **VE** `user_marketplace_credentials.write_enabled=true`. Aksi takdirde dispatcher `status=skipped` log.
-- ✅ **Para hesabı `decimal(15, 4)` veya cents-as-integer** — asla `float`. Pest `arch()` test bunu doğrular.
-- ✅ **Calculations TDD zorunlu** — `VatCalculator`, `CommissionCalculator`, `ProfitCalculator` vb. önce Pest, sonra implementasyon.
-- ✅ **Webhook + sync idempotent** — `marketplace_events.event_uuid` UNIQUE; `stock_events.(source, source_reference, event_type)` UNIQUE.
-- ✅ **Marketplace dosya yapısı sabit:** `app/Services/Marketplaces/{Name}/{Client,ProductService,OrderService,ClaimService,QuestionService,FinanceService,WebhookService,Mapper/}`. Spec Bölüm 0 Madde 4.
-- ✅ **Yorum dili Türkçe, kod İngilizce, commit conventional (`feat:`, `fix:`, `refactor:`, `test:`)**.
-- ❌ Eloquent model'den direkt API çağrısı — her zaman Service katmanı.
-- ❌ Hardcoded marketplace URL — her zaman `config/marketplaces/{name}.php`.
-- ❌ Migration `down()` olmadan merge.
-- ❌ Team/Workspace/multi-user — model **1 user = 1 hesap** (Spec Bölüm 4).
-- ❌ Mobile/Push referansları — yok; bildirim sadece **mail** + **in-app** (Spec Bölüm 5).
-
-### Mimari Tek Bakış
+Katmanlı servis mimarisi. Akış:
 
 ```
-master_products (Cirotik kendi şeması, denormalized current_stock/price)
-  ←→ marketplace_listings (per credential, per remote_product_id)
-  ←  stock_events (append-only ledger; source=trendyol|hb|n11|pazarama|amazon|user|system)
-  ←  price_events
-  →  sync_dispatch_queue (outbound mutations, exp backoff retry)
+routes/web.php → App\Http\Controllers\Web\* (thin)
+  → App\Services\* (tüm iş kuralı + API çağrıları)
+    → Eloquent Model (sadece veri; ASLA API çağrısı yapmaz)
 ```
 
-**Stok = tek integer değil, event akışıdır.** `MasterProductStockProjector` ile projeksiyon. Atomik UPDATE + optimistic lock (`version` sütunu) ile race condition. Stock buffer stratejisi ile oversell önleme.
+- Tüm uygulama route'ları session auth (`auth`/`guest` grupları). Özellik gating: `feature:*` middleware; admin `admin` prefix'i altında. `api.php` sadece bir stub'dır (`auth:sanctum GET /user`); public REST API Faz 5 hedefidir.
+- Public POST webhook'lar auth bypass eder: `/webhooks/trendyol/{uuid}`, `/webhooks/hepsiburada/{uuid}`, `/webhooks/ses/*`, iyzico callback.
+- View katmanı **server-rendered Blade**'dir (API-only DEĞİL).
 
-### Hangi Faz / Hangi PR Üzerinde Çalışıyorum?
+### Pazaryeri servisleri (gerçek yapı)
 
-`docs/CIROTIK_IMPLEMENTATION_PLAN.md` PR satırlarının başındaki `[ ]` / `[x]` durumlarına bak — sıradaki ilk `[ ]` PR senin görevin. Spec referansı her PR'ın altında `Spec Ref:` etiketiyle.
+Konum: **`app/Services/Marketplaces/<Name>/`**.
 
-Faz başlangıç PR sıralaması (Spec Bölüm 16.6 ile uyumlu):
+Servisler `new`'lenmez; **`App\Services\MarketplaceManager`** üzerinden erişilir:
 
-1. `feat: introduce ServiceResult value object`
-2. `chore: remove stale marketplace model references` (User.php + console.php — gerçek modeller `Product`/`Order`/`FinancialTransaction`)
-3. `chore: remove team/workspace scaffolding`
-4. `feat: add @money Blade directive`
-5. `feat: add 2FA (TOTP) via pragmarx/google2fa-laravel`
-6. `feat: activity logging via spatie/laravel-activitylog`
-7. `feat: job resilience (tries + backoff + failed handler)`
+```php
+$manager->credentialFor($user, $slug);              // aktif UserMarketplaceCredential
+$manager->productService($credential);              // vb. order/finance/question/claim
+// make() credential'dan per-marketplace Client kurar ve concrete service'e inject eder
+```
 
-### Her Oturum Açılışı
+`MarketplaceManager::$services` map'inde **yalnızca**: trendyol, hepsiburada, n11, pazarama. Her biri `product/order/finance/question/claim` sunar. `make()` client match'i de sadece bu 4'ü kurar.
 
-1. Spec'in PR'a denk gelen bölümünü oku (PR satırının `Spec Ref:` etiketinden).
-2. `docs/CIROTIK_IMPLEMENTATION_PLAN.md` ilgili PR satırının tamamını oku.
-3. `git status` temiz mi? `php artisan test --compact` yeşil mi (baseline)?
-4. `git checkout -b feat/cirotik-pr-XX-<slug>`.
+Zorunlu dosya seti (`app/Services/Marketplaces/<Name>/`): `Client.php`, `ProductService.php`, `OrderService.php`, `ClaimService.php`, `QuestionService.php`, `FinanceService.php`, `Mapper/`. **WebhookService yalnızca Trendyol'da** dosya olarak var; Hepsiburada webhook'u `HepsiburadaWebhookController` içinde. (Yani "WebhookService her pazaryeride zorunlu" kuralı gerçekte esnetilmiştir.)
 
-### Her Oturum Kapanışı (PR sonu)
+**Amazon: scaffold-only.** `Client/OrderService/FinanceService/ReportsService` + `config/marketplaces/amazon.php` var ama `MarketplaceManager`'a **kayıtlı değil** ve ProductService/ClaimService/QuestionService yok — manager üzerinden instantiate edilemez. Yeni Amazon işi önce manager'a wiring gerektirir.
 
-- [ ] `vendor/bin/pint --dirty --format agent`
-- [ ] `php artisan test --compact` yeşil
-- [ ] Migration `up()` + `down()` test edildi (rollback ile)
-- [ ] `.env.example` güncel
-- [ ] `lang/{en,tr}/` çevirileri eşli
-- [ ] Bu plan dosyasında PR satırı `[x]` ve commit hash eklendi
-- [ ] PHPStan level 6 hatasız
+### Dönüş tipleri
 
-### Kritik Endpoint Referansları
+- Pazaryeri/kargo/e-fatura servis metotları **`App\Support\ServiceResult` döner, throw ETMEZ.** Exception yalnızca programming bug içindir. `ServiceResult::ok($data)` / `ServiceResult::fail(code, message, raw)`.
+- `App\Services\Calculations\*` value object (ör. `ProfitBreakdown`) veya scalar döner — **ServiceResult değil**.
 
-- **Trendyol AI indeks (öncelikli):** https://developers.trendyol.com/llms.txt
-- **Amazon SP-API AI indeks:** https://developer-docs.amazon.com/llms.txt
-- **Hepsiburada Webhook:** https://developers.hepsiburada.com/hepsiburada/reference/webhook-%C3%B6nemli-bilgiler
-- **2026 Trendyol Komisyon:** https://faturaport.com/blog/on-muhasebe/2026-trendyol-kar-hesaplama-komisyon-kargo-kdv-ve-net-kazanc-rehberi
+### Servis kataloğu (mevcut)
 
-Spec Bölüm 17'de tüm referans listesi var.
+- `Calculations/`: ProfitCalculator, VatCalculator, CommissionCalculator, ShippingCostCalculator, PackagingCostCalculator, ServiceFeeCalculator, ReturnCostEstimator, StopajCalculator, NetVatLiability, AdAllocator
+- `Finance/`: ReconciliationService, SettlementReconciler, ProfitAggregator, DailyProfitAggregator, FeeResolver, ReturnCostResolver, ProfitContextFactory, AdSpendRepository
+- `Inventory/`: MasterProductStockProjector, MasterProductPriceProjector, StockAlertService
+- `Cargo/`: Manager facade + `Contracts/CargoProvider` + providers (Aras, Mng, Yurtici, Dhl, Ptt, Surat, Ups)
+- `EFatura/`: EInvoiceManager + `Contracts/EInvoiceProvider` + providers (Parasut, BizimHesap, Gib)
+- Ayrıca: Ads, Buybox, Repricer, Reports, Supplier, Auth/TwoFactorAuthService
+
+## Bağlayıcı Kurallar
+
+1. **ServiceResult zorunlu.** Pazaryeri/harici servis metodu `ServiceResult` döner, throw etmez. API/network/validation/rate-limit hataları `ok=false`.
+2. **Para asla float değil.** `decimal(15,4)` veya cents-as-integer. Kâr hesabı yapan her sınıf için **TDD zorunlu** (önce Pest testi, sonra kod).
+3. **İki katmanlı write-gating.** Yazma ancak `MARKETPLACE_WRITE_ENABLED=true` (config `marketplace.php` → `write_enabled`, default false) **VE** `user_marketplace_credentials.write_enabled=true` birlikte true iken atılır. Biri false ise write yok, UI disabled, log'a "write blocked".
+4. **Idempotency zorunlu.** Webhook + sync job aynı external_id'yi 2 kez işlemez. `marketplace_events.event_uuid` PRIMARY KEY dedup; `stock_events` UNIQUE(source, source_reference, event_type) — duplicate insert exception fırlatmaz, yakalanır ve SKIP edilir.
+5. **Stok = append-only event akışı, tek integer değil.** `current_stock = SUM(stock_events.quantity_delta)`. `master_products.current_stock/current_price` denormalize (salt-okuma), atomik `UPDATE ... SET current_stock = current_stock - 1 WHERE id=? AND current_stock >= 1`; 0 row affected = oversell sinyali. `price_events` aynı desende.
+6. **Eloquent'ten asla direkt API çağrısı yapma** — daima Service katmanı.
+7. **Optimistic lock.** `UPDATE master_products SET current_price=?, version=version+1 WHERE id=? AND version=?`; affected=0 → conflict → `sync_dispatch_queue`'ya güncel version ile yeniden. Conflict çözümü: satışlar absolute öncelikli (last-write-wins değil).
+8. **Stock buffer.** `stock_buffer_strategy` enum(none|fixed|percent) + `stock_buffer_value`; push = `max(0, current_stock - buffer)`.
+9. **Migration her zaman up() + down().** down()'suz bırakma; rollback ile test et.
+10. **Hardcoded URL/limit yok.** Base URL/rate limit `config/marketplace.php` (merkezi) + `config/marketplaces/<name>.php`. Not: hem `marketplace.php` (merkezi) hem `marketplaces.php` (ince aggregator) mevcut. Test/prod credential karıştırma — `MarketplaceEnvironment` enum(stage|production).
+11. **Capability-driven.** Her config'de capabilities manifest + limits + rate_limits; `MarketplaceCapability::supports()` ile UI aksiyonları gate edilir.
+12. **CargoProvider** interface (`createShipment/cancelShipment/getLabel/track/listStatusUpdates/getServiceCode/getCapabilities` → hepsi ServiceResult); `CargoManager` facade ile erişilir.
+
+## Konvansiyonlar
+
+- **Yorum dili TÜRKÇE; kod (identifier/method/değişken) İNGİLİZCE.**
+- Naming: Model PascalCase singular, tablo snake_case plural, servis `+Service`, job `+Job`, event `+Event`, enum değerleri snake_case string.
+- PHP 8 modern stil: `final class`, `readonly` promoted constructor properties, constructor DI (`private readonly`), typed enum.
+- Her public method için PHPDoc zorunlu; karmaşık iş kuralı için inline Türkçe yorum.
+- Locale-bağımlı string karşılaştırma yasak: `strtolower` yerine `Str::lower` + tr locale.
+- Para gösterimi **`@money` Blade directive** üzerinden.
+- Yeni env → `.env.example`; yeni TR metin → `lang/tr/` **ve** eşi `lang/en/`.
+- Commit: İngilizce conventional commits (`feat:`, `fix:`, `refactor:`, `test:`, `chore:`).
+- Her PR öncesi: `vendor/bin/pint`, `vendor/bin/phpstan analyse` (level 6 temiz).
+
+## Test Kuralları (Pest, PHPUnit değil)
+
+- Para/kâr hesabı yapan her sınıf: **TDD zorunlu** (kırmızı → yeşil).
+- Zorunlu sync edge-case'leri: aynı webhook 2× → stok bir kez azalır; API down → 5 deneme sonra failed + bildirim; manuel stok + eş zamanlı webhook → ikisi de event; master 3 pazaryerinde → manuel update 3'üne dispatch; iade webhook → stok +1; oversell → tüm pazaryerlerine 0 push + alarm; 15dk'da aynı SKU 2 fiyat update engellenir; event_uuid duplicate → UNIQUE ile yakalanır, exception yok.
+- Stock projector: 100 ardışık event → projection doğru.
+- Kâr doğrulama metric'i: tahmini net kâr ile `getSettlements` gerçeği farkı ≤ %2.
+- Platform fee: paket başına 1 kez (item başına değil) — 5 item'lı paket kârı = SUM(items) − 4×service_fee.
+- Migration up()+down() rollback ile test.
+- Non-trivial mantık (branch/loop/parser/para/güvenlik) en az bir runnable test bırakır; trivial one-liner gerekmez.
+
+## Do NOT
+
+- try-catch ile exception yutma — hatayı `ServiceResult(ok=false)` ile yüzeye çıkar.
+- down()'suz migration.
+- Eloquent'ten direkt pazaryeri API çağrısı.
+- Para hesabında float.
+- Locale-bağımlı string karşılaştırma.
+- Hardcoded URL/limit.
+- **Team/Workspace/RBAC/tenant/multi-user scaffolding ekleme** — kaldırıldı; sahiplik `user_id`. spatie/laravel-permission kullanılmıyorsa kaldır.
+- Native mobil app / push notification ekleme — kapsam dışı (e-posta + in-app + PWA yeterli).
+- Stok'u tek integer olarak mutate etme — append-only ledger + projection.
+- Servis metodundan exception fırlatma (bug hariç).
+- PHPDoc'suz public method.
 
 === foundation rules ===
 
@@ -139,10 +144,11 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.3
+- php - 8.4
 - laravel/framework (LARAVEL) - v12
 - laravel/prompts (PROMPTS) - v0
 - laravel/sanctum (SANCTUM) - v4
+- larastan/larastan (LARASTAN) - v3
 - laravel/boost (BOOST) - v2
 - laravel/mcp (MCP) - v0
 - laravel/pail (PAIL) - v1
