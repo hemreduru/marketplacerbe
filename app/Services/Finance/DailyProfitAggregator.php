@@ -10,11 +10,14 @@ use Illuminate\Support\Facades\DB;
  * Kalem bazlı kâr defterini günlük özete toplar — COGS dashboard'a buradan girer.
  *
  * Mevcut FinancialDailySummary satırlarını (settlement günleri) COGS, stopaj,
- * reklam ve iade maliyetleriyle zenginleştirir ve GERÇEK net kârı yazar:
+ * reklam ve iade maliyetleriyle zenginleştirir ve GERÇEK net kârı yazar.
  *
- *   true_net_profit = gross_sales − commission − shipping_cost
- *                   − platform_expense − other_expense
- *                   − cogs − stopaj − ad_cost − return_cost
+ *   true_net_profit = SUM(order_item_financials.net_profit)
+ *
+ * Kalem defteri (order_item_financials) tek doğruluk kaynağıdır; böylece
+ * dashboard günlük kârı SKU raporu kârına birebir eşittir. Summary'nin
+ * keyword-kategorize commission/shipping kolonları yalnızca gider kırılımı
+ * (donut) içindir, kâr formülüne GİRMEZ.
  *
  * Yalnızca settlement özeti OLAN günler işlenir; tahmin-yalnız günler
  * dashboard'a Stage 5'te ProfitAggregator overlay'i ile eklenir.
@@ -37,6 +40,7 @@ class DailyProfitAggregator
                 DB::raw('SUM(stopaj) as stopaj_sum'),
                 DB::raw('SUM(ad_cost) as ad_cost_sum'),
                 DB::raw('SUM(return_cost) as return_cost_sum'),
+                DB::raw('SUM(net_profit) as net_profit_sum'),
             ])
             ->get()
             ->keyBy('day');
@@ -57,24 +61,10 @@ class DailyProfitAggregator
             $adCost = bcround((string) ($totals->ad_cost_sum ?? '0'), self::SCALE);
             $returnCost = bcround((string) ($totals->return_cost_sum ?? '0'), self::SCALE);
 
-            $marketplaceNet = bcsub(
-                (string) $summary->gross_sales,
-                bcadd(
-                    bcadd((string) $summary->commission, (string) $summary->shipping_cost, 6),
-                    bcadd((string) $summary->platform_expense, (string) $summary->other_expense, 6),
-                    6
-                ),
-                6
-            );
-
-            $trueNet = bcround(
-                bcsub(
-                    $marketplaceNet,
-                    bcadd(bcadd($cogs, $stopaj, 6), bcadd($adCost, $returnCost, 6), 6),
-                    6
-                ),
-                self::SCALE
-            );
+            // K.4: gerçek net kâr = kalem defterinin günlük net_profit toplamı
+            // (tek doğruluk kaynağı). Summary'nin keyword komisyon/kargo kolonları
+            // artık kâr formülüne girmez — yalnızca gider kırılımı için tutulur.
+            $trueNet = bcround((string) ($totals->net_profit_sum ?? '0'), self::SCALE);
 
             $summary->update([
                 'cogs' => $cogs,

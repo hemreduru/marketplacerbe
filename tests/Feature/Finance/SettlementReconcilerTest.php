@@ -170,8 +170,9 @@ test('DailyProfitAggregator günlük özete COGS dahil gerçek net kârı yazar'
     // Factory: kalem başına cogs 40, stopaj 1 → 2 kalem: cogs 80, stopaj 2
     expect((string) $summary->cogs)->toBe('80.0000')
         ->and((string) $summary->stopaj)->toBe('2.0000')
-        // true_net = (180 - 27 - 40 - 8.49 - 0) - 80 - 2 - 0 - 0 = 22.51
-        ->and((string) $summary->true_net_profit)->toBe('22.5100')
+        // K.4: true_net = SUM(kalem net_profit) = 2 × -4.4900 = -8.9800 (kalem defteri tek kaynak,
+        // summary'nin keyword komisyon/kargo kolonları artık kâr formülüne girmez)
+        ->and((string) $summary->true_net_profit)->toBe('-8.9800')
         // legacy net_profit dokunulmadı
         ->and((float) $summary->net_profit)->toBe(104.51);
 });
