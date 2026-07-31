@@ -111,6 +111,14 @@ return [
     'return_cost' => 'Return Cost',
     'vat_passthrough_note' => 'Net profit excludes VAT — VAT is a pass-through (sale VAT owed to the state, input VAT on purchases/commission offset). See your net VAT liability in the VAT report.',
     'vat_report_cta' => 'VAT Report',
+    'cost_of_goods' => 'Cost of Goods',
+    'packaging' => 'Packaging',
+    'simulator_title' => 'Profit Simulator',
+    'simulator_hint' => 'Pick a product and a hypothetical sale price; see net profit after deductions.',
+    'simulator_product' => 'Product',
+    'simulator_price' => 'Sale Price',
+    'simulator_submit' => 'Calculate',
+    'simulator_empty' => 'Enter a product and price to see the result.',
     'real_net' => 'Real Net Profit',
 
     // Marketplace comparison (4.4)

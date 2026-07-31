@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Web;
 
 use App\Exports\ArrayExport;
 use App\Http\Controllers\Controller;
+use App\Models\MasterProduct;
+use App\Models\OrderItem;
+use App\Services\Calculations\ProfitCalculator;
 use App\Services\Finance\ProfitAggregator;
+use App\Services\Finance\ProfitContextFactory;
 use App\Services\Finance\ReconciliationService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -16,6 +20,47 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProfitReportController extends Controller
 {
+    /**
+     * Kampanya kâr simülatörü: seçilen ürün + hipotetik satış fiyatıyla
+     * ProfitCalculator'ı istek anında çalıştırır (what-if). Yeni motor yok;
+     * mevcut forOrderItem'ı geçici (persist edilmemiş) bir OrderItem ile kullanır.
+     */
+    public function simulator(Request $request, ProfitCalculator $calculator, ProfitContextFactory $contexts): View
+    {
+        $user = Auth::user();
+        $products = MasterProduct::where('user_id', $user->id)
+            ->orderBy('title')
+            ->get(['id', 'title', 'sku', 'cost_price', 'current_price']);
+
+        $result = null;
+        $selected = null;
+
+        if ($request->filled('master_product_id') && $request->filled('price')) {
+            $validated = $request->validate([
+                'master_product_id' => ['required', 'integer'],
+                'price' => ['required', 'numeric', 'min:0'],
+            ]);
+
+            $selected = MasterProduct::where('user_id', $user->id)->find($validated['master_product_id']);
+
+            if ($selected) {
+                $item = new OrderItem;
+                $item->price = $validated['price'];
+                $item->quantity = 1;
+                $item->commission_rate = 0;
+                $item->merchant_sku = $selected->sku;
+
+                $result = $calculator->forOrderItem($item, $selected, $contexts->forMarketplace('trendyol'));
+            }
+        }
+
+        return view('reports.simulator', [
+            'products' => $products,
+            'result' => $result,
+            'selected' => $selected,
+        ]);
+    }
+
     /**
      * SKU bazlı kâr/zarar raporu — kalem bazlı kâr defterinden (order_item_financials)
      * okunur, istek anında yeniden hesap YOK.
