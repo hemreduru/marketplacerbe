@@ -87,22 +87,21 @@ class MarketplaceSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Amazon TR',
-                'slug' => 'amazon-tr',
-                'code' => 'AMAZON',
-                'api_base_url' => 'https://sellingpartnerapi-eu.amazon.com',
+                'name' => 'Pazarama',
+                'slug' => 'pazarama',
+                'code' => 'PAZARAMA',
+                'api_base_url' => 'https://isortagimapi.pazarama.com',
                 'logo' => null,
                 'is_active' => false,
                 'config' => json_encode([
-                    'auth_type' => 'oauth2',
-                    'marketplace_id' => 'A33AVAJ2PDY3EV', // Turkey marketplace ID
+                    'auth_type' => 'oauth_client_credentials',
                     'rate_limit' => [
                         'requests_per_minute' => 60,
                         'requests_per_hour' => 3600,
                     ],
                     'endpoints' => [
-                        'products' => '/catalog/2022-04-01/items',
-                        'orders' => '/orders/v0/orders',
+                        'products' => '/product/products',
+                        'orders' => '/order/orders',
                     ],
                 ]),
                 'created_at' => now(),
@@ -110,6 +109,12 @@ class MarketplaceSeeder extends Seeder
             ],
         ];
 
-        \DB::table('marketplaces')->insert($marketplaces);
+        // Idempotent: slug'a göre upsert — yeniden çalıştırınca kopya oluşturmaz.
+        foreach ($marketplaces as $marketplace) {
+            \DB::table('marketplaces')->updateOrInsert(
+                ['slug' => $marketplace['slug']],
+                $marketplace
+            );
+        }
     }
 }

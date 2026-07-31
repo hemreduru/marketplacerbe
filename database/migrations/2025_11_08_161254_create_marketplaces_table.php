@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('marketplaces', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // Trendyol, Hepsiburada, n11, Amazon
+            $table->string('name'); // Trendyol, Hepsiburada, n11, Pazarama
             $table->string('slug')->unique(); // trendyol, hepsiburada, n11
             $table->string('code')->unique(); // TRENDYOL, HEPSIBURADA, N11
             $table->string('api_base_url')->nullable();

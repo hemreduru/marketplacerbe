@@ -46,7 +46,7 @@ test('growth plan allows connecting up to three marketplaces but blocks fourth',
     $trendyol = Marketplace::where('slug', 'trendyol')->first() ?? Marketplace::factory()->trendyol()->create();
     $hepsiburada = Marketplace::where('slug', 'hepsiburada')->first() ?? Marketplace::factory()->create(['slug' => 'hepsiburada', 'name' => 'Hepsiburada']);
     $n11 = Marketplace::where('slug', 'n11')->first() ?? Marketplace::factory()->create(['slug' => 'n11', 'name' => 'n11']);
-    $amazon = Marketplace::where('slug', 'amazon')->first() ?? Marketplace::factory()->create(['slug' => 'amazon', 'name' => 'Amazon']);
+    $fourth = Marketplace::factory()->create(['slug' => 'ciceksepeti', 'name' => 'Çiçeksepeti']);
 
     UserMarketplaceCredential::factory()->create(['user_id' => $user->id, 'marketplace_id' => $trendyol->id]);
     UserMarketplaceCredential::factory()->create(['user_id' => $user->id, 'marketplace_id' => $hepsiburada->id]);
@@ -54,7 +54,7 @@ test('growth plan allows connecting up to three marketplaces but blocks fourth',
 
     $response = $this->actingAs($user)
         ->putJson(route('marketplace.settings.update'), [
-            'marketplace_id' => $amazon->id,
+            'marketplace_id' => $fourth->id,
             'api_key' => 'amz-api-key',
             'api_secret' => 'amz-api-secret',
         ]);
@@ -171,7 +171,7 @@ test('pro plan allows unlimited marketplace connections', function () {
     $trendyol = Marketplace::where('slug', 'trendyol')->first() ?? Marketplace::factory()->trendyol()->create();
     $hepsiburada = Marketplace::where('slug', 'hepsiburada')->first() ?? Marketplace::factory()->create(['slug' => 'hepsiburada', 'name' => 'Hepsiburada']);
     $n11 = Marketplace::where('slug', 'n11')->first() ?? Marketplace::factory()->create(['slug' => 'n11', 'name' => 'n11']);
-    $amazon = Marketplace::where('slug', 'amazon')->first() ?? Marketplace::factory()->create(['slug' => 'amazon', 'name' => 'Amazon']);
+    $fourth = Marketplace::factory()->create(['slug' => 'ciceksepeti', 'name' => 'Çiçeksepeti']);
 
     UserMarketplaceCredential::factory()->create(['user_id' => $user->id, 'marketplace_id' => $trendyol->id]);
     UserMarketplaceCredential::factory()->create(['user_id' => $user->id, 'marketplace_id' => $hepsiburada->id]);
@@ -179,7 +179,7 @@ test('pro plan allows unlimited marketplace connections', function () {
 
     $response = $this->actingAs($user)
         ->putJson(route('marketplace.settings.update'), [
-            'marketplace_id' => $amazon->id,
+            'marketplace_id' => $fourth->id,
             'api_key' => 'amz-api-key',
             'api_secret' => 'amz-api-secret',
         ]);

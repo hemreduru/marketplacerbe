@@ -39,4 +39,5 @@ return [
     'select_theme' => 'Select Theme',
     'marketplace_settings' => 'Marketplace Settings',
     'credentials_updated' => 'Credentials updated successfully.',
+    'marketplace_inactive' => 'This marketplace is not active yet; you cannot connect it for now.',
 ];

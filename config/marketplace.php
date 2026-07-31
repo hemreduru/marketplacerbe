@@ -130,24 +130,6 @@ return [
                 'orders' => '/OrderService',
             ],
         ],
-        'amazon' => [
-            'name' => 'Amazon TR',
-            'code' => 'AMAZON',
-            'production_api_url' => 'https://sellingpartnerapi-eu.amazon.com',
-            'stage_api_url' => null,
-            'use_stage' => false,
-            'marketplace_id' => 'A33AVAJ2PDY3EV', // Turkey
-            'rate_limit' => [
-                'requests_per_minute' => 60,
-                'requests_per_hour' => 3600,
-            ],
-            'auth_type' => 'oauth2',
-            'timeout' => 30,
-            'endpoints' => [
-                'products' => '/catalog/2022-04-01/items',
-                'orders' => '/orders/v0/orders',
-            ],
-        ],
     ],
 
     /*
@@ -277,9 +259,6 @@ return [
             'default' => 15.0,
         ],
         'n11' => [
-            'default' => 15.0,
-        ],
-        'amazon' => [
             'default' => 15.0,
         ],
     ],

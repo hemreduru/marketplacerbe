@@ -39,4 +39,5 @@ return [
     'select_theme' => 'Tema Seçin',
     'marketplace_settings' => 'Pazaryeri Ayarları',
     'credentials_updated' => 'Kimlik bilgileri başarıyla güncellendi.',
+    'marketplace_inactive' => 'Bu pazaryeri şu anda aktif değil; şimdilik bağlanamazsınız.',
 ];

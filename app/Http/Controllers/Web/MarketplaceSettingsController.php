@@ -44,6 +44,18 @@ class MarketplaceSettingsController extends Controller
             $user = Auth::user();
             $validated = $request->validated();
 
+            // Guard: yalnızca aktif pazaryerine credential girilebilir.
+            // Pasif pazaryeri UI'da gizli olsa da doğrudan istek gelebilir; sunucu tarafında reddet.
+            $marketplace = Marketplace::find($validated['marketplace_id']);
+            if (! $marketplace || ! $marketplace->is_active) {
+                DB::rollBack();
+
+                return response()->json([
+                    'success' => false,
+                    'message' => __('settings.marketplace_inactive'),
+                ], 422);
+            }
+
             // Guard: Marketplace Limit Enforcement
             $exists = UserMarketplaceCredential::where('user_id', $user->id)
                 ->where('marketplace_id', $validated['marketplace_id'])
@@ -78,8 +90,7 @@ class MarketplaceSettingsController extends Controller
 
             DB::commit();
 
-            $marketplace = Marketplace::find($validated['marketplace_id']);
-            if ($marketplace && $marketplace->slug === 'trendyol') {
+            if ($marketplace->slug === 'trendyol') {
                 SyncTrendyolProductsJob::dispatch($credential->id)->onQueue('sync');
                 SyncTrendyolOrdersJob::dispatch($credential->id)->onQueue('sync');
                 SyncTrendyolFinancialsJob::dispatch($credential->id)->onQueue('sync');

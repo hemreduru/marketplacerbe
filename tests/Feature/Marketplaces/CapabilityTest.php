@@ -7,11 +7,6 @@ it('Trendyol buybox destekler, HB desteklemez', function () {
     expect(MarketplaceCapability::supports('hepsiburada', 'buybox'))->toBeFalse();
 });
 
-it('Amazon TR price update yapamaz (read-only Faz 2)', function () {
-    expect(MarketplaceCapability::supports('amazon', 'price_update'))->toBeFalse();
-    expect(MarketplaceCapability::supports('amazon', 'finance_sync'))->toBeTrue();
-});
-
 it('limit() yapısal alanları okur', function () {
     expect(MarketplaceCapability::limit('trendyol', 'product_title_max'))->toBe(100);
     expect(MarketplaceCapability::limit('hepsiburada', 'product_description_max'))->toBe(5000);
@@ -25,7 +20,7 @@ it('rateLimit() bucket çözümler', function () {
 });
 
 it('all() tüm pazaryeri code listesini döner', function () {
-    expect(MarketplaceCapability::all())->toContain('trendyol', 'hepsiburada', 'n11', 'pazarama', 'amazon');
+    expect(MarketplaceCapability::all())->toContain('trendyol', 'hepsiburada', 'n11', 'pazarama');
 });
 
 it('manifest() tüm konfigi geri verir', function () {

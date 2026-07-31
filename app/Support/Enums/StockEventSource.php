@@ -8,7 +8,6 @@ enum StockEventSource: string
     case Hepsiburada = 'hepsiburada';
     case N11 = 'n11';
     case Pazarama = 'pazarama';
-    case Amazon = 'amazon';
     case User = 'user';
     case System = 'system';
 }

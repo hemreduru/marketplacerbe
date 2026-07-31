@@ -82,3 +82,18 @@ test('credential limiti aşılınca eklenmez', function () {
         $response->assertStatus(422);
     }
 });
+
+test('pasif pazaryerine credential eklenemez (is_active guard)', function () {
+    $inactive = Marketplace::factory()->create(['slug' => 'pasif-mp', 'is_active' => false]);
+    $user = User::factory()->withPlan('pro')->create(); // limitsiz plan — sadece is_active guard'ı test et
+
+    $response = $this->actingAs($user)
+        ->putJson(route('marketplace.settings.update'), [
+            'marketplace_id' => $inactive->id,
+            'api_key' => 'x',
+            'api_secret' => 'y',
+        ]);
+
+    $response->assertStatus(422)->assertJson(['success' => false]);
+    expect(UserMarketplaceCredential::where('marketplace_id', $inactive->id)->exists())->toBeFalse();
+});
