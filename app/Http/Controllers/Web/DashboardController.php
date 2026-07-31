@@ -40,6 +40,10 @@ class DashboardController extends Controller
             ->where('current_stock', '<=', 5)
             ->count();
 
+        $zeroCostCount = MasterProduct::where('user_id', $user->id)
+            ->where('cost_price', 0)
+            ->count();
+
         $kpis = [
             'revenue' => $currentSummary['gross_sales'],
             'revenue_change' => $this->percentChange($currentSummary['gross_sales'], $previousSummary['gross_sales']),
@@ -96,6 +100,7 @@ class DashboardController extends Controller
             'recentOrders' => $recentOrders,
             'listingsSummary' => $listingsSummary,
             'lastSyncAt' => $credential->last_sync_at,
+            'zeroCostCount' => $zeroCostCount,
         ]);
     }
 

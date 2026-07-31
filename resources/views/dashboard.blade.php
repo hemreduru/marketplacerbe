@@ -10,6 +10,13 @@
         </div>
     @endif
 
+    @if(($zeroCostCount ?? 0) > 0)
+        <div class="alert alert-warning d-flex flex-stack flex-wrap gap-3 mb-6">
+            <span class="fw-semibold">{{ __('master_products.cogs_warning', ['count' => $zeroCostCount]) }}</span>
+            <a href="{{ route('cost-entry') }}" class="btn btn-sm btn-warning">{{ __('master_products.cogs_warning_cta') }}</a>
+        </div>
+    @endif
+
     @unless ($hasCredential)
         <!--begin::Welcome / Connect Card-->
         <div class="card">

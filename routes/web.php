@@ -121,6 +121,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/update-price-stock', [ProductController::class, 'updatePriceStock'])->name('products.update-price-stock');
 
     // Master Products
+    Route::get('/cost-entry', [MasterProductController::class, 'costEntry'])->name('cost-entry');
+    Route::post('/cost-entry', [MasterProductController::class, 'updateCosts'])->name('cost-entry.update');
     Route::get('/master-products/{id}', [MasterProductController::class, 'show'])->name('master-products.show');
 
     // Claims (returns)
