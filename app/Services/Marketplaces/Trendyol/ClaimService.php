@@ -45,6 +45,12 @@ class ClaimService
 
             foreach ($content as $item) {
                 try {
+                    $status = $item['items'][0]['claimItems'][0]['claimItemStatus']['name']
+                        ?? ($item['status'] ?? 'Created');
+                    $claimDate = isset($item['claimDate'])
+                        ? Carbon::createFromTimestampMs($item['claimDate'])
+                        : null;
+
                     $claim = Claim::updateOrCreate(
                         [
                             'user_marketplace_credential_id' => $credentialId,
@@ -52,15 +58,16 @@ class ClaimService
                         ],
                         [
                             'order_number' => $item['orderNumber'] ?? null,
-                            'status' => $item['items'][0]['claimItems'][0]['claimItemStatus']['name']
-                                ?? ($item['status'] ?? 'Created'),
+                            'status' => $status,
                             'customer_name' => trim(
                                 ($item['customerFirstName'] ?? '').' '.($item['customerLastName'] ?? '')
                             ) ?: null,
                             'item_count' => count($item['items'] ?? []),
-                            'claim_date' => isset($item['claimDate'])
-                                ? Carbon::createFromTimestampMs($item['claimDate'])
-                                : null,
+                            'claim_date' => $claimDate,
+                            'refund_amount' => $this->extractRefundAmount($item),
+                            // İade "Accepted" ise onay tarihi = claim_date; ReturnCostResolver
+                            // yalnızca approved_at dolu iadeleri iade maliyetine katar (K.2).
+                            'approved_at' => $status === 'Accepted' ? $claimDate : null,
                             'raw_data' => $item,
                         ]
                     );
@@ -79,6 +86,24 @@ class ClaimService
         } while ($page < $totalPages);
 
         return $stats;
+    }
+
+    /**
+     * Talep kalemlerinden toplam iade tutarı: her claimItem bir iade birimi,
+     * birim fiyat order line'dan gelir.
+     *
+     * @param  array<string, mixed>  $item
+     */
+    private function extractRefundAmount(array $item): string
+    {
+        $total = '0.0000';
+        foreach ($item['items'] ?? [] as $line) {
+            $unitPrice = (string) ($line['orderLine']['price'] ?? 0);
+            $count = count($line['claimItems'] ?? []);
+            $total = bcadd($total, bcmul($unitPrice, (string) $count, 4), 4);
+        }
+
+        return $total;
     }
 
     /**
