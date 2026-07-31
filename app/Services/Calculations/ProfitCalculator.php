@@ -33,7 +33,6 @@ class ProfitCalculator
         private readonly ShippingCostCalculator $shipping,
         private readonly ReturnCostEstimator $returnCost,
         private readonly PackagingCostCalculator $packaging,
-        private readonly AdAllocator $ads,
         private readonly StopajCalculator $stopaj,
         private readonly ProfitContextFactory $contexts,
     ) {}
@@ -87,7 +86,8 @@ class ProfitCalculator
         $returnCost = $this->returnCost->expectedReturnCost($ctx->returnRate, (float) $shippingResult['total']);
         $deductions['return_cost'] = bcround($returnCost, 4);
 
-        $adCost = $this->ads->perUnit($item->merchant_sku ?? '', $profile->code, $qty);
+        // Reklam: dönem bazlı blended birim maliyet context'ten gelir (ProfitContextFactory)
+        $adCost = bcmul($ctx->adCostPerUnit, (string) $qty, 6);
         $deductions['ad_cost'] = bcround($adCost, 4);
 
         $packagingCost = $master

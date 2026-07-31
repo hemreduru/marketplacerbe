@@ -49,26 +49,4 @@ class AdAllocator
 
         return bcround(bcmul($perUnit, (string) $units, self::INTERNAL_SCALE), self::RESULT_SCALE);
     }
-
-    /**
-     * Config fallback ile SKU başına birim reklam maliyeti.
-     *
-     * @deprecated blendedPerUnit() kullanın — Stage 2'de ProfitCalculator geçince kaldırılacak.
-     */
-    public function perUnit(string $sku, string $marketplace, int $unitsSold, ?string $periodStart = null, ?string $periodEnd = null): string
-    {
-        if ($unitsSold <= 0) {
-            return '0.0000';
-        }
-
-        $defaultAdCostPerUnit = (float) config("marketplaces.{$marketplace}.advertising.default_cost_per_unit", 0);
-
-        if ($defaultAdCostPerUnit <= 0) {
-            return '0.0000';
-        }
-
-        $total = bcdiv((string) $defaultAdCostPerUnit, '1', 4);
-
-        return bcround(bcmul($total, (string) $unitsSold, 6), 4);
-    }
 }

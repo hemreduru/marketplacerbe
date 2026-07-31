@@ -16,5 +16,6 @@ final class ProfitContext
         public readonly ?int $credentialId = null,
         public readonly string $orderType = 'standard',
         public readonly float $returnRate = 0.0,
+        public readonly string $adCostPerUnit = '0.0000',
     ) {}
 }

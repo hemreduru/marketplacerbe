@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\AdCampaign;
+use App\Models\AdMetric;
 use App\Models\MasterProduct;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -215,4 +217,39 @@ test('ProfitBreakdown toArray döndürür', function () {
     $array = $result->toArray();
 
     expect($array)->toHaveKeys(['net_revenue', 'net_profit', 'margin', 'roi', 'deductions', 'details']);
+});
+
+test('ad_cost gerçek reklam harcamasından blended hesaplanır (K.1)', function () {
+    [$user, $credential] = userWithTrendyol();
+
+    // Haziranda 100 TL reklam harcaması
+    $campaign = AdCampaign::factory()->create([
+        'user_marketplace_credential_id' => $credential->id,
+        'marketplace_code' => 'trendyol',
+    ]);
+    AdMetric::factory()->create([
+        'ad_campaign_id' => $campaign->id,
+        'date' => '2026-06-15',
+        'spend' => '100.0000',
+    ]);
+
+    $master = MasterProduct::factory()->create(['user_id' => $user->id, 'cost_price' => 30.0]);
+    $order = Order::factory()->create([
+        'user_id' => $user->id,
+        'user_marketplace_credential_id' => $credential->id,
+        'marketplace_id' => $credential->marketplace_id,
+        'order_date' => '2026-06-15',
+    ]);
+    // Haziranda toplam 10 birim satış (bu kalem 2 + diğer kalem 8)
+    $item = OrderItem::factory()->create([
+        'order_id' => $order->id, 'price' => 200.00, 'quantity' => 2, 'master_product_id' => $master->id,
+    ]);
+    OrderItem::factory()->create([
+        'order_id' => $order->id, 'price' => 50.00, 'quantity' => 8, 'master_product_id' => $master->id,
+    ]);
+
+    $result = makeCalculator()->forOrderItem($item, $master);
+
+    // 100 TL / 10 birim = 10 TL/birim × 2 birim = 20.0000 (eskiden hep 0.0000 idi)
+    expect($result->deductions['ad_cost'])->toBe('20.0000');
 });

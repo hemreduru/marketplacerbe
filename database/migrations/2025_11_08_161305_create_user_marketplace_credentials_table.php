@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('marketplace_id')->constrained()->onDelete('cascade');
             $table->string('api_key'); // or supplier_id, seller_id
             $table->string('api_secret');
-            $table->json('additional_credentials')->nullable(); // Extra fields per marketplace
+            $table->longText('additional_credentials')->nullable(); // şifreli blob (JSON değil) — encrypt migration ile uyumlu
             $table->boolean('is_active')->default(true);
             $table->timestamp('last_sync_at')->nullable();
             $table->timestamps();
