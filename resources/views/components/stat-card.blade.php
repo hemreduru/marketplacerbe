@@ -9,6 +9,8 @@
     'link' => null,
     'linkLabel' => null,
     'format' => 'currency',
+    'badge' => null,
+    'badgeColor' => 'secondary',
 ])
 
 <div class="card card-flush h-xl-100">
@@ -24,6 +26,9 @@
                 @endif
             </span>
             <span class="text-gray-500 pt-1 fw-semibold fs-6">{{ $title }}</span>
+            @if($badge)
+                <span class="badge badge-light-{{ $badgeColor }} fs-8 fw-semibold mt-2 align-self-start">{{ $badge }}</span>
+            @endif
         </div>
     </div>
     <div class="card-body pt-2 pb-4 d-flex flex-wrap align-items-center">

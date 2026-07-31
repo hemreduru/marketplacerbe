@@ -50,4 +50,7 @@ return [
     'connect_prompt' => 'Ürün, sipariş, finans ve soruları senkronlamaya başlamak için Trendyol mağazanızı bağlayın.',
     'connect_now' => 'Trendyol Bağla',
     'view_all' => 'Tümünü Gör',
+    'source_settled' => 'Gerçek (settlement)',
+    'source_estimate' => 'Tahmini',
+    'source_mixed' => 'Kısmi mutabık',
 ];

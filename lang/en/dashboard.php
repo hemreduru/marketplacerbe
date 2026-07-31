@@ -50,4 +50,7 @@ return [
     'connect_prompt' => 'Connect your Trendyol store to start syncing products, orders, finances and questions.',
     'connect_now' => 'Connect Trendyol',
     'view_all' => 'View All',
+    'source_settled' => 'Actual (settlement)',
+    'source_estimate' => 'Estimated',
+    'source_mixed' => 'Partly reconciled',
 ];

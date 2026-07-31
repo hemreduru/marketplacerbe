@@ -7,6 +7,7 @@ use App\Models\FinancialDailySummary;
 use App\Models\MarketplaceListing;
 use App\Models\MasterProduct;
 use App\Models\Order;
+use App\Models\OrderItemFinancial;
 use App\Services\MarketplaceManager;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -91,6 +92,8 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $profitSource = $this->resolveProfitSource($credential->id, $currentStart, $currentEnd);
+
         return view('dashboard', [
             'user' => $user,
             'hasCredential' => true,
@@ -101,6 +104,7 @@ class DashboardController extends Controller
             'listingsSummary' => $listingsSummary,
             'lastSyncAt' => $credential->last_sync_at,
             'zeroCostCount' => $zeroCostCount,
+            'profitSource' => $profitSource,
         ]);
     }
 
@@ -144,6 +148,37 @@ class DashboardController extends Controller
             'net_profit' => (float) ($rows->net ?? 0),
             'ad_spend' => (float) ($rows->ad_spend ?? 0),
         ];
+    }
+
+    /**
+     * Dönem kâr rakamının kaynağı: kalemlerin reconciliation_status dağılımı.
+     * Hepsi settled → 'settled', hepsi estimated → 'estimate', karışık → 'mixed',
+     * veri yoksa null (rozet gösterilmez).
+     */
+    private function resolveProfitSource(int $credentialId, string $from, string $to): ?string
+    {
+        $counts = OrderItemFinancial::query()
+            ->where('user_marketplace_credential_id', $credentialId)
+            ->whereBetween('order_date', [$from.' 00:00:00', $to.' 23:59:59'])
+            ->toBase()
+            ->selectRaw('reconciliation_status, COUNT(*) as c')
+            ->groupBy('reconciliation_status')
+            ->pluck('c', 'reconciliation_status');
+
+        $total = (int) $counts->sum();
+        if ($total === 0) {
+            return null;
+        }
+
+        if ((int) ($counts['settled'] ?? 0) === $total) {
+            return 'settled';
+        }
+
+        if ((int) ($counts['estimated'] ?? 0) === $total) {
+            return 'estimate';
+        }
+
+        return 'mixed';
     }
 
     private function percentChange(float $current, float $previous): string

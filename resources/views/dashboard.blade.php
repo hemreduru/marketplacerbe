@@ -53,12 +53,22 @@
                 />
             </div>
             <div class="col-md-4 col-xl-2">
+                @php
+                    $sourceBadge = match($profitSource ?? null) {
+                        'settled' => ['label' => __('dashboard.source_settled'), 'color' => 'success'],
+                        'estimate' => ['label' => __('dashboard.source_estimate'), 'color' => 'warning'],
+                        'mixed' => ['label' => __('dashboard.source_mixed'), 'color' => 'primary'],
+                        default => null,
+                    };
+                @endphp
                 <x-stat-card
                     :value="$kpis['net_profit']"
                     :title="__('dashboard.net_profit')"
                     icon="ki-dollar"
                     color="success"
                     :change="$kpis['profit_change']"
+                    :badge="$sourceBadge['label'] ?? null"
+                    :badgeColor="$sourceBadge['color'] ?? 'secondary'"
                 />
             </div>
             <div class="col-md-4 col-xl-2">
