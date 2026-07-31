@@ -91,7 +91,28 @@ Bu plan **tek bir agent oturumunda bitirilmez.** Her PR ayrı bir oturumda işle
 - [ ] **Dosya:** `sku-profit.blade.php`'ye `ProfitAggregator::skuTable`'ın zaten döndürdüğü commission/shipping/stopaj/ad/return kolonları (veri hazır, view eksik).
 - [ ] **Kabul:** kullanıcı bir SKU/siparişin kesinti kırılımını görebilir. Yeni endpoint/JS drill-down gerekmez.
 
-**FAZ K sonrası (P2, para doğruluğu bitince):** dashboard tahmin/gerçek kaynak rozeti (ProfitSource enum var); Net KDV mahsubunu (komisyon KDV'si) dönem-sonu P&L'e bağla; orderType düzelt (service_fee 8.49 vs bugün-teslim 5.49). **En son (P3):** kampanya kâr simülatörü (motor hazır, tek form).
+> **FAZ K TAMAMLANDI (2026-07-31, commit `a46b874`→`47815c3`; K.1–K.6 + migration fix; tüm Feature suite yeşil 246 test).**
+
+---
+
+## FAZ K+ — GÜVEN & REKABET (P2/P3, kâr doğruluğu SONRASI)
+
+> **Eklendi: 2026-07-31.** Ship-blocker değil; para doğruluğu üzerine güven + rekabet katmanı. Ponytail: hepsi mevcut motor/enum üzerinde küçük diff, yeni soyutlama yok.
+
+### PR #K.7 — `feat: dashboard tahmin/gerçek kaynak rozeti` (P2)
+- [ ] **Neden:** Dashboard net kâr kartı tahmin mi settlement mi ayırt edilemiyor (`true_net ?: net_profit` fallback); güven için kaynak görünür olmalı.
+- [ ] **Dosya:** `DashboardController` — dönemdeki `order_item_financials.reconciliation_status` dağılımından kaynak belirle; `dashboard.blade` net kâr kartına küçük "tahmini/gerçek/kısmi" rozet (ProfitSource/ReconciliationStatus enum zaten var).
+- [ ] **Kabul:** tümü Settled → "gerçek", tümü Estimated → "tahmini", karışık → "kısmi" (Pest). Yeni state yok.
+
+### PR #K.8 — `feat: net KDV mahsubunu dönem P&L'e bağla` (P2) 💰
+- [ ] **Neden:** `NetVatLiability` ayrı hesaplanıyor ama net kâr/P&L formülüne girmiyor; %10 KDV ürünlerde sapma.
+- [ ] **Dosya:** mevcut `NetVatLiability` çıktısını günlük/aylık P&L özetine tek satır olarak bağla; formülü sıfırdan yazma. Dönem-sonu mahsup yeterli.
+- [ ] **Kabul:** P&L'de net KDV mahsubu satırı görünür ve dönem net kârına yansır (Pest).
+
+### PR #K.9 — `feat: kampanya kâr simülatörü` (P3)
+- [ ] **Neden:** İndirim öncesi "bu fiyatta kâr ne olur" görülemiyor (rakiplerde var).
+- [ ] **Dosya:** `ProfitCalculator::forOrderItem`'ı verilen hipotetik fiyatla çağıran tek form sayfası (controller + route + blade). Yeni motor YOK.
+- [ ] **Kabul:** kullanıcı bir SKU + fiyat girip net kâr/marj tahminini görür (Pest).
 
 ---
 
